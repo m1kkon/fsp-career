@@ -1,0 +1,1256 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ФСП Карьера MVP API",
+    "version": "1.1.0",
+    "description": "Sites передаёт подтверждённую идентичность через доверенные серверные заголовки. Браузер использует сессию платформы. Пароли приложение не хранит. Параметр role выбирает представление, но не выдаёт права. ChatGPT identity используется для текущего хостинга; самостоятельная регистрация с подтверждением email пока не реализована."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/state": {
+      "get": {
+        "summary": "Загрузить свой кабинет и доступные каталоги",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Свой кабинет и разрешённые записи; без входа только публичные опубликованные и демонстрационные вакансии.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/State"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка инфраструктуры",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/action": {
+      "post": {
+        "summary": "Выполнить ролевую операцию",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/onboard"
+                  },
+                  {
+                    "$ref": "#/components/schemas/profile"
+                  },
+                  {
+                    "$ref": "#/components/schemas/settings"
+                  },
+                  {
+                    "$ref": "#/components/schemas/company"
+                  },
+                  {
+                    "$ref": "#/components/schemas/favorite"
+                  },
+                  {
+                    "$ref": "#/components/schemas/need"
+                  },
+                  {
+                    "$ref": "#/components/schemas/delete-need"
+                  },
+                  {
+                    "$ref": "#/components/schemas/invite"
+                  },
+                  {
+                    "$ref": "#/components/schemas/invite-status"
+                  },
+                  {
+                    "$ref": "#/components/schemas/job"
+                  },
+                  {
+                    "$ref": "#/components/schemas/job-status"
+                  },
+                  {
+                    "$ref": "#/components/schemas/apply"
+                  },
+                  {
+                    "$ref": "#/components/schemas/application-status"
+                  },
+                  {
+                    "$ref": "#/components/schemas/test-start"
+                  },
+                  {
+                    "$ref": "#/components/schemas/test-submit"
+                  },
+                  {
+                    "$ref": "#/components/schemas/task"
+                  },
+                  {
+                    "$ref": "#/components/schemas/task-answer"
+                  },
+                  {
+                    "$ref": "#/components/schemas/task-review"
+                  },
+                  {
+                    "$ref": "#/components/schemas/message"
+                  },
+                  {
+                    "$ref": "#/components/schemas/fsp-link"
+                  },
+                  {
+                    "$ref": "#/components/schemas/fsp-unlink"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Операция выполнена. test-start возвращает test без ключа ответов; test-submit возвращает result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "test": {
+                      "$ref": "#/components/schemas/Test"
+                    },
+                    "result": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные поля, зарплата или ответы",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не выполнен вход",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет ролевых прав или неверный Origin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запись недоступна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Дубликат либо решение уже сохранено",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит попыток теста",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка инфраструктуры",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "onboard": {
+        "type": "object",
+        "description": "Создать ролевой профиль",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "onboard"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "employer"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "consent": {
+            "const": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "role",
+          "name",
+          "consent"
+        ]
+      },
+      "profile": {
+        "type": "object",
+        "description": "Сохранить резюме кандидата",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "profile"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "about": {
+            "type": "string"
+          },
+          "experience": {
+            "type": "string"
+          },
+          "stack": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "phone": {
+            "type": "string"
+          },
+          "education": {
+            "type": "string"
+          },
+          "work": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        },
+        "required": [
+          "action",
+          "name",
+          "min",
+          "max"
+        ]
+      },
+      "settings": {
+        "type": "object",
+        "description": "Видимость и согласие",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "settings"
+          },
+          "visible": {
+            "type": "boolean"
+          },
+          "consent": {
+            "type": "boolean"
+          },
+          "notifications": {
+            "type": "boolean"
+          },
+          "fspVisible": {
+            "type": "boolean",
+            "description": "Отдельная видимость спортивной истории, по умолчанию включена."
+          }
+        },
+        "required": [
+          "action",
+          "visible",
+          "consent",
+          "notifications"
+        ]
+      },
+      "company": {
+        "type": "object",
+        "description": "Редактировать свою компанию",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "company"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "name"
+        ]
+      },
+      "favorite": {
+        "type": "object",
+        "description": "Добавить или убрать избранное",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "favorite"
+          },
+          "candidateId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "candidateId"
+        ]
+      },
+      "need": {
+        "type": "object",
+        "description": "Сохранить потребность команды",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "need"
+          },
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "text"
+        ]
+      },
+      "delete-need": {
+        "type": "object",
+        "description": "Удалить свою подборку",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "delete-need"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "invite": {
+        "type": "object",
+        "description": "Пригласить подтверждённого кандидата",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "invite"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        },
+        "required": [
+          "action",
+          "candidateId",
+          "title",
+          "description",
+          "contact",
+          "min",
+          "max"
+        ]
+      },
+      "invite-status": {
+        "type": "object",
+        "description": "Решение кандидата по своему приглашению",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "invite-status"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "viewed",
+              "accepted",
+              "declined"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "status"
+        ]
+      },
+      "job": {
+        "type": "object",
+        "description": "Публикация или редактирование своей вакансии",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "job"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "stack": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        },
+        "required": [
+          "action",
+          "title",
+          "description",
+          "spec",
+          "grade",
+          "min",
+          "max"
+        ]
+      },
+      "job-status": {
+        "type": "object",
+        "description": "Архивировать или восстановить свою вакансию",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "job-status"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "archived"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "status"
+        ]
+      },
+      "apply": {
+        "type": "object",
+        "description": "Откликнуться и открыть контакт владельцу вакансии",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "apply"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "letter": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "jobId"
+        ]
+      },
+      "application-status": {
+        "type": "object",
+        "description": "Ответ работодателя на свой входящий отклик",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "application-status"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "viewed",
+              "shortlisted",
+              "rejected"
+            ]
+          },
+          "feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "status"
+        ]
+      },
+      "test-start": {
+        "type": "object",
+        "description": "Создать персонализированную попытку теста",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-start"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "spec",
+          "grade"
+        ]
+      },
+      "test-submit": {
+        "type": "object",
+        "description": "Проверить ответы, сохранить результат и назначить категорию",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-submit"
+          },
+          "id": {
+            "type": "string"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 6,
+            "maxItems": 6
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "answers"
+        ]
+      },
+      "task": {
+        "type": "object",
+        "description": "Опубликовать короткое задание работодателя",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "title",
+          "description",
+          "spec"
+        ]
+      },
+      "task-answer": {
+        "type": "object",
+        "description": "Передать подход к задаче компании",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task-answer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "answer"
+        ]
+      },
+      "task-review": {
+        "type": "object",
+        "description": "Обратная связь работодателя по решению",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task-review"
+          },
+          "id": {
+            "type": "string"
+          },
+          "feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "feedback"
+        ]
+      },
+      "message": {
+        "type": "object",
+        "description": "Сообщение в доступном диалоге",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "message"
+          },
+          "contextId": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "contextId",
+          "text"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "topic",
+          "prompt",
+          "options"
+        ]
+      },
+      "Test": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "version": {
+            "type": "string"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "expires": {
+            "type": "integer"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          }
+        }
+      },
+      "Result": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer"
+          },
+          "correct": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "applied": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "feedback": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string"
+                },
+                "correct": {
+                  "type": "boolean"
+                },
+                "explanation": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Candidate": {
+        "type": "object",
+        "description": "Контакты отсутствуют до согласия конкретной компании. Другие кандидаты не получают этот объект.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "score": {
+            "type": "integer"
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "verifiedAt": {
+            "type": "integer"
+          },
+          "synthetic": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "match": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "type": "integer"
+              },
+              "parts": {
+                "type": "object"
+              },
+              "reasons": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "fsp": {
+            "$ref": "#/components/schemas/FspProfile"
+          }
+        }
+      },
+      "State": {
+        "type": "object",
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "fsp": {
+                "$ref": "#/components/schemas/FspProfile"
+              }
+            }
+          },
+          "privacy": {
+            "type": "object"
+          },
+          "company": {
+            "type": "object"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            }
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "invites": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "applications": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "needs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "tests": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "submissions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "favorites": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serverTime": {
+            "type": "integer"
+          },
+          "assessmentNotice": {
+            "type": "string"
+          }
+        }
+      },
+      "fsp-link": {
+        "type": "object",
+        "description": "Привязать тестовый ФСП ID к своему кандидату. Реестр не вызывается; принадлежность реального ID не подтверждается.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "fsp-link"
+          },
+          "fspId": {
+            "type": "string",
+            "pattern": "^DEMO-FSP-00[1-8]$",
+            "example": "DEMO-FSP-001"
+          }
+        },
+        "required": [
+          "action",
+          "fspId"
+        ]
+      },
+      "fsp-unlink": {
+        "type": "object",
+        "description": "Отвязать тестовый ID, сохранив резюме и категорию.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "fsp-unlink"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "FspProfile": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Только синтетические fixture-данные; null при отсутствующей или скрытой истории. Не означает реальную проверку ФСП.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "const": "demo"
+          },
+          "status": {
+            "const": "demo"
+          },
+          "linkedAt": {
+            "type": "integer"
+          },
+          "achievements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "discipline": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string"
+                },
+                "format": {
+                  "type": "string"
+                },
+                "year": {
+                  "type": "integer"
+                },
+                "source": {
+                  "const": "demo"
+                }
+              },
+              "required": [
+                "id",
+                "event",
+                "discipline",
+                "year",
+                "result",
+                "format",
+                "source"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "status",
+          "achievements"
+        ]
+      }
+    }
+  }
+}
