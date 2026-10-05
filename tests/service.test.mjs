@@ -68,3 +68,20 @@ test('public FSP projection excludes adapter secrets and uses canonical syntheti
  assert.equal(publicCandidate({profile:{fsp:{id:'FSP-123',source:'registry',status:'verified'}}}).fsp,null);
  assert.ok(seed.candidates.some(c=>c.profile.fsp.achievements.length===0));
 });
+test('resume blocks persist independently from the questionnaire and cannot forge category',async()=>{
+ const {repo,candidate,employer}=await fixture();
+ await assert.rejects(action(repo,employer,{action:'resume-details'}));
+ await action(repo,candidate,{action:'resume-details',headline:'ML Researcher',skillGroups:[{label:'ML & AI',text:'Python, PyTorch'},{label:'NLP',text:'RAG'}],projects:[{name:'Search',description:'Semantic search',url:'https://example.test/project'}],links:[{label:'GitHub',url:'https://github.com/example'}],achievements:'Own achievement',grade:'Senior',verified:false});
+ assert.equal(candidate.profile.grade,'Middle');assert.equal(candidate.profile.verified,true);assert.equal((await repo.account(candidate.id)).profile.resume.skillGroups.length,2);
+ await action(repo,candidate,{action:'profile',name:'Updated',min:100,max:200,stack:'Python'});
+ assert.equal(candidate.profile.resume.projects[0].name,'Search');
+ assert.equal(publicCandidate(candidate,false).resume,undefined);
+});
+test('resume blocks reject unsafe links and allow deleting all optional groups',async()=>{
+ const {repo,candidate}=await fixture();
+ for(const url of ['javascript:alert(1)','data:text/html,hello','file:///tmp/secret','not a URL'])await assert.rejects(action(repo,candidate,{action:'resume-details',links:[{label:'Link',url}]}));
+ for(const details of [{skillGroups:[{label:'Tools'}]},{skillGroups:[{text:'Git'}]},{projects:[{description:'My work'}]},{links:[{label:'Portfolio'}]}])await assert.rejects(action(repo,candidate,{action:'resume-details',...details}));
+ await action(repo,candidate,{action:'resume-details',skillGroups:[{label:'Tools',text:'Git'}]});
+ await action(repo,candidate,{action:'resume-details',skillGroups:[],projects:[],links:[]});
+ assert.deepEqual((await repo.account(candidate.id)).profile.resume.skillGroups,[]);
+});

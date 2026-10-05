@@ -129,6 +129,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/fsp-unlink"
+                  },
+                  {
+                    "$ref": "#/components/schemas/resume-details"
                   }
                 ]
               }
@@ -1292,6 +1295,84 @@
           "status",
           "achievements"
         ]
+      },
+      "resume-details": {
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "const": "resume-details"
+          },
+          "headline": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "languages": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "achievements": {
+            "type": "string",
+            "maxLength": 1800
+          },
+          "skillGroups": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "projects": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1200
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

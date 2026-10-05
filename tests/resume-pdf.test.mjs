@@ -9,13 +9,18 @@ test('PDF generation rejects absent accounts and employer-only profiles',async()
 });
 test('saved own profile is projected without account secrets; hidden FSP is omitted',()=>{
  const a=account();a.token='secret-token';a.profile.fsp={id:'DEMO-FSP-003',source:'registry',achievements:[{result:'Forged winner'}]};
- let data=resumeData(a);assert.ok(data.contacts.includes(a.email));assert.ok(!JSON.stringify(data).includes('secret-token'));assert.ok(!JSON.stringify(data).includes('Forged winner'));
+ let data=resumeData(a);assert.ok(data.contacts.some(x=>x.text===a.email));assert.ok(!JSON.stringify(data).includes('secret-token'));assert.ok(!JSON.stringify(data).includes('Forged winner'));
  assert.ok(data.sections.some(s=>s.title.includes('тестовые данные')));
  a.privacy.fspVisible=false;data=resumeData(a);assert.ok(!data.sections.some(s=>s.title.includes('ФСП')));
 });
 test('empty resume works without achievements and never claims an unverified grade',()=>{
  const a=account();Object.assign(a.profile,{about:'',work:'',education:'',stack:[],verified:false,grade:'Senior'});
- const data=resumeData(a);assert.ok(!data.sections.some(s=>s.title==='Опыт работы'));assert.ok(!data.sections.some(s=>s.title==='Навыки'));assert.equal(data.sections.find(s=>s.title==='Подтверждённая категория').text,'Категория ещё не подтверждена');
+ const data=resumeData(a);assert.ok(!data.sections.some(s=>s.title==='Опыт работы'));assert.ok(!data.sections.some(s=>s.title==='Навыки'));assert.equal(data.category,'Категория ещё не подтверждена');
+});
+test('editable skill groups, projects, languages and achievements become separate PDF sections',async()=>{
+ const a=account();a.profile.resume={skillGroups:[{label:'ML & AI',text:'Python, PyTorch'},{label:'NLP & LLM',text:'RAG, Transformers'},{label:'Tools',text:'Git, Linux'}],languages:'Русский — родной',projects:[{name:'Поиск документов',description:'Разработала сервис поиска.',url:'https://example.test/project'}],achievements:'• Финалист соревнования (2025)',links:[{label:'GitHub',url:'https://github.com/example'}]};
+ const data=resumeData(a);assert.equal(data.sections.find(s=>s.title==='Навыки').rows.length,4);assert.equal(data.sections.find(s=>s.title==='Проекты').entries[0].name,'Поиск документов');assert.ok(data.sections.some(s=>s.title==='Достижения'));assert.ok(data.contacts.some(c=>c.text==='GitHub'));
+ const pdf=await PDFDocument.load(await generateResumePDF(a));assert.equal(pdf.getPageCount(),1);
 });
 test('download response contains a valid PDF, safe UTF-8 filename and private cache policy',async()=>{
  const a=account();a.profile.name='Анна\r\n"Соколова/';
