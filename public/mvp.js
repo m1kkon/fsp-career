@@ -53,16 +53,46 @@ const field=(label,name,value='',type='text',attrs='')=>`<div class="field"><lab
 const textarea=(label,name,value='',attrs='')=>`<div class="field"><label for="f-${name}">${label}</label><textarea id="f-${name}" name="${name}" ${attrs}>${esc(value)}</textarea></div>`;
 const select=(label,name,values,current)=>`<div class="field"><label for="f-${name}">${label}</label><select id="f-${name}" name="${name}">${options(values,current)}</select></div>`;
 function toast(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),4500);}
-async function api(body){const r=await fetch('/api/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await r.json();if(!r.ok)throw new Error(data.error||'Не удалось сохранить.');return data;}
-async function refresh(){const r=await fetch('/api/state?role='+role+'&query='+encodeURIComponent(query),{cache:'no-store'});const data=await r.json();if(!r.ok)throw new Error(data.error||'Сервис недоступен.');state={...state,...data};}
-async function mutate(body,next){if(busy)return;busy=true;const submit=overlay.querySelector('button[type="submit"]')||app.querySelector('form button[type="submit"]');const submitLabel=submit?.textContent;if(submit){submit.disabled=true;submit.textContent='Сохраняем…';}try{const response=await api(body);await refresh();close();if(next)go(next);else render();if(response.message)toast(response.message);return response;}catch(e){const error=overlay.querySelector('[data-error]')||app.querySelector('[data-error]');if(error){error.textContent=e.message;error.focus();}else toast(e.message);}finally{busy=false;if(submit){submit.disabled=false;submit.textContent=submitLabel;}}}
+async function requestData(url,options={},read='json',timeoutMs=20000){
+ const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),timeoutMs);
+ try{
+  const response=await fetch(url,{...options,signal:controller.signal});
+  if(!response.ok){let message;try{message=(await response.json()).error;}catch{}throw new Error(message||(response.status===401?'Войдите в аккаунт ещё раз.':'Не удалось выполнить запрос.'));}
+  if(read==='pdf'){
+   if(!response.headers.get('content-type')?.includes('application/pdf'))throw new Error('Не удалось получить PDF. Попробуйте ещё раз.');
+   const filename=response.headers.get('content-disposition')?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+   return {blob:await response.blob(),filename:filename?decodeURIComponent(filename):'resume.pdf'};
+  }
+  return await response.json();
+ }catch(error){
+  if(controller.signal.aborted)throw new Error(options.method==='POST'?'Сервер долго не отвечает. Не удалось подтвердить сохранение — проверьте кабинет перед повтором.':'Сервер долго не отвечает. Попробуйте ещё раз.');
+  throw error;
+ }finally{clearTimeout(deadline);}
+}
+async function api(body,returnState=false){return requestData('/api/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(returnState?{...body,returnState:true,stateRole:role,stateQuery:query}:body)});}
+async function refresh(){const data=await requestData('/api/state?role='+role+'&query='+encodeURIComponent(query),{cache:'no-store'});state={...state,...data};}
+async function mutate(body,next){
+ if(busy)return;busy=true;
+ const submit=overlay.querySelector('button[type="submit"]')||app.querySelector('form button[type="submit"]'),submitLabel=submit?.textContent;
+ let committed=false;
+ if(submit){submit.disabled=true;submit.textContent='Сохраняем…';submit.setAttribute('aria-busy','true');}
+ try{
+  const response=await api(body,true);
+  committed=true;
+  if(response.state)state={...state,...response.state};
+  else await refresh();
+  invalidateResumePDF();close();if(next)go(next);else render();
+  if(response.message)toast(response.message);return response;
+ }catch(e){const message=committed?'Изменения сохранены, но обновить страницу не удалось. Перезагрузите её перед повтором.':e.message;const error=overlay.querySelector('[data-error]')||app.querySelector('[data-error]');if(error){error.textContent=message;error.focus();}else toast(message);}
+ finally{busy=false;if(submit){submit.disabled=false;submit.textContent=submitLabel;submit.removeAttribute('aria-busy');}}
+}
 function go(next){page=next;location.hash=next==='home'?'':next;close();render();window.scrollTo({top:0});}
 function close(){overlay.innerHTML='';document.body.classList.remove('overlay-open');previousFocus?.focus?.();}
 function modal(h,p,body,wide=false){previousFocus=document.activeElement;overlay.innerHTML=`<div class="overlay" data-backdrop><section class="modal ${wide?'wide-modal':''}" role="dialog" aria-modal="true" aria-label="${esc(h)}"><div class="modal-header"><div><h2>${h}</h2><p>${p}</p></div><button class="icon-button" data-action="close" aria-label="Закрыть">${icon('close')}</button></div>${body}</section></div>`;document.body.classList.add('overlay-open');overlay.querySelector('input,button,select')?.focus();}
 const formEnd=(label='Сохранить')=>`<p class="form-error" data-error tabindex="-1" role="alert"></p><div class="modal-actions">${button('Отмена','close','',true)}<button class="button" type="submit">${label}</button></div>`;
 function ensureRole(wanted,next='dashboard'){role=wanted;localStorage.setItem('fsp-role',role);if(!state.authenticated){location.href='/signin-with-chatgpt?return_to='+encodeURIComponent('/#onboarding-'+wanted);return;}if(!state.roles.includes(wanted)){onboarding(wanted);return;}refresh().then(()=>go(next)).catch(e=>toast(e.message));}
 function onboarding(wanted){role=wanted;localStorage.setItem('fsp-role',wanted);const p=state.profile||{};modal(wanted==='candidate'?'Создайте профиль кандидата':'Расскажите о компании','Вы уже вошли через ChatGPT. Email аккаунта подтверждается провайдером.',`<form id="onboard" data-role="${wanted}"><div class="stack">${field(wanted==='candidate'?'Имя и фамилия':'Название компании','name',wanted==='candidate'?p.name:'','text','required maxlength="100"')}${field('Город','city',p.city||'','text','required')}${wanted==='candidate'?`<div class="form-row">${select('Специализация','spec',specs,p.spec)}${select('Предполагаемый грейд','grade',grades,p.grade)}</div><div class="inline-note">${icon('shield')}Для появления в поиске нужно заполнить профиль и пройти тест. Самооценка грейда не видна работодателю как подтверждение.</div>`:`${field('Контакт для кандидатов','contact',state.user?.email||'','email','required')}${textarea('Чем занимается компания','description','','required minlength="20"')}` }<label class="check-row"><input name="consent" type="checkbox" required>Согласен на обработку данных профиля. <a href="#privacy" data-action="legal">Условия</a></label></div>${formEnd('Создать профиль')}</form>`);}
-function header(){const signed=state.authenticated,member=state.roles.includes(role);return `<header class="site-header"><div class="header-inner"><a class="brand" href="#home" data-action="nav" data-page="home"><span class="brand-icon">фсп</span><span>Карьера</span></a><nav class="public-nav" aria-label="Основная навигация"><a href="#jobs" data-action="nav" data-page="jobs">Вакансии</a><a href="#employers" data-action="nav" data-page="employers">Работодателям</a><a href="#method" data-action="nav" data-page="method">Как это работает</a></nav><div class="header-actions">${signed?`<button class="account-switch" data-action="switch-workspace">${icon(role==='employer'?'briefcase':'user','small-icon')}<span>${role==='employer'?'Работодатель':'Кандидат'}</span>${icon('down','small-icon')}</button>${button(member?'Мой кабинет':'Создать профиль',member?'nav':'join',member?'data-page="dashboard"':`data-role="${role}"`,true)}`:`${button('Войти','login','',true)}${button('Создать резюме','join','data-role="candidate"')}`}</div></div></header>`;}
+function header(){const signed=state.authenticated,member=state.roles.includes(role);return `<header class="site-header"><div class="header-inner"><a class="brand" href="#home" data-action="nav" data-page="home"><span class="brand-icon">фсп</span><span>Карьера</span></a><nav class="public-nav" aria-label="Основная навигация"><a href="#jobs" data-action="nav" data-page="jobs">Вакансии</a><a href="#employers" data-action="nav" data-page="employers">Работодателям</a><a href="#method" data-action="nav" data-page="method">Как это работает</a></nav><div class="header-actions">${signed?`<button class="account-switch" data-action="switch-workspace">${icon(role==='employer'?'briefcase':'user','small-icon')}<span>${role==='employer'?'Работодатель':'Кандидат'}</span>${icon('down','small-icon')}</button>${button(member?'Мой кабинет':'Создать профиль',member?'nav':'join',member?'data-page="dashboard"':`data-role="${role}"`,true)}<a class="header-signout" href="/signout-with-chatgpt?return_to=/" target="_top" aria-label="Выйти из аккаунта">Выйти</a>`:`${button('Войти','login','',true)}${button('Создать резюме','join','data-role="candidate"')}`}</div></div></header>`;}
 function nav(){if(!state.roles.includes(role)||['home','employers','method','privacy','help','onboarding-candidate','onboarding-employer'].includes(page))return '';const menus=role==='employer'?[['dashboard','Обзор'],['catalog','Поиск кандидатов'],['needs','Подборки'],['invites','Приглашения'],['jobs','Вакансии'],['applications','Отклики'],['tasks','Задания'],['company','Компания']]:[['dashboard','Обзор'],['profile','Моё резюме'],['tests','Подтверждение навыков'],['offers','Приглашения'],['jobs','Вакансии'],['applications','Мои отклики'],['tasks','Задания'],['settings','Настройки']];return `<nav class="product-nav" aria-label="Личный кабинет">${menus.map(([key,label])=>`<a href="#${key}" data-action="nav" data-page="${key}" class="nav-item ${page===key?'active':''}">${label}${(role==='employer'||state.privacy?.notifications)&&key===(role==='employer'?'invites':'offers')&&state.invites.filter(i=>i.status==='sent').length?`<span class="nav-count">${state.invites.filter(i=>i.status==='sent').length}</span>`:''}</a>`).join('')}</nav>`;}
 function footer(){return `<footer class="site-footer"><div><a class="footer-brand" href="#home">ФСП Карьера</a><p>Работа в IT начинается с навыков.</p><small>MVP · достижения ФСП на тестовых данных</small></div><div><strong>Кандидатам</strong><a href="#jobs">Вакансии</a><a href="#tests" data-action="join" data-role="candidate">Подтвердить навыки</a><a href="#profile" data-action="join" data-role="candidate">Создать резюме</a></div><div><strong>Компаниям</strong><a href="#employers">Подбор специалистов</a><a href="#catalog" data-action="join" data-role="employer">Найти кандидата</a><a href="#company" data-action="join" data-role="employer">Профиль компании</a></div><div><strong>О сервисе</strong><a href="#method">Механика подбора</a><a href="#privacy">Данные и приватность</a><a href="#help">Помощь</a><a href="/openapi.json" target="_blank">API</a></div></footer>`;}
 function home(){return `<section class="home-hero"><div class="hero-copy"><div class="eyebrow">Карьера в IT</div><h1>Навыки говорят.<br>Команды находят.</h1><p>Подтвердите свой уровень и получайте предложения от работодателей. С понятными задачами и открытой зарплатой.</p><form id="home-search" class="hero-search"><label class="sr-only" for="home-query">Должность или технология</label><input id="home-query" name="query" placeholder="Должность, компания или технология" value="${esc(jobQuery)}"><button class="button" type="submit">Найти работу</button></form><div class="popular-queries"><span>Например:</span>${['Python','Frontend','QA'].map(t=>`<button data-action="job-query" data-query="${t}">${t}</button>`).join('')}</div></div><aside class="hero-board"><div class="board-top"><span>Ваш профиль</span>${icon('shield')}</div><div class="board-grade">Middle<br><span>Backend Developer</span></div><div class="board-divider"></div><div class="board-line"><span>Специализация и уровень</span><strong>Подтверждены тестом</strong></div><div class="board-offer"><span>Приглашение в команду</span><strong>180 000–250 000 ₽</strong><p>Условия известны до знакомства</p></div><small>Пример профиля и предложения</small></aside></section><section class="entry-strip"><div><h2>Пусть хорошая работа найдёт вас</h2><p>Резюме, подтверждённый уровень и предложения в одном кабинете.</p></div>${button('Создать резюме '+icon('arrow','small-icon'),'join','data-role="candidate"')}</section><section class="home-section"><div class="section-heading"><h2>Выберите своё направление</h2><a href="#jobs">Все вакансии ${icon('arrow','small-icon')}</a></div><div class="direction-grid">${specs.map((s,i)=>`<button data-action="job-direction" data-spec="${s}"><span class="direction-number">0${i+1}</span><strong>${s}</strong><span>${state.jobs.filter(j=>j.spec===s&&j.status==='published').length} вакансий ${icon('arrow','small-icon')}</span></button>`).join('')}</div></section><section class="home-section"><div class="section-heading"><div><h2>Вакансии с открытой зарплатой</h2><p>Для старта добавлены демонстрационные вакансии. Компании могут публиковать свои.</p></div><a href="#jobs">Вся выдача ${icon('arrow','small-icon')}</a></div><div class="home-job-grid">${state.jobs.filter(j=>j.status==='published').slice(0,4).map(j=>`<button class="home-job" data-action="job-detail" data-id="${j.id}"><span>${esc(j.company)} ${j.synthetic?'<small>Демо</small>':''}</span><h3>${esc(j.title)}</h3><strong>${salary(j.min,j.max)}</strong><div>${esc(j.grade)} · ${esc(j.format||'Удалённо')}</div>${tag(j.stack)}</button>`).join('')}</div></section><section class="how-section home-section"><div><div class="eyebrow">Другой подход к найму</div><h2>Сначала навыки.<br>Потом знакомство.</h2><p>Работодатель ищет подходящую категорию и приглашает вас напрямую. Вы решаете, кому открыть контакт.</p><a href="#method">Подробнее о механике ${icon('arrow','small-icon')}</a></div><ol>${[['Заполните резюме','Опыт, технологии, зарплатные ожидания и формат работы.'],['Подтвердите уровень','Выберите специализацию и пройдите тест на свой грейд.'],['Выберите команду','Примите предложение или откликнитесь самостоятельно.']].map(([h,p],i)=>`<li><span>0${i+1}</span><div><h3>${h}</h3><p>${p}</p></div></li>`).join('')}</ol></section><section class="employer-callout"><div><h2>Нужен человек в команду?</h2><p>Ищите среди специалистов с подтверждённой категорией. Предлагайте задачу и зарплату напрямую.</p></div>${button('Работодателям '+icon('arrow','small-icon'),'nav','data-page="employers"',true)}</section>`;}
@@ -109,7 +139,7 @@ function testClock(){
 }
 function render(){
  const beforePage=renderedPage,beforeAttempt=renderedAttempt,beforeQuestion=renderedQuestion,beforeProgress=renderedProgress;
- renderView(); testClock();
+ renderView(); testClock(); prepareResumePDF();
  const activeQuestion=page==='tests'&&test&&!result;
  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  if(!reduced){
@@ -164,25 +194,32 @@ function taskForm(){modal('Задание от команды','Короткая
 function taskAnswer(id){const t=state.tasks.find(x=>x.id===id);modal(esc(t.title),esc(t.company),`<form id="task-answer" data-id="${id}"><p class="multiline detail-section">${esc(t.description)}</p>${textarea('Ваше решение или подход','answer','','required minlength="30" maxlength="8000"')}${formEnd('Отправить решение')}</form>`,true);}
 function taskReview(id){const s=state.submissions.find(x=>x.id===id);modal('Обратная связь по заданию',esc(s.candidateName),`<form id="task-review" data-id="${id}"><p class="multiline">${esc(s.answer)}</p>${textarea('Что получилось и что улучшить','feedback','','required maxlength="3000"')}${formEnd('Отправить обратную связь')}</form>`,true);}
 function chat(id){const context=state.invites.find(x=>x.id===id)||state.applications.find(x=>x.id===id);if(!context)return;const rows=state.messages.filter(m=>m.contextId===id).sort((a,b)=>a.created-b.created);modal('Диалог',esc(context.title||context.job?.title||'Обсуждение предложения'),`<div class="chat-thread">${rows.length?rows.map(m=>`<div class="chat-message ${m.owner===state.user.id?'mine':''}"><strong>${esc(m.author)}</strong><p>${esc(m.text)}</p><small>${date(m.created)}</small></div>`).join(''):'<p class="subtext">Начните разговор с вопроса о команде или следующем шаге.</p>'}</div><form id="message-form" data-id="${id}">${textarea('Сообщение','text','','required maxlength="4000"')}${formEnd('Отправить')}</form>`,true);}
-let pdfExporting=false;
+let pdfExporting=false,pdfCache=null,pdfPreparationTimer;
+function resumePDFKey(){return JSON.stringify([state.user?.id,state.user?.email,state.profile,state.privacy?.fspVisible,new Date().toDateString()]);}
+function invalidateResumePDF(){pdfCache=null;clearTimeout(pdfPreparationTimer);}
+function preparedResumePDF(){
+ const key=resumePDFKey();
+ if(pdfCache?.key===key)return pdfCache.promise;
+ const entry={key,promise:null};
+ entry.promise=requestData('/api/resume/pdf',{cache:'no-store'},'pdf',30000).then(file=>({...file,key})).catch(error=>{if(pdfCache===entry)pdfCache=null;throw error;});
+ pdfCache=entry;return entry.promise;
+}
+function prepareResumePDF(){
+ clearTimeout(pdfPreparationTimer);
+ if(page!=='profile'||!state.authenticated||!state.roles.includes('candidate'))return;
+ pdfPreparationTimer=setTimeout(()=>{if(page==='profile')preparedResumePDF().catch(()=>{});},600);
+}
 async function exportPDF(){
  if(pdfExporting)return;
- pdfExporting=true;
- const buttons=[...document.querySelectorAll('[data-action="pdf"]')];
- const labels=buttons.map(b=>b.innerHTML);
- buttons.forEach(b=>{b.disabled=true;b.textContent='Формируем PDF…';b.setAttribute('aria-busy','true');});
+ pdfExporting=true;clearTimeout(pdfPreparationTimer);
+ const buttons=[...document.querySelectorAll('[data-action="pdf"]')],labels=buttons.map(b=>b.innerHTML);
+ buttons.forEach(b=>{b.disabled=true;b.textContent='Готовим файл…';b.setAttribute('aria-busy','true');});
  try{
-  const response=await fetch('/api/resume/pdf',{cache:'no-store'});
-  if(!response.ok){const data=await response.json();throw new Error(data.error||'Не удалось сформировать PDF.');}
-  if(!response.headers.get('content-type')?.includes('application/pdf'))throw new Error('Не удалось получить PDF. Попробуйте ещё раз.');
-  const blob=await response.blob();
-  const disposition=response.headers.get('content-disposition')||'';
-  const filename=disposition.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+  const {blob,filename,key}=await preparedResumePDF();
+  if(key!==resumePDFKey())throw new Error('Резюме изменилось. Скачайте обновлённый файл ещё раз.');
   const url=URL.createObjectURL(blob),link=document.createElement('a');
-  link.href=url;link.download=filename?decodeURIComponent(filename):'resume.pdf';
-  document.body.appendChild(link);link.click();link.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),60000);
-  toast('PDF готов. Скачивание началось.');
+  link.href=url;link.download=filename;document.body.appendChild(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);toast('PDF готов. Скачивание началось.');
  }catch(error){toast(error.message||'Не удалось скачать PDF.');}
  finally{pdfExporting=false;buttons.forEach((b,i)=>{b.disabled=false;b.innerHTML=labels[i];b.removeAttribute('aria-busy');});}
 }

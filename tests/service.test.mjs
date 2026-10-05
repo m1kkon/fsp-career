@@ -5,6 +5,7 @@ import {makeTest,testView,gradeTest,COOLDOWN,SPECS,GRADES,matching,parseNeed} fr
 import {seed} from '../lib/seed.mjs';
 import {mockFspProfile} from '../lib/fsp.mjs';
 import {publicCandidate} from '../lib/domain.mjs';
+import {actionResponse} from '../lib/action-response.mjs';
 function memory(){const accounts=new Map(),records=new Map();const clone=x=>x?structuredClone(x):null;return {account:async id=>clone(accounts.get(id)),accounts:async()=>[...accounts.values()].map(clone),saveAccount:async a=>accounts.set(a.id,clone(a)),records:async kind=>[...records.values()].filter(r=>r.kind===kind).map(clone),scoped:async(kind,id)=>[...records.values()].filter(r=>r.kind===kind&&(r.owner===id||r.recipient===id)).map(clone),record:async id=>clone(records.get(id)),put:async(kind,r)=>records.set(r.id,{...clone(r),kind}),remove:async(id,owner)=>{if(records.get(id)?.owner===owner)records.delete(id);}};}
 async function fixture(){const repo=memory();const candidate=await accountFor(repo,{id:'candidate-a',email:'a@example.test',name:'Candidate'});await action(repo,candidate,{action:'onboard',role:'candidate',name:'Candidate',city:'Москва',spec:'Backend',grade:'Middle',consent:true});candidate.profile={...candidate.profile,verified:true,score:90,stack:['Python','PostgreSQL'],verifiedAt:Date.now(),about:'Backend engineer',gradeChangedAt:Date.now()};await repo.saveAccount(candidate);const employer=await accountFor(repo,{id:'employer-a',email:'hr@example.test',name:'HR'});await action(repo,employer,{action:'onboard',role:'employer',name:'Company',description:'Product engineering team',contact:'hr@example.test',consent:true});const other=await accountFor(repo,{id:'employer-b',email:'b@example.test'});await action(repo,other,{action:'onboard',role:'employer',name:'Other',description:'Other engineering team',contact:'b@example.test',consent:true});return {repo,candidate,employer,other};}
 const invitation=(candidateId)=>({action:'invite',candidateId,title:'Backend role',description:'API development in product team',min:180000,max:240000,contact:'hr@example.test'});
@@ -84,4 +85,20 @@ test('resume blocks reject unsafe links and allow deleting all optional groups',
  await action(repo,candidate,{action:'resume-details',skillGroups:[{label:'Tools',text:'Git'}]});
  await action(repo,candidate,{action:'resume-details',skillGroups:[],projects:[],links:[]});
  assert.deepEqual((await repo.account(candidate.id)).profile.resume.skillGroups,[]);
+});
+test('account saves return committed own state without querying workspace lists',async()=>{
+ const {repo,candidate,employer}=await fixture();
+ const fastRepo={...repo,accounts:()=>{throw new Error('Workspace read is unnecessary');},records:()=>{throw new Error('Workspace read is unnecessary');},scoped:()=>{throw new Error('Workspace read is unnecessary');}};
+ const response=await actionResponse(fastRepo,candidate,{action:'resume-details',returnState:true,headline:'Saved',id:employer.id});
+ assert.equal(response.state.user.id,candidate.id);assert.equal(response.state.profile.resume.headline,'Saved');
+ assert.equal((await repo.account(candidate.id)).profile.resume.headline,'Saved');assert.ok(!JSON.stringify(response).includes(employer.email));
+ await assert.rejects(actionResponse(fastRepo,employer,{action:'resume-details',returnState:true}));
+});
+test('record saves include updated state but still acknowledge committed writes if list loading fails',async()=>{
+ const {repo,candidate,employer}=await fixture();
+ let response=await actionResponse(repo,employer,{action:'need',text:'Middle Backend Python',returnState:true,stateRole:'employer'});
+ assert.equal(response.state.needs.length,1);assert.equal(response.state.user.id,employer.id);
+ response=await actionResponse({...repo,records:()=>{throw new Error('Read unavailable');}},employer,{action:'need',text:'Junior Frontend React',returnState:true,stateRole:'employer'});
+ assert.equal(response.refreshRequired,true);assert.equal((await repo.scoped('need',employer.id)).length,2);
+ assert.equal((await getState(repo,candidate)).needs.length,0);
 });
