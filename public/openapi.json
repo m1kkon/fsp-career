@@ -29,8 +29,60 @@
           {
             "name": "query",
             "in": "query",
+            "description": "Потребность работодателя свободным текстом. Без неё need = null, а кандидаты упорядочены по силе подтверждённого профиля.",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "team",
+            "in": "query",
+            "description": "Контекст команды: чем она занимается. Технологии из текста добавляются к стеку, темы — к предметной области. Учитывается только вместе с query.",
+            "schema": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Формат работы команды.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Город офиса; учитывается для форматов «Офис» и «Гибрид».",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          {
+            "name": "budgetMin",
+            "in": "query",
+            "description": "Бюджет от, ₽.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            }
+          },
+          {
+            "name": "budgetMax",
+            "in": "query",
+            "description": "Бюджет до, ₽. Неверные значения поиска (не целые, вне диапазона, до < от) игнорируются без ошибки.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
             }
           }
         ],
@@ -446,7 +498,7 @@
       },
       "need": {
         "type": "object",
-        "description": "Сохранить потребность команды",
+        "description": "Сохранить потребность команды вместе с контекстом и снимком точной категории. 400 — неверный бюджет: не целое число, вне 1–10 000 000 или «до» меньше «от».",
         "properties": {
           "action": {
             "type": "string",
@@ -457,6 +509,37 @@
           },
           "title": {
             "type": "string"
+          },
+          "team": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Целое число рублей; пробелы и точки-разделители допускаются"
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Целое число рублей; пробелы и точки-разделители допускаются"
           }
         },
         "required": [
@@ -1015,21 +1098,7 @@
             "type": "string"
           },
           "match": {
-            "type": "object",
-            "properties": {
-              "score": {
-                "type": "integer"
-              },
-              "parts": {
-                "type": "object"
-              },
-              "reasons": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/schemas/Match"
           },
           "min": {
             "type": "integer",
@@ -1092,6 +1161,16 @@
               "$ref": "#/components/schemas/Candidate"
             }
           },
+          "need": {
+            "$ref": "#/components/schemas/Need"
+          },
+          "categories": {
+            "type": "array",
+            "description": "С запросом — рекомендуемые категории, без запроса — все непустые категории банка.",
+            "items": {
+              "$ref": "#/components/schemas/CategoryRecommendation"
+            }
+          },
           "jobs": {
             "type": "array",
             "items": {
@@ -1113,7 +1192,7 @@
           "needs": {
             "type": "array",
             "items": {
-              "type": "object"
+              "$ref": "#/components/schemas/SavedNeed"
             }
           },
           "tests": {
@@ -1154,6 +1233,496 @@
           }
         }
       },
+        "Match": {
+          "type": "object",
+          "description": "Объяснимый балл соответствия: сумма parts[].points равна score. Без запроса score = null и порядок задаёт strength. В отклике балл считается относительно вакансии.",
+          "properties": {
+            "score": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 100
+            },
+            "strength": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 30,
+              "description": "Сила подтверждённого профиля: баллы теста и ФСП"
+            },
+            "relation": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "exact",
+                "higher",
+                "lower",
+                "adjacent",
+                "other",
+                null
+              ]
+            },
+            "parts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/MatchPart"
+              }
+            },
+            "matched": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "reasons": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "fsp": {
+              "$ref": "#/components/schemas/FspSignal"
+            }
+          },
+          "required": [
+            "score",
+            "strength",
+            "relation",
+            "parts",
+            "matched",
+            "reasons",
+            "fsp"
+          ]
+        },
+        "MatchPart": {
+          "type": "object",
+          "description": "Веса: spec 25, grade 15, stack 20, test 20, fsp 10, format 4, salary 4, domain 2. Незаданный работодателем признак получает полный балл у всех.",
+          "properties": {
+            "key": {
+              "type": "string",
+              "enum": [
+                "spec",
+                "grade",
+                "stack",
+                "test",
+                "fsp",
+                "format",
+                "salary",
+                "domain"
+              ]
+            },
+            "label": {
+              "type": "string"
+            },
+            "group": {
+              "type": "string",
+              "enum": [
+                "category",
+                "stack",
+                "test",
+                "fsp",
+                "context"
+              ]
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "test",
+                "resume",
+                "fsp"
+              ],
+              "description": "test — подтверждено тестом, resume — заявлено кандидатом, fsp — адаптер ФСП (сейчас тестовые данные)"
+            },
+            "points": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "max": {
+              "type": "integer"
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "label",
+            "group",
+            "source",
+            "points",
+            "max",
+            "note"
+          ]
+        },
+        "FspSignal": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Вклад ФСП: лучший результат × профильность дисциплины × давность, каждый следующий результат +10%, не более 10 баллов. null — история не привязана или скрыта кандидатом; пустой items — привязка без достижений.",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "source": {
+              "const": "demo"
+            },
+            "points": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "event": {
+                    "type": "string"
+                  },
+                  "discipline": {
+                    "type": "string"
+                  },
+                  "result": {
+                    "type": "string"
+                  },
+                  "level": {
+                    "type": "string",
+                    "enum": [
+                      "winner",
+                      "prize",
+                      "final",
+                      "participant"
+                    ]
+                  },
+                  "year": {
+                    "type": "integer"
+                  },
+                  "relevance": {
+                    "type": "number"
+                  },
+                  "recency": {
+                    "type": "number"
+                  },
+                  "value": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "NeedContext": {
+          "type": "object",
+          "properties": {
+            "team": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "format": {
+              "type": "string",
+              "enum": [
+                "",
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            },
+            "city": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "budgetMin": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "budgetMax": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "maximum": 10000000
+            }
+          }
+        },
+        "Need": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Разбор потребности правилами на ключевых словах. Специализацию и грейд задаёт текст запроса; контекст команды уточняет порядок внутри категории.",
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "spec": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "DevOps",
+                "QA"
+              ]
+            },
+            "grade": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Middle",
+                "Senior"
+              ]
+            },
+            "stack": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "format": {
+              "type": "string",
+              "enum": [
+                "",
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            },
+            "city": {
+              "type": "string"
+            },
+            "team": {
+              "type": "string"
+            },
+            "budgetMin": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "budgetMax": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "domains": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "adjacent": {
+              "type": "array",
+              "description": "Смежные специализации по общим технологиям",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Backend",
+                  "Frontend",
+                  "Data Science",
+                  "DevOps",
+                  "QA"
+                ]
+              }
+            },
+            "scores": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer"
+              }
+            },
+            "evidence": {
+              "type": "object",
+              "description": "Слова и источники, на которые опирается разбор"
+            },
+            "defaulted": {
+              "type": "object",
+              "properties": {
+                "spec": {
+                  "type": "boolean"
+                },
+                "grade": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "CategoryRecommendation": {
+          "type": "object",
+          "description": "С запросом точная категория идёт первой, даже пустая, за ней до трёх соседних: грейд выше или ниже, смежное направление. Без запроса relation = all.",
+          "properties": {
+            "key": {
+              "type": "string",
+              "example": "Backend|Middle"
+            },
+            "spec": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "DevOps",
+                "QA"
+              ]
+            },
+            "grade": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Middle",
+                "Senior"
+              ]
+            },
+            "relation": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "higher",
+                "lower",
+                "adjacent",
+                "all"
+              ]
+            },
+            "count": {
+              "type": "integer"
+            },
+            "withFsp": {
+              "type": "integer"
+            },
+            "best": {
+              "type": "integer"
+            },
+            "averageTest": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "salary": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "min": {
+                  "type": "integer"
+                },
+                "max": {
+                  "type": "integer"
+                }
+              }
+            },
+            "inBudget": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "coverage": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "SavedNeed": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "created": {
+              "type": "integer"
+            },
+            "title": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "spec": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "DevOps",
+                "QA"
+              ]
+            },
+            "grade": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Middle",
+                "Senior"
+              ]
+            },
+            "stack": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "context": {
+              "$ref": "#/components/schemas/NeedContext"
+            },
+            "snapshot": {
+              "type": "object",
+              "description": "Точная категория на момент сохранения: до 50 кандидатов с баллами, без контактов",
+              "properties": {
+                "at": {
+                  "type": "integer"
+                },
+                "total": {
+                  "type": "integer"
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "score": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
       "fsp-link": {
         "type": "object",
         "description": "Привязать тестовый ФСП ID к своему кандидату. Реестр не вызывается; принадлежность реального ID не подтверждается.",
@@ -1164,7 +1733,7 @@
           },
           "fspId": {
             "type": "string",
-            "pattern": "^DEMO-FSP-00[1-8]$",
+            "pattern": "^DEMO-FSP-0(0[1-9]|1[0-4])$",
             "example": "DEMO-FSP-001"
           }
         },
@@ -1221,6 +1790,15 @@
                 },
                 "result": {
                   "type": "string"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "winner",
+                    "prize",
+                    "final",
+                    "participant"
+                  ]
                 },
                 "format": {
                   "type": "string"
