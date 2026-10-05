@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ФСП Карьера MVP API",
-    "version": "1.1.0",
-    "description": "Sites передаёт подтверждённую идентичность через доверенные серверные заголовки. Браузер использует сессию платформы. Пароли приложение не хранит. Параметр role выбирает представление, но не выдаёт права. ChatGPT identity используется для текущего хостинга; самостоятельная регистрация с подтверждением email пока не реализована."
+    "version": "1.2.2",
+    "description": "Sites передаёт подтверждённую идентичность через доверенные серверные заголовки. Браузер использует сессию платформы. Пароли приложение не хранит. Параметр role выбирает представление, но не выдаёт права. ChatGPT identity используется для текущего хостинга; самостоятельная регистрация с подтверждением email пока не реализована. Выход из кабинета через /api/session независим от входа хостинга: закрывает приватные API и сохраняет аккаунт до повторного входа."
   },
   "servers": [
     {
@@ -29,8 +29,105 @@
           {
             "name": "query",
             "in": "query",
+            "description": "Потребность работодателя свободным текстом. Без неё need = null, а кандидаты упорядочены по силе подтверждённого профиля.",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "team",
+            "in": "query",
+            "description": "Контекст команды: чем она занимается. Технологии из текста добавляются к стеку, темы — к предметной области. Учитывается только вместе с query.",
+            "schema": {
+              "type": "string",
+              "maxLength": 2000
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Формат работы команды.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "description": "Город офиса; учитывается для форматов «Офис» и «Гибрид».",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          },
+          {
+            "name": "budgetMin",
+            "in": "query",
+            "description": "Бюджет от, ₽.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            }
+          },
+          {
+            "name": "budgetMax",
+            "in": "query",
+            "description": "Бюджет до, ₽. Неверные значения поиска (не целые, вне диапазона, до < от) игнорируются без ошибки.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            }
+          },
+          {
+            "name": "spec",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "DevOps",
+                "QA"
+              ]
+            }
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Middle",
+                "Senior"
+              ]
+            }
+          },
+          {
+            "name": "stack",
+            "in": "query",
+            "description": "Подтверждённый стек через запятую; пустая строка очищает стек.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmed",
+            "in": "query",
+            "description": "Значение 1 подтверждает категорию и разрешает поиск. Без подтверждения возвращается только разбор запроса.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
             }
           }
         ],
@@ -72,6 +169,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/profile"
+                  },
+                  {
+                    "$ref": "#/components/schemas/survey"
                   },
                   {
                     "$ref": "#/components/schemas/settings"
@@ -129,6 +229,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/fsp-unlink"
+                  },
+                  {
+                    "$ref": "#/components/schemas/resume-details"
                   }
                 ]
               }
@@ -237,6 +340,108 @@
               }
             }
           }
+        },
+        "description": " При returnState=true ответ содержит сохранённое состояние текущего аккаунта (для форм профиля) либо обновлённое состояние кабинета. stateRole и stateQuery задают текущий вид кабинета. При ошибке чтения после успешной записи возвращается refreshRequired=true; запись не отменяется."
+      }
+    },
+    "/api/resume/pdf": {
+      "get": {
+        "summary": "Скачать свой стандартизированный PDF-профиль",
+        "description": "Только кандидат с доверенной идентичностью текущей сессии. Профиль берётся из серверной базы; ID другого пользователя и данные резюме в запросе не принимаются. Экспорт включает контакты владельца и соблюдает настройку видимости ФСП.",
+        "responses": {
+          "200": {
+            "description": "Готовый текстовый PDF со встроенными кириллическими шрифтами",
+            "headers": {
+              "Content-Disposition": {
+                "description": "attachment, безопасное имя файла UTF-8",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "private, no-store"
+                }
+              }
+            },
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Необходим вход"
+          },
+          "403": {
+            "description": "Нет профиля кандидата"
+          },
+          "500": {
+            "description": "Ошибка формирования PDF"
+          }
+        }
+      }
+    },
+    "/api/session": {
+      "post": {
+        "summary": "Войти в кабинет или выйти на главную сервиса",
+        "description": "Временный мост к доверенной идентичности Sites. login восстанавливает сохранённый аккаунт и удаляет маркер выхода; logout выставляет HttpOnly/SameSite=Lax cookie и возвращает публичные вакансии, не завершая вход хостинга. Запрос допускается только со своего origin.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "login",
+                      "logout"
+                    ]
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "candidate",
+                      "employer"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "login: собственное State; logout: authenticated=false и публичные jobs. Set-Cookie меняет состояние кабинета.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/State"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректное действие или тело запроса"
+          },
+          "401": {
+            "description": "Нет доверенной идентичности хостинга для входа"
+          },
+          "403": {
+            "description": "Недопустимый origin"
+          },
+          "500": {
+            "description": "Не удалось изменить состояние входа"
+          }
         }
       }
     }
@@ -302,7 +507,7 @@
       },
       "profile": {
         "type": "object",
-        "description": "Сохранить резюме кандидата",
+        "description": "Сохранить частично заполненное резюме кандидата. Пропущенные ключи сохраняются, пустые поля очищаются; пустое имя сохраняет имя аккаунта. Зарплата необязательна, при двух границах max >= min. Необязательное поле resume сохраняет структурированные блоки вместе с основными полями одной записью; ошибка любого блока отменяет весь запрос.",
         "properties": {
           "action": {
             "type": "string",
@@ -346,21 +551,188 @@
             "type": "string"
           },
           "min": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "description": "Одна граница ожиданий. null или пустая строка удаляют значение; отсутствие ключа сохраняет его."
           },
           "max": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "description": "Одна граница ожиданий. null или пустая строка удаляют значение; отсутствие ключа сохраняет его."
+          },
+          "resume": {
+            "$ref": "#/components/schemas/ResumeDetails"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "survey": {
+        "type": "object",
+        "description": "Сохранить новую версию обязательной анкеты кандидата перед тестированием",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "survey"
+          },
+          "careerGoal": {
+            "type": "string"
+          },
+          "employmentStatus": {
+            "type": "string"
+          },
+          "experienceYears": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string",
+            "enum": [
+              "Финтех",
+              "Электронная коммерция",
+              "Образование",
+              "Медиа",
+              "Государственные сервисы",
+              "Другое"
+            ]
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "primaryRole": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "technicalSkills": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 600
+          },
+          "achievement": {
+            "type": "string",
+            "minLength": 30,
+            "maxLength": 1200
+          },
+          "softSkills": {
+            "type": "array",
+            "minItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "softSkillExample": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 1200
+          },
+          "uncertaintyResponse": {
+            "type": "string"
+          },
+          "feedbackPreference": {
+            "type": "string"
+          },
+          "workStyle": {
+            "type": "string",
+            "enum": [
+              "Команда",
+              "Самостоятельно",
+              "Смешанный формат"
+            ]
+          },
+          "preferredFormat": {
+            "type": "string",
+            "enum": [
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "teamSize": {
+            "type": "string"
+          },
+          "taskType": {
+            "type": "string"
+          },
+          "businessTrips": {
+            "type": "string"
+          },
+          "relocation": {
+            "type": "string"
+          },
+          "motivation": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 1200
+          },
+          "avoidTasks": {
+            "type": "string",
+            "maxLength": 800
           }
         },
         "required": [
           "action",
-          "name",
-          "min",
-          "max"
+          "careerGoal",
+          "employmentStatus",
+          "experienceYears",
+          "industry",
+          "spec",
+          "grade",
+          "primaryRole",
+          "roles",
+          "technicalSkills",
+          "achievement",
+          "softSkills",
+          "softSkillExample",
+          "uncertaintyResponse",
+          "feedbackPreference",
+          "motivation"
         ]
       },
       "settings": {
@@ -446,7 +818,7 @@
       },
       "need": {
         "type": "object",
-        "description": "Сохранить потребность команды",
+        "description": "Сохранить потребность команды вместе с контекстом и снимком точной категории. 400 — неверный бюджет: не целое число, вне 1–10 000 000 или «до» меньше «от».",
         "properties": {
           "action": {
             "type": "string",
@@ -457,11 +829,74 @@
           },
           "title": {
             "type": "string"
+          },
+          "team": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Целое число рублей; пробелы и точки-разделители допускаются"
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Целое число рублей; пробелы и точки-разделители допускаются"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "description": "Подтверждение выбранной специализации, уровня и стека перед сохранением."
           }
         },
         "required": [
           "action",
-          "text"
+          "text",
+          "spec",
+          "grade",
+          "confirmed"
         ]
       },
       "delete-need": {
@@ -999,6 +1434,43 @@
               "type": "string"
             }
           },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "softSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "competencies": {
+            "type": "array",
+            "description": "Паспорт компетенций из последнего принятого успешного теста",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "confirmed",
+                    "development"
+                  ]
+                },
+                "source": {
+                  "type": "string"
+                },
+                "verifiedAt": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
           "verified": {
             "type": "boolean"
           },
@@ -1015,29 +1487,21 @@
             "type": "string"
           },
           "match": {
-            "type": "object",
-            "properties": {
-              "score": {
-                "type": "integer"
-              },
-              "parts": {
-                "type": "object"
-              },
-              "reasons": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
+            "$ref": "#/components/schemas/Match"
           },
           "min": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 1,
             "maximum": 10000000
           },
           "max": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 1,
             "maximum": 10000000
           },
@@ -1086,10 +1550,20 @@
           "company": {
             "type": "object"
           },
+          "need": {
+            "$ref": "#/components/schemas/Need"
+          },
           "candidates": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Candidate"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "С запросом — рекомендуемые категории, без запроса — все непустые категории банка.",
+            "items": {
+              "$ref": "#/components/schemas/CategoryRecommendation"
             }
           },
           "jobs": {
@@ -1113,11 +1587,18 @@
           "needs": {
             "type": "array",
             "items": {
-              "type": "object"
+              "$ref": "#/components/schemas/SavedNeed"
             }
           },
           "tests": {
             "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "surveys": {
+            "type": "array",
+            "description": "Версии анкет текущего кандидата, от новых к старым",
             "items": {
               "type": "object"
             }
@@ -1154,6 +1635,531 @@
           }
         }
       },
+      "Match": {
+        "type": "object",
+        "description": "Объяснимый балл соответствия: сумма parts[].points равна score. Без запроса score = null и порядок задаёт strength. В отклике балл считается относительно вакансии.",
+        "properties": {
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "strength": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30,
+            "description": "Сила подтверждённого профиля: баллы теста и ФСП"
+          },
+          "relation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "exact",
+              "higher",
+              "lower",
+              "adjacent",
+              "other",
+              null
+            ]
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchPart"
+            }
+          },
+          "matched": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fsp": {
+            "$ref": "#/components/schemas/FspSignal"
+          }
+        },
+        "required": [
+          "score",
+          "strength",
+          "relation",
+          "parts",
+          "matched",
+          "reasons",
+          "fsp"
+        ]
+      },
+      "MatchPart": {
+        "type": "object",
+        "description": "Веса: spec 25, grade 15, stack 20, test 20, fsp 10, format 4, salary 4, domain 2. Незаданный работодателем признак получает полный балл у всех.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "spec",
+              "grade",
+              "stack",
+              "test",
+              "fsp",
+              "format",
+              "salary",
+              "domain"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "category",
+              "stack",
+              "test",
+              "fsp",
+              "context"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "test",
+              "resume",
+              "fsp"
+            ],
+            "description": "test — подтверждено тестом, resume — заявлено кандидатом, fsp — адаптер ФСП (сейчас тестовые данные)"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "group",
+          "source",
+          "points",
+          "max",
+          "note"
+        ]
+      },
+      "FspSignal": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Вклад ФСП: лучший результат × профильность дисциплины × давность, каждый следующий результат +10%, не более 10 баллов. null — история не привязана или скрыта кандидатом; пустой items — привязка без достижений.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "const": "demo"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "discipline": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "winner",
+                    "prize",
+                    "final",
+                    "participant"
+                  ]
+                },
+                "year": {
+                  "type": "integer"
+                },
+                "relevance": {
+                  "type": "number"
+                },
+                "recency": {
+                  "type": "number"
+                },
+                "value": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NeedContext": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        }
+      },
+      "Need": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Разбор потребности правилами на ключевых словах. Специализацию и грейд задаёт текст запроса; контекст команды уточняет порядок внутри категории.",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "spec": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "grade": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string"
+          },
+          "team": {
+            "type": "string"
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "adjacent": {
+            "type": "array",
+            "description": "Смежные специализации по общим технологиям",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "DevOps",
+                "QA"
+              ]
+            }
+          },
+          "scores": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "description": "Слова и источники, на которые опирается разбор"
+          },
+          "defaulted": {
+            "type": "object",
+            "properties": {
+              "spec": {
+                "type": "boolean"
+              },
+              "grade": {
+                "type": "boolean"
+              }
+            }
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "missing": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "spec",
+                "grade"
+              ]
+            }
+          },
+          "signals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "quote": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "ambiguous": {
+            "type": "object",
+            "properties": {
+              "spec": {
+                "type": "boolean"
+              },
+              "grade": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "CategoryRecommendation": {
+        "type": "object",
+        "description": "С запросом точная категория идёт первой, даже пустая, за ней до трёх соседних: грейд выше или ниже, смежное направление. Без запроса relation = all.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "Backend|Middle"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "higher",
+              "lower",
+              "adjacent",
+              "all"
+            ]
+          },
+          "count": {
+            "type": "integer"
+          },
+          "withFsp": {
+            "type": "integer"
+          },
+          "best": {
+            "type": "integer"
+          },
+          "averageTest": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "salary": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "min": {
+                "type": "integer"
+              },
+              "max": {
+                "type": "integer"
+              }
+            }
+          },
+          "inBudget": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "coverage": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SavedNeed": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/NeedContext"
+          },
+          "snapshot": {
+            "type": "object",
+            "description": "Точная категория на момент сохранения: до 50 кандидатов с баллами, без контактов",
+            "properties": {
+              "at": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "score": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "fsp-link": {
         "type": "object",
         "description": "Привязать тестовый ФСП ID к своему кандидату. Реестр не вызывается; принадлежность реального ID не подтверждается.",
@@ -1164,7 +2170,7 @@
           },
           "fspId": {
             "type": "string",
-            "pattern": "^DEMO-FSP-00[1-8]$",
+            "pattern": "^DEMO-FSP-0(0[1-9]|1[0-4])$",
             "example": "DEMO-FSP-001"
           }
         },
@@ -1222,6 +2228,15 @@
                 "result": {
                   "type": "string"
                 },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "winner",
+                    "prize",
+                    "final",
+                    "participant"
+                  ]
+                },
                 "format": {
                   "type": "string"
                 },
@@ -1250,6 +2265,294 @@
           "status",
           "achievements"
         ]
+      },
+      "resume-details": {
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "const": "resume-details"
+          },
+          "headline": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "languages": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "achievements": {
+            "type": "string",
+            "maxLength": 1800
+          },
+          "skillGroups": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "projects": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1200
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "workEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "position": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 3000
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "educationEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "institution": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "program": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "level": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              }
+            }
+          }
+        }
+      },
+      "ResumeDetails": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "languages": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "achievements": {
+            "type": "string",
+            "maxLength": 1800
+          },
+          "skillGroups": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "projects": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1200
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "workEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "position": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 3000
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "educationEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "institution": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "program": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "level": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
