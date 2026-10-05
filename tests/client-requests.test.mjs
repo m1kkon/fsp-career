@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {historyDefaults} from '../public/resume-history.mjs';
 
 const source=fs.readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
 const requests=source.slice(source.indexOf('async function requestData('),source.indexOf('function go(next)'));
@@ -65,7 +66,7 @@ test('workspace logout stays on the site and clears private data; login restores
 test('adding or removing resume groups keeps basic fields and unsaved block values',()=>{
  const form={values:{name:'Unsaved name',min:'100.000','skill-label-0':'ML','skill-text-0':'Python, PyTorch',headline:'ML Engineer'},querySelectorAll(){return [];}};
  const blocks={innerHTML:''},panel={scrollTop:321};
- const context=vm.createContext({structuredClone,state:{profile:{resume:{}}},FormData:class{constructor(form){this.values=form.values;}get(key){return this.values[key];}},document:{getElementById:id=>id==='profile-form'?form:blocks},overlay:{querySelector:()=>panel},resumeEditorFields:()=>'<new groups>'});
+ const context=vm.createContext({historyDefaults,structuredClone,state:{profile:{resume:{}}},FormData:class{constructor(form){this.values=form.values;}get(key){return this.values[key];}},document:{getElementById:id=>id==='profile-form'?form:blocks},overlay:{querySelector:()=>panel},resumeEditorFields:()=>'<new groups>'});
  const draft=source.slice(source.indexOf('let resumeDraft='),source.indexOf('function resumeEditorFields'));
  const update=source.slice(source.indexOf('function updateResumeEditor'),source.indexOf('function resumeExtraSections'));
  vm.runInContext(draft+update+"resumeDraft={skillGroups:[{label:'',text:''}],projects:[],links:[]};updateResumeEditor('skillGroups');",context);
@@ -86,4 +87,15 @@ test('salary typing and paste format thousands while editing preserves the digit
  input.value='1.234.567';input.selectionStart=2;input.selectionEnd=2;listeners.beforeinput({target:input,inputType:'deleteContentBackward'});assert.equal(input.selectionStart,0);assert.equal(input.selectionEnd,2);
  input.value='250 000 ₽';input.selectionStart=input.value.length;listeners.input({target:input});assert.equal(input.value,'250.000');
  input.value='';input.selectionStart=0;listeners.input({target:input});assert.equal(input.value,'');
+});
+
+test('adding history cards preserves unsaved history, project and contact fields',()=>{
+ const form={values:{phone:'Draft contact','workEntries-company-0':'Vector','workEntries-position-0':'ML Engineer','workEntries-start-0':'2023','workEntries-current-0':'on','workEntries-description-0':'Built search','project-name-0':'Unsaved project'},querySelectorAll(){return [];}};
+ const panel={scrollTop:500},blocks={innerHTML:''};
+ const context=vm.createContext({historyDefaults,structuredClone,FormData:class{constructor(form){this.values=form.values;}get(k){return this.values[k];}},document:{getElementById:id=>id==='profile-form'?form:blocks},overlay:{querySelector:()=>panel},resumeEditorFields:()=>'<cards>'});
+ const draft=source.slice(source.indexOf('let resumeDraft='),source.indexOf('function historyEditor'));
+ const update=source.slice(source.indexOf('function updateResumeEditor'),source.indexOf('function resumeExtraSections'));
+ vm.runInContext(draft+update+"resumeDraft={workEntries:[{...historyDefaults.workEntries}],educationEntries:[],skillGroups:[],projects:[{name:'',description:'',url:''}],links:[]};updateResumeEditor('workEntries')",context);
+ assert.equal(vm.runInContext('resumeDraft.workEntries[0].company',context),'Vector');assert.equal(vm.runInContext('resumeDraft.workEntries[0].current',context),true);assert.equal(vm.runInContext('resumeDraft.workEntries.length',context),2);assert.equal(vm.runInContext('resumeDraft.projects[0].name',context),'Unsaved project');assert.equal(form.values.phone,'Draft contact');assert.equal(panel.scrollTop,500);
+ vm.runInContext("updateResumeEditor('workEntries',1)",context);assert.equal(vm.runInContext('resumeDraft.workEntries.length',context),1);
 });

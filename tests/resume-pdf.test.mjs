@@ -31,3 +31,11 @@ test('long Cyrillic paragraphs and unbroken tokens flow onto multiple A4 pages',
  const a=account();a.profile.about=('Надёжные системы, измеримые результаты и работа с командой. '.repeat(80));a.profile.work=('• Подробный опыт разработки и сопровождения сервиса.\n'.repeat(60))+'https://example.test/'+('a'.repeat(1200));
  const pdf=await PDFDocument.load(await generateResumePDF(a));assert.ok(pdf.getPageCount()>2);for(const page of pdf.getPages()){assert.equal(page.getWidth(),595.28);assert.equal(page.getHeight(),841.89);}
 });
+
+test('structured histories appear in PDF and completely empty optional sections are omitted',async()=>{
+ const a=account();a.profile.work='Stale old work';a.profile.education='Stale old education';a.profile.stack=[];
+ a.profile.resume={skillGroups:[],projects:[{name:'',description:'',url:''}],workEntries:[{company:'Vector',position:'ML Engineer',start:'2023',current:true,description:'Built search'}],educationEntries:[{institution:'University',program:'Mathematics',end:'2022'}]};
+ let data=resumeData(a);assert.equal(data.sections.find(s=>s.title==='Опыт работы').entries[0].name,'Vector | ML Engineer');assert.ok(!data.sections.some(s=>s.title==='Проекты'));assert.ok(!data.sections.some(s=>s.title==='Навыки'));
+ a.profile.resume.workEntries=[];a.profile.resume.educationEntries=[];data=resumeData(a);assert.ok(!data.sections.some(s=>['Опыт работы','Образование и курсы'].includes(s.title)));
+ const pdf=await PDFDocument.load(await generateResumePDF(a));assert.equal(pdf.getPageCount(),1);
+});

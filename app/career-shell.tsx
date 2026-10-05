@@ -5,6 +5,7 @@ export default function CareerShell() {
     if (document.getElementById('career-client')) return;
     const script = document.createElement('script');
     script.id = 'career-client';
+    script.type = 'module';
     script.src = '/mvp.js';
     document.body.appendChild(script);
   }, []);

@@ -1420,6 +1420,10 @@
                 "text": {
                   "type": "string",
                   "maxLength": 300
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
                 }
               }
             }
@@ -1458,6 +1462,71 @@
                 "url": {
                   "type": "string",
                   "maxLength": 300
+                }
+              }
+            }
+          },
+          "workEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "position": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 3000
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "educationEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "institution": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "program": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "level": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1000
                 }
               }
             }
@@ -1492,6 +1561,10 @@
                 "text": {
                   "type": "string",
                   "maxLength": 300
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
                 }
               }
             }
@@ -1530,6 +1603,71 @@
                 "url": {
                   "type": "string",
                   "maxLength": 300
+                }
+              }
+            }
+          },
+          "workEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "position": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 3000
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "educationEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "institution": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "program": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "level": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1000
                 }
               }
             }

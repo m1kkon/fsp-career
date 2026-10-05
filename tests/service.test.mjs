@@ -126,3 +126,32 @@ test('one resume save commits basic fields and structured blocks together or rej
  await action(repo,candidate,{action:'profile',resume:{skillGroups:[{label:'',text:''}],projects:[],links:[]}});
  assert.equal(candidate.profile.name,'Updated');assert.deepEqual(candidate.profile.resume.skillGroups,[]);
 });
+
+test('work and education cards round-trip with text mirrors and clearing removes stale text',async()=>{
+ const {repo,candidate}=await fixture();
+ await action(repo,candidate,{action:'profile',resume:{workEntries:[{company:'Vector',position:'ML Engineer',start:'Март 2023',end:'2025',current:true,description:'Built search'},{company:'',position:'',start:'',end:'',current:false,description:''}],educationEntries:[{institution:'University',program:'Mathematics',level:'Бакалавриат',start:'2018',end:'2022',description:'Diploma'}]}});
+ assert.equal(candidate.profile.resume.workEntries.length,1);assert.match(candidate.profile.work,/Vector \| ML Engineer/);assert.match(candidate.profile.work,/настоящее время/);assert.match(candidate.profile.education,/University/);
+ await action(repo,candidate,{action:'profile',about:'Updated without replacing cards'});
+ assert.equal(candidate.profile.resume.workEntries[0].company,'Vector');
+ await action(repo,candidate,{action:'resume-details',headline:'Engineer'});
+ assert.equal(candidate.profile.resume.educationEntries[0].program,'Mathematics');
+ await action(repo,candidate,{action:'profile',resume:{workEntries:[],educationEntries:[]}});
+ assert.equal(candidate.profile.work,'');assert.equal(candidate.profile.education,'');
+ assert.deepEqual((await repo.account(candidate.id)).profile.resume.workEntries,[]);
+});
+test('history cards accept partial drafts and reject invalid collections without saving other edits',async()=>{
+ const {repo,candidate}=await fixture();
+ await action(repo,candidate,{action:'profile',resume:{workEntries:[{description:'Internship draft'}],educationEntries:[{program:'Course draft'}]}});
+ assert.equal(candidate.profile.resume.workEntries[0].company,'');
+ const before=structuredClone(candidate.profile);
+ for(const workEntries of [{company:'Wrong shape'},[null],Array.from({length:11},()=>({company:'Company'}))]){
+  await assert.rejects(action(repo,candidate,{action:'profile',name:'Must not save',resume:{workEntries}}));assert.deepEqual(candidate.profile,before);
+ }
+});
+test('skill groups provide search technologies without duplicating profile fields',async()=>{
+ const {repo,candidate}=await fixture();
+ await action(repo,candidate,{action:'profile',resume:{skillGroups:[{label:'ML',text:'Python, PyTorch, python',description:'Model development'},{label:'Tools',text:'Docker, SQL'}]}});
+ assert.deepEqual(candidate.profile.stack,['Python','PyTorch','Docker','SQL']);assert.equal(candidate.profile.resume.skillGroups[0].description,'Model development');
+ await action(repo,candidate,{action:'profile',about:'Only description changed'});assert.deepEqual(candidate.profile.stack,['Python','PyTorch','Docker','SQL']);
+ await action(repo,candidate,{action:'profile',resume:{skillGroups:[]}});assert.deepEqual(candidate.profile.stack,[]);
+});
