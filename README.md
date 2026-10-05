@@ -43,7 +43,7 @@ npm run dev -- --port 4173 --hostname 127.0.0.1
 Проверки:
 
 ```sh
-node --test tests/service.test.mjs tests/resume-pdf.test.mjs tests/client-requests.test.mjs tests/app-session.test.mjs tests/resume-history.test.mjs
+node --test tests/service.test.mjs tests/resume-pdf.test.mjs tests/client-requests.test.mjs tests/app-session.test.mjs tests/resume-history.test.mjs tests/client-assets.test.mjs
 npx tsc --noEmit
 npm run build
 ```
@@ -83,3 +83,5 @@ npm run build
 Vinext 1.0.0-beta.5, Vite 8.0.13, React/React DOM 19.2.6, Next 16.3.4 (совместимые интерфейсы), Wrangler 4.92.0, TypeScript 5.9.3, Drizzle ORM 0.45.2, Drizzle Kit 0.31.10, pdf-lib 1.17.1, @pdf-lib/fontkit 1.1.1. Точные версии всего starter-окружения зафиксированы `package-lock.json`. Шрифт Golos Text загружается через Google Fonts с системным fallback.
 
 Подробное соответствие исходному ТЗ: [docs/requirements.md](docs/requirements.md). Переходы страниц и вопросов сопровождаются направленной анимацией; таймер теста отсчитывает оставшееся время, а режим reduced motion отключает перемещения.
+
+Клиентские ресурсы версионируются по содержимому при `npm run dev` / `npm run build`; это предотвращает смешивание новых форм со старыми CSS и скриптами из кеша браузера.

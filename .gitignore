@@ -50,3 +50,5 @@ next-env.d.ts
 # Local document render checks; never include personal examples in source.
 /tmp/
 /output/
+/public/assets/
+/app/asset-urls.ts
