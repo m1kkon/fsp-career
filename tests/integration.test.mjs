@@ -18,7 +18,7 @@ async function employerWorkspace(){
 }
 function client(){
  const element={innerHTML:'',querySelector:()=>null};
- const context=vm.createContext({...history,document:{getElementById:()=>element,addEventListener:()=>{},body:{classList:{add:()=>{},remove:()=>{}}}},window:{addEventListener:()=>{}},localStorage:{getItem:()=>null},location:{hash:''},setInterval:()=>{}});
+ const context=vm.createContext({...history,document:{getElementById:()=>element,querySelector:()=>null,addEventListener:()=>{},body:{classList:{add:()=>{},remove:()=>{}}}},window:{addEventListener:()=>{},scrollTo:()=>{}},localStorage:{getItem:()=>null,setItem:()=>{}},location:{hash:''},setInterval:()=>{}});
  const source=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8').replace(/^import .*;\n/,'').replace(/^boot\(\);$/m,'');
  vm.runInContext(source,context);
  vm.runInContext('modal=()=>{};matchBreakdown=(match,heading)=>{globalThis.display={match,heading};return "";}',context);
@@ -77,4 +77,103 @@ test('parser leaves unknown and conflicting categories for employer confirmation
  assert.deepEqual([explicit.spec,explicit.grade],['Backend','Middle']);
  assert.ok(explicit.signals.some(s=>s.field==='Специализация'&&s.quote==='backend'));
  assert.ok(explicit.signals.some(s=>s.field==='Уровень'&&s.quote==='middle'));
+});
+
+
+test('home candidate search switches workspace and requests explicit confirmation without retaining an old need',async()=>{
+ const context=client();
+ vm.runInContext("render=()=>{};state={authenticated:true,roles:['candidate','employer']};role='candidate';needConfirmed=true;needSpec='QA';needGrade='Senior';needContext={team:'Old team'};activeNeed={id:'old'};refresh=async()=>{state.need={spec:'Backend',grade:'Middle'};};confirmNeed=()=>{globalThis.confirmation={query,role,page};};searchFromHome('Middle Backend Python');",context);
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.deepEqual(JSON.parse(JSON.stringify(context.confirmation)),{query:'Middle Backend Python',role:'employer',page:'catalog'});
+ assert.equal(vm.runInContext('needConfirmed',context),false);
+ assert.equal(vm.runInContext('needSpec',context),'');
+ assert.equal(vm.runInContext('activeNeed',context),null);
+ assert.equal(vm.runInContext('needContext.team',context),'');
+});
+
+test('home search preserves its request and catalogue destination while a company profile is created',()=>{
+ const context=client();
+ vm.runInContext("render=()=>{};state={authenticated:true,roles:['candidate'],profile:{},user:{email:'test@example.test'}};modal=(title,description,body)=>{globalThis.onboardingForm=body;};searchFromHome('Junior Frontend React');",context);
+ assert.match(context.onboardingForm,/data-next="catalog"/);
+ assert.equal(vm.runInContext('query',context),'Junior Frontend React');
+ assert.equal(vm.runInContext('pendingHomeSearch',context),true);
+ vm.runInContext("state.roles.push('employer');confirmNeed=()=>{globalThis.confirmedQuery=query;};go('catalog');",context);
+ assert.equal(context.confirmedQuery,'Junior Frontend React');
+ assert.equal(vm.runInContext('pendingHomeSearch',context),false);
+});
+
+test('vacancy URLs render a full public page and survive a fresh deep link',async()=>{
+ const {seed}=await import('../lib/seed.mjs');
+ const context=client();context.jobs=seed.jobs;
+ const html=vm.runInContext("state={...emptyState(),jobs};location.hash='#job/demo-job-1';page=routePage(location.hash.slice(1));jobPage()",context);
+ assert.equal(vm.runInContext('page',context),'job');
+ for(const heading of ['Чем предстоит заниматься','Что ждём от вас','Что предлагаем','Как проходит знакомство'])assert.ok(html.includes(heading));
+ assert.ok(html.includes('/companies/kontur.svg'));
+ assert.ok(html.includes('Описание и условия синтетические'));
+ assert.match(vm.runInContext('jobCard(jobs[0])',context),/href="#job\/demo-job-1"/);
+ vm.runInContext("location.hash='#job/unknown'",context);
+ assert.match(vm.runInContext('jobPage()',context),/Вакансия недоступна/);
+ vm.runInContext("location.hash='#job/%E0%A4%A'",context);
+ assert.match(vm.runInContext('jobPage()',context),/Вакансия недоступна/);
+});
+
+test('demonstration vacancies cover every direction with complete original content',async()=>{
+ const {seed}=await import('../lib/seed.mjs');
+ assert.equal(seed.jobs.length,120);
+ assert.deepEqual(new Set(seed.jobs.map(j=>j.spec)),new Set(['Backend','Frontend','Data Science','DevOps','QA']));
+ assert.equal(new Set(seed.jobs.map(j=>j.id)).size,120);
+ for(const job of seed.jobs){
+  assert.equal(job.synthetic,true);assert.equal(job.own,false);
+  assert.ok(job.city&&['Удалённо','Гибрид','Офис'].includes(job.format));
+  assert.ok(job.min>0&&job.max>=job.min);
+  for(const key of ['responsibilities','requirements','benefits','hiringSteps'])assert.ok(job[key].length>=3,`${job.id}: ${key}`);
+ }
+});
+
+test('city and remote preferences filter both job and candidate discovery',()=>{
+ const context=client();
+ vm.runInContext("locationPreference={city:'Москва',format:'Удалённо'}",context);
+ assert.equal(vm.runInContext("matchesLocation({city:'Москва',format:'Удалённо'})",context),true);
+ assert.equal(vm.runInContext("matchesLocation({city:'Санкт-Петербург',format:'Удалённо'})",context),false);
+ assert.equal(vm.runInContext("matchesLocation({city:'Москва',format:'Офис'})",context),false);
+ vm.runInContext("locationPreference={city:'',format:'Удалённо'}",context);
+ assert.equal(vm.runInContext("matchesLocation({city:'Екатеринбург',format:'Удалённо'})",context),true);
+});
+
+test('vacancy search accepts several terms across the title, company and technologies',async()=>{
+ const {seed}=await import('../lib/seed.mjs');const context=client();context.job=seed.jobs[0];
+ assert.equal(vm.runInContext("jobQuery='python docker';jobMatchesQuery(job)",context),true);
+ assert.equal(vm.runInContext("jobQuery='контур middle';jobMatchesQuery(job)",context),true);
+ assert.equal(vm.runInContext("jobQuery='python react';jobMatchesQuery(job)",context),false);
+});
+
+test('large vacancy feeds paginate, clamp the current page after filtering and keep shareable links',async()=>{
+ const {seed}=await import('../lib/seed.mjs');const context=client();context.jobs=seed.jobs;
+ const html=vm.runInContext("state={...emptyState(),jobs};page='jobs';jobPageIndex=8;jobsPage()",context);
+ assert.equal((html.match(/class="job-card"/g)||[]).length,15);
+ assert.ok(html.includes('120 вакансий'));assert.ok(html.includes('aria-current="page"'));
+ assert.ok(html.includes('#job/'+seed.jobs[105].id));
+ vm.runInContext("jobQuery='python docker';jobsPage()",context);
+ assert.equal(vm.runInContext('jobPageIndex',context),1);
+});
+
+test('the employer journey is primary and audience tabs replace the duplicate workspace chooser',async()=>{
+ const context=client();
+ assert.equal(vm.runInContext('homeMode',context),'employer');
+ const header=vm.runInContext('header()',context);
+ assert.ok(header.indexOf('Ищу сотрудника')<header.indexOf('Ищу работу'));
+ assert.ok(!header.includes('switch-workspace'));
+ vm.runInContext("render=()=>{};refresh=async()=>{}",context);
+ await vm.runInContext("selectAudience('candidate')",context);
+ assert.deepEqual(JSON.parse(vm.runInContext('JSON.stringify({homeMode,role,page})',context)),{homeMode:'candidate',role:'candidate',page:'home'});
+ await vm.runInContext("selectAudience('employer')",context);
+ assert.equal(vm.runInContext('role',context),'employer');
+ assert.match(vm.runInContext('home()',context),/Найдите человека<br>под задачу команды/);
+});
+
+test('landing preview contains only synthetic public summaries with no contacts or private accounts',async()=>{
+ const {demoCandidatePreview}=await import('../lib/service.mjs');const previews=demoCandidatePreview();
+ assert.equal(previews.length,3);
+ assert.deepEqual(previews.map(c=>c.spec),['Backend','Frontend','DevOps']);
+ for(const c of previews){assert.equal(c.synthetic,true);assert.equal(c.verified,true);assert.ok(!('email' in c));assert.ok(!('phone' in c));assert.ok(!('resume' in c));assert.ok(!('privacy' in c));}
 });

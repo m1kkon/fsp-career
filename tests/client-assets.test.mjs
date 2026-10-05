@@ -8,7 +8,7 @@ test('published asset URLs change with content and the client imports the matchi
  const root=mkdtempSync(join(tmpdir(),'fsp-assets-'));
  try{
   mkdirSync(join(root,'public'));mkdirSync(join(root,'app'));
-  for(const name of ['styles.css','enterprise.css','marketplace.css','mvp.css','resume-editor.css','resume-history.mjs'])writeFileSync(join(root,'public',name),name+' original');
+  for(const name of ['styles.css','enterprise.css','marketplace.css','mvp.css','resume-editor.css','product.css','resume-history.mjs'])writeFileSync(join(root,'public',name),name+' original');
   writeFileSync(join(root,'public/mvp.js'),"import {historyDefaults} from './resume-history.mjs';");
   const first=versionClientAssets(root);assert.deepEqual(versionClientAssets(root),first);
   writeFileSync(join(root,'public/mvp.css'),'updated navigation styles');const css=versionClientAssets(root);assert.notEqual(css['mvp.css'],first['mvp.css']);assert.equal(css['mvp.js'],first['mvp.js']);assert.ok(!existsSync(join(root,'public',first['mvp.css'])));

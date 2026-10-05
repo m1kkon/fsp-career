@@ -17,7 +17,7 @@ function client(fetch){
   role:'candidate',query:'',page:'profile',busy:false,
   state:{authenticated:true,user:{id:'a',email:'a@example.test'},roles:['candidate'],profile:{name:'Original'},privacy:{fspVisible:true},invites:[]},
   overlay:{querySelector:s=>s==='[data-error]'?error:button},app:{querySelector:()=>null},
-  test:{id:'old-attempt'},result:{score:90},answers:[1],jobQuery:'old',localStorage:{setItem(){}},
+  test:{id:'old-attempt'},result:{score:90},answers:[1],jobQuery:'old',localStorage:{getItem(){return null;},setItem(){}},
   close(){context.closed=true;},render(){},go(page){context.page=page;},onboarding(){context.onboarded=true;},toast(message){context.toastMessage=message;}
  });
  vm.runInContext(empty+requests+pdf+auth,context);

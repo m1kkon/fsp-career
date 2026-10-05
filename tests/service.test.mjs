@@ -162,3 +162,45 @@ test('skill groups provide search technologies without duplicating profile field
  await action(repo,candidate,{action:'profile',about:'Only description changed'});assert.deepEqual(candidate.profile.stack,['Python','PyTorch','Docker','SQL']);
  await action(repo,candidate,{action:'profile',resume:{skillGroups:[]}});assert.deepEqual(candidate.profile.stack,[]);
 });
+
+test('company profile round-trips blocks, preserves omitted fields and clears optional data',async()=>{
+ const {repo,employer}=await fixture();
+ const details={action:'company',tagline:'Product for engineering teams',product:'Cloud platform for collaborative development',foundedYear:'2018',teamSize:'24',teamDescription:'Three cross-functional teams with shared review and mentoring',techStack:'Go, React, PostgreSQL, Go',workFormats:['Удалённо','Гибрид'],officeAddress:'Москва, центр',workingHours:'Flexible start; shared hours 12–16 MSK',benefits:'Equipment\nLearning budget',hiringProcess:'Recruiter call, technical discussion, decision in three days',website:'https://example.test',careersUrl:'https://example.test/careers',contactName:'Recruiter Name',contactRole:'IT recruiter'};
+ await action(repo,employer,details);
+ const saved=await repo.account(employer.id);
+ assert.equal(saved.company.name,'Company');assert.equal(saved.company.industry,'IT');assert.equal(saved.company.size,'1–50');
+ assert.deepEqual(saved.company.techStack,['Go','React','PostgreSQL']);assert.deepEqual(saved.company.benefits,['Equipment','Learning budget']);
+ assert.deepEqual((await getState(repo,saved,'employer')).company,saved.company);
+ await action(repo,saved,{action:'company',tagline:'Updated tagline'});
+ assert.equal((await repo.account(saved.id)).company.product,details.product);
+ await action(repo,saved,{action:'company',product:'',website:'',workFormats:[],benefits:[],techStack:[],foundedYear:'',teamSize:''});
+ const cleared=(await repo.account(saved.id)).company;
+ assert.equal(cleared.product,'');assert.equal(cleared.website,'');assert.deepEqual(cleared.workFormats,[]);assert.deepEqual(cleared.techStack,[]);
+});
+
+test('company validation rejects unsafe links and malformed blocks without a partial save',async()=>{
+ const {repo,employer,candidate}=await fixture();
+ await assert.rejects(action(repo,candidate,{action:'company',name:'Impersonated company'}),/профиль компании/);
+ const original=(await repo.account(employer.id)).company;
+ for(const update of [{website:'javascript:alert(1)'},{careersUrl:'https://user:password@example.test'},{foundedYear:'2099'},{teamSize:'-4'},{workFormats:['Invalid']},{benefits:Array(13).fill('Benefit')},{size:'Fake size'}]){
+  await assert.rejects(action(repo,employer,{action:'company',name:'Should not save',...update}));
+  assert.deepEqual((await repo.account(employer.id)).company,original);
+ }
+});
+
+test('candidates see current company information in jobs and invitations without recruiting or account contacts',async()=>{
+ const {repo,employer,candidate}=await fixture();
+ await action(repo,employer,{action:'company',name:'Studio',product:'Developer platform',teamDescription:'A distributed engineering team',techStack:['Go'],contactName:'Private recruiter',contactRole:'Private role',contact:'private@example.test',website:'https://example.test'});
+ await action(repo,employer,{action:'job',title:'Backend engineer',description:'Develop APIs',spec:'Backend',grade:'Middle',stack:'Go',min:100,max:200});
+ await action(repo,employer,invitation(candidate.id));
+ await action(repo,employer,{action:'company',name:'Studio Updated',product:'Updated product'});
+ const publicJob=(await publicJobs(repo)).find(j=>!j.synthetic);
+ assert.equal(publicJob.company,'Studio Updated');assert.equal(publicJob.companyProfile.product,'Updated product');
+ const incoming=await getState(repo,candidate,'candidate');
+ assert.equal(incoming.invites[0].companyProfile.name,'Studio Updated');
+ assert.equal(incoming.jobs.find(j=>j.id===publicJob.id).companyProfile.product,'Updated product');
+ for(const profile of [publicJob.companyProfile,incoming.invites[0].companyProfile]){
+  for(const key of ['contact','contactName','contactRole','email','id','privacy'])assert.ok(!(key in profile));
+  assert.ok(!JSON.stringify(profile).includes('private@example.test'));
+ }
+});
