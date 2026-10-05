@@ -7,7 +7,7 @@ import {historyDefaults} from '../public/resume-history.mjs';
 const source=fs.readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
 const requests=source.slice(source.indexOf('async function requestData('),source.indexOf('function go(next)'));
 const pdf=source.slice(source.indexOf('let pdfExporting='),source.indexOf("document.addEventListener('click'"));
-const auth=source.slice(source.indexOf('async function loginApp('),source.indexOf('function onboarding('));
+const auth=source.slice(source.indexOf('function completeLogin('),source.indexOf('function onboarding('));
 const empty=source.slice(source.indexOf('const emptyState='),source.indexOf('let role='));
 function client(fetch){
  const button={textContent:'Сохранить',disabled:false,setAttribute(){},removeAttribute(){}};

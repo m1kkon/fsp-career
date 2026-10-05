@@ -88,7 +88,7 @@ async function requestData(url,options={},read='json',timeoutMs=20000){
  const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),timeoutMs);
  try{
   const response=await fetch(url,{...options,signal:controller.signal});
-  if(!response.ok){let message;try{message=(await response.json()).error;}catch{}throw new Error(message||(response.status===401?'Войдите в аккаунт ещё раз.':'Не удалось выполнить запрос.'));}
+  if(!response.ok){let message;try{message=(await response.json()).error;}catch{}throw Object.assign(new Error(message||(response.status===401?'Войдите в аккаунт ещё раз.':'Не удалось выполнить запрос.')),{status:response.status});}
   if(read==='pdf'){
    if(!response.headers.get('content-type')?.includes('application/pdf'))throw new Error('Не удалось получить PDF. Попробуйте ещё раз.');
    const filename=response.headers.get('content-disposition')?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
@@ -121,13 +121,29 @@ function go(next){page=next;location.hash=next==='home'?'':next;close();render()
 function close(){overlay.innerHTML='';document.body.classList.remove('overlay-open');previousFocus?.focus?.();}
 function modal(h,p,body,wide=false){previousFocus=document.activeElement;overlay.innerHTML=`<div class="overlay" data-backdrop><section class="modal ${wide?'wide-modal':''}" role="dialog" aria-modal="true" aria-label="${esc(h)}"><div class="modal-header"><div><h2>${h}</h2><p>${p}</p></div><button class="icon-button" data-action="close" aria-label="Закрыть">${icon('close')}</button></div>${body}</section></div>`;document.body.classList.add('overlay-open');overlay.querySelector('input,button,select')?.focus();}
 const formEnd=(label='Сохранить')=>`<p class="form-error" data-error tabindex="-1" role="alert"></p><div class="modal-actions">${button('Отмена','close','',true)}<button class="button" type="submit">${label}</button></div>`;
+function completeLogin(data,wanted,next){
+ viewRevision++;role=wanted;localStorage.setItem('fsp-role',role);state={...emptyState(),...data};invalidateResumePDF();close();
+ if(state.roles.includes(role))go(next);else{go('home');onboarding(role);}
+}
+function authModal(wanted=role,next='dashboard',register=false){
+ modal(register?'Создать аккаунт':'Войти в ФСП Карьеру','Один аккаунт для кабинета кандидата и компании.',`<form id="auth-form" data-role="${wanted}" data-next="${next}" data-register="${register}"><div class="stack">${register?field('Имя','name','','text','required maxlength="100" autocomplete="name"'):''}${field('Email','email','','email','required maxlength="254" autocomplete="email"')}${field('Пароль','password','','password',`required minlength="${register?12:1}" maxlength="128" autocomplete="${register?'new-password':'current-password'}"`)}${register?`${field('Повторите пароль','passwordConfirmation','','password','required minlength="12" maxlength="128" autocomplete="new-password"')}<p class="subtext">От 12 символов. Подтверждение email пока не подключено; храните пароль в менеджере паролей.</p><label class="check-row"><input name="terms" type="checkbox" required>Согласен на обработку данных аккаунта. <a href="#privacy" data-action="legal">Условия</a></label>`:'<p class="subtext">Восстановление по email пока не подключено.</p>'}</div>${formEnd(register?'Зарегистрироваться':'Войти')}<button class="button button-secondary" type="button" data-action="auth-switch" data-role="${wanted}" data-next="${next}" data-register="${!register}">${register?'Уже есть аккаунт — войти':'Создать аккаунт'}</button></form>`);
+}
+async function submitAuth(form,data){
+ if(busy)return;busy=true;
+ const submit=form.querySelector('button[type="submit"]'),label=submit.textContent,error=form.querySelector('[data-error]');submit.disabled=true;submit.textContent='Подождите…';
+ try{
+  const register=form.dataset.register==='true';
+  if(register&&data.password!==data.passwordConfirmation)throw new Error('Пароли не совпадают.');
+  const result=await requestData('/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:register?'register':'login',email:data.email,password:data.password,name:data.name,terms:data.terms==='on',role:form.dataset.role})});
+  completeLogin(result,form.dataset.role,form.dataset.next);toast(register?'Аккаунт создан.':'Вы вошли в аккаунт.');
+ }catch(e){error.textContent=e.message;error.focus();}finally{busy=false;submit.disabled=false;submit.textContent=label;}
+}
 async function loginApp(wanted=role,next='dashboard'){
  if(busy)return;busy=true;
  try{
   const data=await requestData('/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',role:wanted})});
-  viewRevision++;role=wanted;localStorage.setItem('fsp-role',role);state={...emptyState(),...data};invalidateResumePDF();
-  if(state.roles.includes(role))go(next);else{go('home');onboarding(role);}
- }catch(error){toast(error.message);}finally{busy=false;}
+  completeLogin(data,wanted,next);
+ }catch(error){if(error.status===401)authModal(wanted,next);else toast(error.message);}finally{busy=false;}
 }
 async function logoutApp(){
  if(busy)return;busy=true;
@@ -137,7 +153,7 @@ async function logoutApp(){
  }catch(error){toast(error.message);}finally{busy=false;}
 }
 function ensureRole(wanted,next='dashboard'){role=wanted;localStorage.setItem('fsp-role',role);if(!state.authenticated){loginApp(wanted,next);return;}if(!state.roles.includes(wanted)){onboarding(wanted);return;}refresh().then(()=>go(next)).catch(e=>toast(e.message));}
-function onboarding(wanted){role=wanted;localStorage.setItem('fsp-role',wanted);const p=state.profile||{};modal(wanted==='candidate'?'Создайте профиль кандидата':'Расскажите о компании','Вы уже вошли через ChatGPT. Email аккаунта подтверждается провайдером.',`<form id="onboard" data-role="${wanted}"><div class="stack">${field(wanted==='candidate'?'Имя и фамилия':'Название компании','name',wanted==='candidate'?p.name:'','text','required maxlength="100"')}${field('Город','city',p.city||'','text','required')}${wanted==='candidate'?`<div class="inline-note">${icon('shield')}После создания профиля заполните обязательную анкету: направление, предполагаемый уровень, профессиональные роли и мягкие навыки. Затем откроется тест.</div>`:`${field('Контакт для кандидатов','contact',state.user?.email||'','email','required')}${textarea('Чем занимается компания','description','','required minlength="20"')}` }<label class="check-row"><input name="consent" type="checkbox" required>Согласен на обработку данных профиля. <a href="#privacy" data-action="legal">Условия</a></label></div>${formEnd('Создать профиль')}</form>`);}
+function onboarding(wanted){role=wanted;localStorage.setItem('fsp-role',wanted);const p=state.profile||{};modal(wanted==='candidate'?'Создайте профиль кандидата':'Расскажите о компании','Аккаунт создан. Заполните данные выбранного кабинета.',`<form id="onboard" data-role="${wanted}"><div class="stack">${field(wanted==='candidate'?'Имя и фамилия':'Название компании','name',wanted==='candidate'?p.name:'','text','required maxlength="100"')}${field('Город','city',p.city||'','text','required')}${wanted==='candidate'?`<div class="inline-note">${icon('shield')}После создания профиля заполните обязательную анкету: направление, предполагаемый уровень, профессиональные роли и мягкие навыки. Затем откроется тест.</div>`:`${field('Контакт для кандидатов','contact',state.user?.email||'','email','required')}${textarea('Чем занимается компания','description','','required minlength="20"')}` }<label class="check-row"><input name="consent" type="checkbox" required>Согласен на обработку данных профиля. <a href="#privacy" data-action="legal">Условия</a></label></div>${formEnd('Создать профиль')}</form>`);}
 function confirmNeed(){const need=state.need||{};const specOptions=`<option value="">Выберите специализацию</option>${options(specs,needSpec||need.spec)}`;const gradeOptions=`<option value="">Выберите уровень</option>${options(grades,needGrade||need.grade)}`;const warning=need.missing?.length||need.ambiguous?.spec||need.ambiguous?.grade?'Не все параметры удалось определить однозначно. Выберите их вручную.':'Проверьте распознанные параметры перед построением выдачи.';const evidence=need.evidence?.length?`<div class="need-evidence"><strong>Почему система предложила эти параметры</strong>${need.evidence.map(item=>`<div><span>${esc(item.field)} · ${esc(item.value)}</span><q>${esc(item.quote)}</q></div>`).join('')}</div>`:'';modal('Подтвердите потребность',warning,`<form id="need-confirm-form"><div class="need-source"><span>Запрос работодателя</span><strong>${esc(query)}</strong></div>${evidence}<div class="form-row"><div class="field"><label for="confirmed-spec">Специализация</label><select id="confirmed-spec" name="spec" required>${specOptions}</select></div><div class="field"><label for="confirmed-grade">Уровень</label><select id="confirmed-grade" name="grade" required>${gradeOptions}</select></div></div>${field('Обязательные технологии','stack',needStack||(need.stack||[]).join(', '),'text','placeholder="Например: Python, PostgreSQL"')}<div class="inline-note">${icon('shield')}Система не подставляет специализацию или уровень по умолчанию. Подбор начнётся только после вашего подтверждения.</div>${formEnd('Показать кандидатов')}</form>`);}
 function header(){const signed=state.authenticated,member=state.roles.includes(role);return `<header class="site-header"><div class="header-inner"><a class="brand" href="#home" data-action="nav" data-page="home"><span class="brand-icon">фсп</span><span>Карьера</span></a><nav class="public-nav" aria-label="Основная навигация"><a href="#jobs" data-action="nav" data-page="jobs">Вакансии</a><a href="#employers" data-action="nav" data-page="employers">Работодателям</a><a href="#method" data-action="nav" data-page="method">Как это работает</a></nav><div class="header-actions">${signed?`<button class="account-switch" data-action="switch-workspace">${icon(role==='employer'?'briefcase':'user','small-icon')}<span>${role==='employer'?'Работодатель':'Кандидат'}</span>${icon('down','small-icon')}</button>${button(member?'Мой кабинет':'Создать профиль',member?'nav':'join',member?'data-page="dashboard"':`data-role="${role}"`,true)}<button class="header-signout" data-action="logout" aria-label="Выйти из аккаунта">Выйти</button>`:`${button('Войти','login','',true)}${button('Создать резюме','join','data-role="candidate"')}`}</div></div></header>`;}
 function nav(){if(!state.roles.includes(role)||['home','employers','method','privacy','help','onboarding-candidate','onboarding-employer'].includes(page))return '';const menus=role==='employer'?[['dashboard','Обзор'],['catalog','Поиск кандидатов'],['needs','Подборки'],['invites','Приглашения'],['jobs','Вакансии'],['applications','Отклики'],['tasks','Задания'],['company','Компания']]:[['dashboard','Обзор'],['profile','Моё резюме'],['survey','Анкета'],['tests','Подтверждение навыков'],['offers','Приглашения'],['jobs','Вакансии'],['applications','Мои отклики'],['tasks','Задания'],['settings','Настройки']];return `<nav class="product-nav" aria-label="Личный кабинет">${menus.map(([key,label])=>`<a href="#${key}" data-action="nav" data-page="${key}" class="nav-item ${page===key?'active':''}">${label}${(role==='employer'||state.privacy?.notifications)&&key===(role==='employer'?'invites':'offers')&&state.invites.filter(i=>i.status==='sent').length?`<span class="nav-count">${state.invites.filter(i=>i.status==='sent').length}</span>`:''}</a>`).join('')}</nav>`;}
@@ -312,6 +328,7 @@ async function exportPDF(){
 document.addEventListener('click',async event=>{const faq=event.target.closest('.faq-item > summary');if(faq){event.preventDefault();toggleFAQ(faq.parentElement);return;}if(event.target.matches('[data-backdrop]')){close();return;}const el=event.target.closest('[data-action]');if(!el)return;event.preventDefault();const {action,id}=el.dataset;switch(action){
 case 'nav':go(el.dataset.page);break;
 case 'survey-section':document.getElementById(el.dataset.target)?.scrollIntoView({behavior:'smooth',block:'start'});break;
+case 'auth-switch':authModal(el.dataset.role,el.dataset.next,el.dataset.register==='true');break;
 case 'login':await loginApp();break;
 case 'logout':await logoutApp();break;
 case 'join':ensureRole(el.dataset.role||role,el.getAttribute('href')?.slice(1)||'dashboard');break;
@@ -378,6 +395,7 @@ document.addEventListener('input',event=>{
 });
 document.addEventListener('change',e=>{if(e.target.dataset.filter){filter[e.target.dataset.filter]=e.target.value;render();}});
 document.addEventListener('submit',async event=>{const form=event.target;if(!form.id)return;event.preventDefault();const data=Object.fromEntries(new FormData(form));switch(form.id){
+case 'auth-form':await submitAuth(form,data);break;
 case 'onboard':{data.consent=form.elements.consent.checked;const candidate=form.dataset.role==='candidate';const r=await mutate({action:'onboard',role:form.dataset.role,...data},candidate?'survey':'dashboard');if(r&&candidate)toast('Профиль создан. Заполните анкету перед тестированием.');break;}
 case 'home-search':jobQuery=data.query;filter.spec='all';go('jobs');break;
 case 'job-search-form':jobQuery=data.query;filter.spec=data.spec;render();break;
