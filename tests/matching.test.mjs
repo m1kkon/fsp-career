@@ -142,7 +142,7 @@ async function workspace(){
  const repo=memory();
  const candidate=await accountFor(repo,{id:'candidate-a',email:'a@example.test',name:'Candidate'});
  await action(repo,candidate,{action:'onboard',role:'candidate',name:'Candidate',city:'Москва',spec:'Backend',grade:'Middle',consent:true});
- candidate.profile={...candidate.profile,verified:true,score:90,stack:['Python','PostgreSQL'],verifiedAt:Date.now(),gradeChangedAt:Date.now()};await repo.saveAccount(candidate);
+ candidate.profile={...candidate.profile,verified:true,spec:'Backend',grade:'Middle',score:90,stack:['Python','PostgreSQL'],verifiedAt:Date.now(),gradeChangedAt:Date.now()};await repo.saveAccount(candidate);
  const employer=await accountFor(repo,{id:'employer-a',email:'hr@example.test',name:'HR'});
  await action(repo,employer,{action:'onboard',role:'employer',name:'Company',description:'Product engineering team',contact:'hr@example.test',consent:true});
  return {repo,candidate,employer};
@@ -150,7 +150,7 @@ async function workspace(){
 
 test('employer state carries the parsed need, team context and category recommendations',async()=>{
  const {repo,candidate,employer}=await workspace();
- const state=await getState(repo,employer,'employer',QUERY,{team:TEAM.team,format:'Удалённо',budgetMin:'180000',budgetMax:'250000',role:'employer'});
+ const state=await getState(repo,employer,'employer',QUERY,{team:TEAM.team,format:'Удалённо',budgetMin:'180000',budgetMax:'250000',role:'employer',confirmed:true});
  assert.deepEqual([state.need.format,state.need.budgetMin,state.need.budgetMax],['Удалённо',180000,250000]);
  assert.equal(state.categories[0].key,'Backend|Middle');assert.equal(state.categories[0].count,5);
  const own=state.candidates.find(c=>c.id===candidate.id);
@@ -163,7 +163,7 @@ test('employer state carries the parsed need, team context and category recommen
 
 test('saved need keeps team context and a snapshot of the shortlist; invalid budgets are rejected',async()=>{
  const {repo,candidate,employer}=await workspace();
- await action(repo,employer,{action:'need',text:QUERY,...TEAM,budgetMin:'180 000',city:'Москва'});
+ await action(repo,employer,{action:'need',text:QUERY,confirmed:true,...TEAM,budgetMin:'180 000',city:'Москва'});
  const [saved]=await repo.scoped('need',employer.id);
  assert.deepEqual(saved.context,{team:TEAM.team,format:'Удалённо',city:'Москва',budgetMin:180000,budgetMax:250000});
  assert.equal(saved.spec,'Backend');assert.equal(saved.snapshot.total,5);assert.equal(saved.snapshot.items[0].id,'demo-1');
@@ -176,7 +176,7 @@ test('saved need keeps team context and a snapshot of the shortlist; invalid bud
 
 test('hidden or missing FSP history neither moves nor hides a real candidate in employer search',async()=>{
  const {repo,candidate,employer}=await workspace();
- const find=async()=>(await getState(repo,employer,'employer',QUERY)).candidates.find(c=>c.id===candidate.id);
+ const find=async()=>(await getState(repo,employer,'employer',QUERY,{confirmed:true})).candidates.find(c=>c.id===candidate.id);
  const before=await find();
  assert.equal(part(before.match,'fsp').points,0);
  await action(repo,candidate,{action:'fsp-link',fspId:'DEMO-FSP-001'});
