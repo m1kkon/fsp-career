@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ФСП Карьера MVP API",
-    "version": "1.2.1",
-    "description": "Sites передаёт подтверждённую идентичность через доверенные серверные заголовки. Браузер использует сессию платформы. Пароли приложение не хранит. Параметр role выбирает представление, но не выдаёт права. ChatGPT identity используется для текущего хостинга; самостоятельная регистрация с подтверждением email пока не реализована."
+    "version": "1.2.2",
+    "description": "Sites передаёт подтверждённую идентичность через доверенные серверные заголовки. Браузер использует сессию платформы. Пароли приложение не хранит. Параметр role выбирает представление, но не выдаёт права. ChatGPT identity используется для текущего хостинга; самостоятельная регистрация с подтверждением email пока не реализована. Выход из кабинета через /api/session независим от входа хостинга: закрывает приватные API и сохраняет аккаунт до повторного входа."
   },
   "servers": [
     {
@@ -285,6 +285,65 @@
           }
         }
       }
+    },
+    "/api/session": {
+      "post": {
+        "summary": "Войти в кабинет или выйти на главную сервиса",
+        "description": "Временный мост к доверенной идентичности Sites. login восстанавливает сохранённый аккаунт и удаляет маркер выхода; logout выставляет HttpOnly/SameSite=Lax cookie и возвращает публичные вакансии, не завершая вход хостинга. Запрос допускается только со своего origin.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "action"
+                ],
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "login",
+                      "logout"
+                    ]
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "candidate",
+                      "employer"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "login: собственное State; logout: authenticated=false и публичные jobs. Set-Cookie меняет состояние кабинета.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/State"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректное действие или тело запроса"
+          },
+          "401": {
+            "description": "Нет доверенной идентичности хостинга для входа"
+          },
+          "403": {
+            "description": "Недопустимый origin"
+          },
+          "500": {
+            "description": "Не удалось изменить состояние входа"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -348,7 +407,7 @@
       },
       "profile": {
         "type": "object",
-        "description": "Сохранить резюме кандидата",
+        "description": "Сохранить частично заполненное резюме кандидата. Пропущенные ключи сохраняются, пустые поля очищаются; пустое имя сохраняет имя аккаунта. Зарплата необязательна, при двух границах max >= min. Необязательное поле resume сохраняет структурированные блоки вместе с основными полями одной записью; ошибка любого блока отменяет весь запрос.",
         "properties": {
           "action": {
             "type": "string",
@@ -392,21 +451,45 @@
             "type": "string"
           },
           "min": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "description": "Одна граница ожиданий. null или пустая строка удаляют значение; отсутствие ключа сохраняет его."
           },
           "max": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10000000
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "description": "Одна граница ожиданий. null или пустая строка удаляют значение; отсутствие ключа сохраняет его."
+          },
+          "resume": {
+            "$ref": "#/components/schemas/ResumeDetails"
           }
         },
         "required": [
-          "action",
-          "name",
-          "min",
-          "max"
+          "action"
         ]
       },
       "settings": {
@@ -1078,12 +1161,18 @@
             }
           },
           "min": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 1,
             "maximum": 10000000
           },
           "max": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "minimum": 1,
             "maximum": 10000000
           },
@@ -1306,6 +1395,78 @@
           "action": {
             "const": "resume-details"
           },
+          "headline": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "languages": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "achievements": {
+            "type": "string",
+            "maxLength": 1800
+          },
+          "skillGroups": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "projects": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1200
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          }
+        }
+      },
+      "ResumeDetails": {
+        "type": "object",
+        "properties": {
           "headline": {
             "type": "string",
             "maxLength": 100

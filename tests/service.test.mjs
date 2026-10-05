@@ -102,3 +102,27 @@ test('record saves include updated state but still acknowledge committed writes 
  assert.equal(response.refreshRequired,true);assert.equal((await repo.scoped('need',employer.id)).length,2);
  assert.equal((await getState(repo,candidate)).needs.length,0);
 });
+test('candidate drafts save empty optional fields and retain fields omitted from a partial edit',async()=>{
+ const {repo,candidate}=await fixture();
+ await action(repo,candidate,{action:'profile',about:'Only this changed'});
+ assert.equal(candidate.profile.name,'Candidate');assert.deepEqual(candidate.profile.stack,['Python','PostgreSQL']);
+ await action(repo,candidate,{action:'profile',name:'',city:'',stack:'',min:'',max:'',about:'',work:'',education:''});
+ const saved=(await repo.account(candidate.id)).profile;
+ assert.equal(saved.name,'Candidate');assert.equal(saved.city,'');assert.deepEqual(saved.stack,[]);assert.equal(saved.min,null);assert.equal(saved.max,null);assert.equal(saved.grade,'Middle');assert.equal(saved.verified,true);
+ await action(repo,candidate,{action:'profile',min:120000});assert.equal(candidate.profile.min,120000);assert.equal(candidate.profile.max,null);
+ await assert.rejects(action(repo,candidate,{action:'profile',min:200000,max:100000}));
+ await assert.rejects(action(repo,candidate,{action:'profile',min:-1}));
+});
+
+test('one resume save commits basic fields and structured blocks together or rejects the entire edit',async()=>{
+ const {repo,candidate}=await fixture();
+ const resume={headline:'ML Engineer',skillGroups:[{label:'ML',text:'Python, PyTorch'},{label:'Tools',text:'Git, Docker'}],projects:[{name:'Search',description:'Built retrieval',url:'https://example.test'}],links:[]};
+ await action(repo,candidate,{action:'profile',name:'Updated',min:100000,max:200000,resume});
+ const before=structuredClone(candidate.profile);
+ assert.equal((await repo.account(candidate.id)).profile.resume.skillGroups[0].label,'ML');
+ assert.equal(candidate.profile.min,100000);assert.equal(candidate.profile.verified,true);
+ await assert.rejects(action(repo,candidate,{action:'profile',name:'Must not save',resume:{links:[{url:'javascript:alert(1)'}]}}));
+ assert.deepEqual(candidate.profile,before);assert.deepEqual((await repo.account(candidate.id)).profile,before);
+ await action(repo,candidate,{action:'profile',resume:{skillGroups:[{label:'',text:''}],projects:[],links:[]}});
+ assert.equal(candidate.profile.name,'Updated');assert.deepEqual(candidate.profile.resume.skillGroups,[]);
+});
