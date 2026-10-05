@@ -46,3 +46,7 @@ next-env.d.ts
 /work/
 
 *.tsbuildinfo
+
+# Local document render checks; never include personal examples in source.
+/tmp/
+/output/

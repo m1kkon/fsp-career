@@ -8,5 +8,5 @@ export default function CareerShell() {
     script.src = '/mvp.js';
     document.body.appendChild(script);
   }, []);
-  return <><div id="app"><div className="boot-screen">ФСП Карьера<span>Загружаем сервис…</span></div></div><div id="overlay-root"/><div id="toast" className="toast" role="status" aria-live="polite"/><div id="print-profile"/></>;
+  return <><div id="app"><div className="boot-screen">ФСП Карьера<span>Загружаем сервис…</span></div></div><div id="overlay-root"/><div id="toast" className="toast" role="status" aria-live="polite"/></>;
 }
