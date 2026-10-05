@@ -32,6 +32,41 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "spec",
+            "in": "query",
+            "description": "Подтверждённая работодателем специализация",
+            "schema": {
+              "type": "string",
+              "enum": ["Backend", "Frontend", "Data Science", "DevOps", "QA"]
+            }
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "description": "Подтверждённый работодателем уровень",
+            "schema": {
+              "type": "string",
+              "enum": ["Junior", "Middle", "Senior"]
+            }
+          },
+          {
+            "name": "stack",
+            "in": "query",
+            "description": "Подтверждённые обязательные технологии через запятую",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "confirmed",
+            "in": "query",
+            "description": "Признак явного подтверждения распознанной потребности",
+            "schema": {
+              "type": "string",
+              "enum": ["1"]
+            }
           }
         ],
         "responses": {
@@ -72,6 +107,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/profile"
+                  },
+                  {
+                    "$ref": "#/components/schemas/survey"
                   },
                   {
                     "$ref": "#/components/schemas/settings"
@@ -363,6 +401,36 @@
           "max"
         ]
       },
+      "survey": {
+        "type": "object",
+        "description": "Сохранить новую версию обязательной анкеты кандидата перед тестированием",
+        "properties": {
+          "action": {"type": "string", "const": "survey"},
+          "careerGoal": {"type": "string"},
+          "employmentStatus": {"type": "string"},
+          "experienceYears": {"type": "string"},
+          "industry": {"type": "string", "enum": ["Финтех", "Электронная коммерция", "Образование", "Медиа", "Государственные сервисы", "Другое"]},
+          "spec": {"type": "string", "enum": ["Backend", "Frontend", "Data Science", "DevOps", "QA"]},
+          "grade": {"type": "string", "enum": ["Junior", "Middle", "Senior"]},
+          "primaryRole": {"type": "string"},
+          "roles": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+          "technicalSkills": {"type": "string", "minLength": 3, "maxLength": 600},
+          "achievement": {"type": "string", "minLength": 30, "maxLength": 1200},
+          "softSkills": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string"}},
+          "softSkillExample": {"type": "string", "minLength": 40, "maxLength": 1200},
+          "uncertaintyResponse": {"type": "string"},
+          "feedbackPreference": {"type": "string"},
+          "workStyle": {"type": "string", "enum": ["Команда", "Самостоятельно", "Смешанный формат"]},
+          "preferredFormat": {"type": "string", "enum": ["Удалённо", "Гибрид", "Офис"]},
+          "teamSize": {"type": "string"},
+          "taskType": {"type": "string"},
+          "businessTrips": {"type": "string"},
+          "relocation": {"type": "string"},
+          "motivation": {"type": "string", "minLength": 40, "maxLength": 1200},
+          "avoidTasks": {"type": "string", "maxLength": 800}
+        },
+        "required": ["action", "careerGoal", "employmentStatus", "experienceYears", "industry", "spec", "grade", "primaryRole", "roles", "technicalSkills", "achievement", "softSkills", "softSkillExample", "uncertaintyResponse", "feedbackPreference", "motivation"]
+      },
       "settings": {
         "type": "object",
         "description": "Видимость и согласие",
@@ -457,11 +525,27 @@
           },
           "title": {
             "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": ["Backend", "Frontend", "Data Science", "DevOps", "QA"]
+          },
+          "grade": {
+            "type": "string",
+            "enum": ["Junior", "Middle", "Senior"]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
           "action",
-          "text"
+          "text",
+          "spec",
+          "grade"
         ]
       },
       "delete-need": {
@@ -999,6 +1083,27 @@
               "type": "string"
             }
           },
+          "roles": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "softSkills": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "competencies": {
+            "type": "array",
+            "description": "Паспорт компетенций из последнего принятого успешного теста",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "status": {"type": "string", "enum": ["confirmed", "development"]},
+                "source": {"type": "string"},
+                "verifiedAt": {"type": "integer"}
+              }
+            }
+          },
           "verified": {
             "type": "boolean"
           },
@@ -1086,6 +1191,23 @@
           "company": {
             "type": "object"
           },
+          "need": {
+            "type": "object",
+            "description": "Результат разбора и подтверждения текущей потребности",
+            "properties": {
+              "text": {"type": "string"},
+              "spec": {"type": ["string", "null"]},
+              "grade": {"type": ["string", "null"]},
+              "stack": {"type": "array", "items": {"type": "string"}},
+              "confirmed": {"type": "boolean"},
+              "missing": {"type": "array", "items": {"type": "string"}}
+              ,"evidence": {
+                "type": "array",
+                "description": "Цитаты из запроса, которыми объясняется распознавание требований",
+                "items": {"type": "object"}
+              }
+            }
+          },
           "candidates": {
             "type": "array",
             "items": {
@@ -1121,6 +1243,11 @@
             "items": {
               "type": "object"
             }
+          },
+          "surveys": {
+            "type": "array",
+            "description": "Версии анкет текущего кандидата, от новых к старым",
+            "items": {"type": "object"}
           },
           "messages": {
             "type": "array",
