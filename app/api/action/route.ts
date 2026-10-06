@@ -1,5 +1,17 @@
-import {env} from 'cloudflare:workers';
 import {getAppUser} from '../../app-auth';
-import {repository,accountFor} from '../../../lib/service.mjs';
+import {transaction} from '../../../lib/postgres.mjs';
 import {actionResponse} from '../../../lib/action-response.mjs';
-export async function POST(request:Request){try{const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return Response.json({error:'Недопустимый источник запроса.'},{status:403});const user=await getAppUser();if(!user)return Response.json({error:'Войдите в аккаунт.'},{status:401});if(!env.DB)throw new Error('Database binding unavailable');const length=Number(request.headers.get('content-length')||0);if(length>60000)return Response.json({error:'Слишком большой запрос.'},{status:413});const payload=await request.json();if(!payload||typeof payload!=='object'||Array.isArray(payload))return Response.json({error:'Некорректный запрос.'},{status:400});const body=payload as Record<string,unknown>;if(new TextEncoder().encode(JSON.stringify(body)).length>(body.action==='company'?60000:30000))return Response.json({error:'Слишком большой запрос.'},{status:413});const repo=repository(env.DB),a=await accountFor(repo,{id:user.userId,email:user.email,name:user.displayName});return Response.json(await actionResponse(repo,a,body),{headers:{'Cache-Control':'no-store'}});}catch(e){const status=(e as {status?:number}).status||500;return Response.json({error:status===500?'Не удалось сохранить данные.':e instanceof Error?e.message:'Ошибка запроса'},{status});}}
+import {checkOrigin, jsonBody, errorResponse, httpError} from '../../../lib/http.mjs';
+export const runtime = 'nodejs';
+export async function POST(request: Request) {
+ try {
+  checkOrigin(request);
+  const user = await getAppUser();
+  if (!user) throw httpError('Войдите в аккаунт.', 401);
+  const body = await jsonBody(request, 60000);
+  if (body.action !== 'company' && Buffer.byteLength(JSON.stringify(body)) > 30000) throw httpError('Слишком большой запрос.', 413);
+  const result = await transaction(async repo => actionResponse(repo, await repo.account(user.userId), body));
+  return Response.json(result, {headers:{'Cache-Control':'no-store'}});
+ } catch (error) { return errorResponse(error, 'Не удалось сохранить данные.'); }
+}
+

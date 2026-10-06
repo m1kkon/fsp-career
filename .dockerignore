@@ -1,0 +1,19 @@
+.git
+node_modules
+.next
+.vinext
+dist
+.wrangler
+.env*
+.sites-runtime
+.agents
+.codex
+work
+outputs
+output
+tmp
+*.tsbuildinfo
+*.log
+
+# Ephemeral GitHub OIDC credentials.
+gha-creds-*.json

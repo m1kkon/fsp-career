@@ -7,14 +7,14 @@ import {historyDefaults} from '../public/resume-history.mjs';
 const source=fs.readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
 const requests=source.slice(source.indexOf('async function requestData('),source.indexOf('function go(next)'));
 const pdf=source.slice(source.indexOf('let pdfExporting='),source.indexOf("document.addEventListener('click'"));
-const auth=source.slice(source.indexOf('async function loginApp('),source.indexOf('function onboarding('));
+const auth=source.slice(source.indexOf('async function completeLogin('),source.indexOf('function onboarding('));
 const empty=source.slice(source.indexOf('const emptyState='),source.indexOf('let role='));
 function client(fetch){
  const button={textContent:'Сохранить',disabled:false,setAttribute(){},removeAttribute(){}};
  const error={textContent:'',focus(){}};
  const context=vm.createContext({fetch,AbortController,setTimeout,clearTimeout,Date,JSON,Error,URLSearchParams,
   needContext:{},needSpec:'',needGrade:'',needStack:'',needConfirmed:false,compare:[],contextDraft:null,activeNeed:null,contextFields:()=>({}),
-  role:'candidate',query:'',page:'profile',busy:false,
+  role:'candidate',query:'',page:'profile',busy:false,pendingHomeSearch:false,homeMode:'candidate',
   state:{authenticated:true,user:{id:'a',email:'a@example.test'},roles:['candidate'],profile:{name:'Original'},privacy:{fspVisible:true},invites:[]},
   overlay:{querySelector:s=>s==='[data-error]'?error:button},app:{querySelector:()=>null},
   test:{id:'old-attempt'},result:{score:90},answers:[1],jobQuery:'old',localStorage:{getItem(){return null;},setItem(){}},
@@ -23,6 +23,38 @@ function client(fetch){
  vm.runInContext(empty+requests+pdf+auth,context);
  return {context,button,error};
 }
+test('email link tokens leave the URL immediately and opening a link does not consume it',()=>{
+ const token='a'.repeat(64),changes=[];
+ const context=vm.createContext({page:'home',URLSearchParams,location:{hash:'#verify-email?token='+token,pathname:'/',search:''},window:{history:{replaceState:(_state,_title,url)=>changes.push(url)}}});
+ vm.runInContext(source.slice(source.indexOf("let emailLinkToken="),source.indexOf('function verificationModal(')),context);
+ vm.runInContext('readEmailLink()',context);
+ assert.equal(context.page,'verify-email');assert.deepEqual(changes,['/#verify-email']);assert.equal(vm.runInContext('emailLinkToken',context),token);
+ context.location.hash='#reset-password?token=invalid';vm.runInContext('readEmailLink()',context);
+ assert.equal(vm.runInContext('emailLinkToken',context),'');assert.equal(context.page,'reset-password');
+});
+test('a fresh mail link rerenders even when its page is already open',()=>{
+ let handler,renders=0;
+ const location={hash:'#reset-password?token='+'c'.repeat(64),pathname:'/',search:''};
+ const context=vm.createContext({page:'reset-password',routePage:route=>route,URLSearchParams,location,window:{history:{replaceState:(_state,_title,url)=>{location.hash=url.slice(url.indexOf('#'));}},addEventListener:(_event,fn)=>{handler=fn;},scrollTo(){}},close(){},render(){renders++;}});
+ vm.runInContext(source.slice(source.indexOf('let emailLinkToken='),source.indexOf('function verificationModal(')),context);
+ vm.runInContext(source.slice(source.indexOf("window.addEventListener('hashchange'"),source.indexOf("document.addEventListener('keydown'")),context);
+ handler();assert.equal(renders,1);assert.equal(location.hash,'#reset-password');
+});
+test('unverified login clears private data and opens confirmation instead of the workspace',async()=>{
+ const {context,button,error}=client(async()=>Response.json({authenticated:false,pendingVerification:true,email:'a@example.test',emailQueued:false}));
+ vm.runInContext('verificationModal=(email,queued)=>{confirmation={email,queued};}',context);
+ context.form={dataset:{register:'false',role:'candidate',next:'dashboard'},querySelector:s=>s==='[data-error]'?error:button};
+ await vm.runInContext("submitAuth(form,{email:'a@example.test',password:'password'})",context);
+ assert.equal(context.state.authenticated,false);assert.equal(context.state.profile,undefined);assert.equal(context.confirmation.email,'a@example.test');assert.notEqual(context.page,'dashboard');assert.equal(button.disabled,false);
+});
+test('reset password confirmation mismatch keeps the link and makes no API request',async()=>{
+ let calls=0;
+ const {context,button,error}=client(async()=>{calls++;return Response.json({});});
+ context.form={id:'email-link-form',dataset:{action:'reset-password'},querySelector:s=>s==='[data-error]'?error:button};
+ vm.runInContext("emailLinkToken='b'.repeat(64)",context);
+ await vm.runInContext("submitEmailForm(form,{password:'a'.repeat(12),passwordConfirmation:'b'.repeat(12)})",context);
+ assert.equal(calls,0);assert.match(error.textContent,/Пароли не совпадают/);assert.equal(vm.runInContext('emailLinkToken.length',context),64);assert.equal(button.disabled,false);
+});
 test('a confirmed profile save updates the UI with one request and keeps workspace lists',async()=>{
  const calls=[];
  const {context,button}=client(async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return Response.json({message:'Saved',state:{profile:{name:'Updated'}}});});

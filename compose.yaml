@@ -1,0 +1,78 @@
+name: fsp-career
+x-logging: &logging
+  driver: json-file
+  options: {max-size: "10m", max-file: "3"}
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fsp
+      POSTGRES_DB: fsp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U fsp -d fsp"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 768m
+    shm_size: 128m
+    logging: *logging
+  migrate:
+    image: fsp-career:${APP_VERSION:-local}
+    build: .
+    command: [node, scripts/migrate.mjs]
+    environment:
+      DATABASE_URL: postgres://fsp:${POSTGRES_PASSWORD}@postgres:5432/fsp
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: "no"
+    mem_limit: 256m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    logging: *logging
+  app:
+    image: fsp-career:${APP_VERSION:-local}
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://fsp:${POSTGRES_PASSWORD}@postgres:5432/fsp
+      APP_URL: https://${SITE_DOMAIN:?Set SITE_DOMAIN}
+      RELEASE_SHA: ${RELEASE_SHA:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      MAIL_TOKEN_KEY: ${MAIL_TOKEN_KEY:-}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    mem_limit: 1536m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    init: true
+    logging: *logging
+  caddy:
+    image: caddy:2-alpine@sha256:d44355d3c2149dc580ce2cac735955d1c08d3d00882c30489c241aa51a5c10d9
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN}
+      SITE_REDIRECT_DOMAINS: ${SITE_REDIRECT_DOMAINS:-localhost}
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app: {condition: service_healthy}
+    mem_limit: 256m
+    logging: *logging
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

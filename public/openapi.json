@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ФСП Карьера MVP API",
-    "version": "1.2.2",
-    "description": "Sites передаёт подтверждённую идентичность через доверенные серверные заголовки. Браузер использует сессию платформы. Пароли приложение не хранит. Параметр role выбирает представление, но не выдаёт права. ChatGPT identity используется для текущего хостинга; самостоятельная регистрация с подтверждением email пока не реализована. Выход из кабинета через /api/session независим от входа хостинга: закрывает приватные API и сохраняет аккаунт до повторного входа."
+    "version": "2.1.0",
+    "description": "Node.js/PostgreSQL API. Собственная регистрация по email и паролю (12–128 символов), scrypt, серверная сессия 30 дней в HttpOnly/Secure/SameSite=Lax cookie. Вход только после подтверждения email через Resend; ссылки одноразовые, подтверждение 24 часа, восстановление 30 минут. role выбирает представление, права выдаются только при создании профиля. Запись требует Origin, совпадающий с APP_URL. Заголовки идентичности Sites не принимаются."
   },
   "servers": [
     {
@@ -341,7 +341,12 @@
             }
           }
         },
-        "description": " При returnState=true ответ содержит сохранённое состояние текущего аккаунта (для форм профиля) либо обновлённое состояние кабинета. stateRole и stateQuery задают текущий вид кабинета. При ошибке чтения после успешной записи возвращается refreshRequired=true; запись не отменяется."
+        "description": " При returnState=true ответ содержит сохранённое состояние текущего аккаунта (для форм профиля) либо обновлённое состояние кабинета. stateRole и stateQuery задают текущий вид кабинета. При ошибке чтения после успешной записи возвращается refreshRequired=true; запись не отменяется.",
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
       }
     },
     "/api/resume/pdf": {
@@ -383,13 +388,18 @@
           "500": {
             "description": "Ошибка формирования PDF"
           }
-        }
+        },
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ]
       }
     },
     "/api/session": {
       "post": {
-        "summary": "Войти в кабинет или выйти на главную сервиса",
-        "description": "Временный мост к доверенной идентичности Sites. login восстанавливает сохранённый аккаунт и удаляет маркер выхода; logout выставляет HttpOnly/SameSite=Lax cookie и возвращает публичные вакансии, не завершая вход хостинга. Запрос допускается только со своего origin.",
+        "summary": "Регистрация, вход, подтверждение email и восстановление пароля",
+        "description": "register создаёт неподтверждённый аккаунт и ставит письмо в очередь без выдачи сессии. login неподтверждённого аккаунта возвращает pendingVerification=true. request-verification и forgot-password всегда возвращают одинаковое сообщение независимо от наличия аккаунта. verify-email принимает одноразовый token; reset-password принимает token и password (12–128 символов), подтверждает владение email и отзывает все сессии и ссылки. login подтверждённого аккаунта создаёт сессию; logout отзывает её. Ограничения запросов хранятся в PostgreSQL.",
         "requestBody": {
           "required": true,
           "content": {
@@ -404,7 +414,12 @@
                     "type": "string",
                     "enum": [
                       "login",
-                      "logout"
+                      "register",
+                      "logout",
+                      "request-verification",
+                      "forgot-password",
+                      "verify-email",
+                      "reset-password"
                     ]
                   },
                   "role": {
@@ -413,6 +428,31 @@
                       "candidate",
                       "employer"
                     ]
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 254
+                  },
+                  "password": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "writeOnly": true,
+                    "description": "Для register/reset-password минимум 12 символов"
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "terms": {
+                    "type": "boolean",
+                    "description": "Для register обязательно true — согласие на обработку данных аккаунта"
+                  },
+                  "token": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$",
+                    "writeOnly": true,
+                    "description": "Одноразовый токен из ссылки в письме"
                   }
                 }
               }
@@ -421,26 +461,69 @@
         },
         "responses": {
           "200": {
-            "description": "login: собственное State; logout: authenticated=false и публичные jobs. Set-Cookie меняет состояние кабинета.",
+            "description": "register или неподтверждённый login: authenticated=false, pendingVerification=true, email, emailQueued. Подтверждённый login: State и Set-Cookie. Почтовые действия: message; reset-password очищает cookie. logout: публичное состояние.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/State"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/State"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        },
+                        "pendingVerification": {
+                          "type": "boolean"
+                        },
+                        "emailQueued": {
+                          "type": "boolean"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
           },
           "400": {
-            "description": "Некорректное действие или тело запроса"
+            "description": "Некорректные данные"
           },
           "401": {
-            "description": "Нет доверенной идентичности хостинга для входа"
+            "description": "Неверный email/пароль или отсутствующая сессия"
           },
           "403": {
             "description": "Недопустимый origin"
           },
           "500": {
             "description": "Не удалось изменить состояние входа"
+          },
+          "409": {
+            "description": "Email уже зарегистрирован"
+          },
+          "429": {
+            "description": "Слишком много попыток"
+          },
+          "503": {
+            "description": "Почтовая конфигурация отсутствует"
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Проверить подключение к PostgreSQL и наличие миграций",
+        "responses": {
+          "200": {
+            "description": "Сервис готов"
+          },
+          "503": {
+            "description": "База или миграции недоступны"
           }
         }
       }
@@ -2553,6 +2636,13 @@
             }
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "SessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "fsp_session"
       }
     }
   }

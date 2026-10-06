@@ -1,28 +1,34 @@
-import {env} from 'cloudflare:workers';
-import {getChatGPTUser} from '../../chatgpt-auth';
-import {appSessionCookie} from '../../../lib/app-session.mjs';
-import {repository,accountFor,getState,publicJobs} from '../../../lib/service.mjs';
-import {seed} from '../../../lib/seed.mjs';
-
-export async function POST(request:Request){
- try{
-  const origin=request.headers.get('origin');
-  if(origin&&origin!==new URL(request.url).origin)return Response.json({error:'Недопустимый источник запроса.'},{status:403});
-  const input=await request.json();
-  if(!input||typeof input!=='object')return Response.json({error:'Некорректный запрос.'},{status:400});
-  const body=input as {action?:unknown;role?:unknown};
-  if(body.action==='logout'){
-   let jobs=seed.jobs;
-   try{if(env.DB)jobs=await publicJobs(repository(env.DB));}catch{}
-   return Response.json({authenticated:false,jobs},{headers:{'Set-Cookie':appSessionCookie(true,request.url),'Cache-Control':'no-store'}});
+import {getAppUser} from '../../app-auth';
+import {authenticate, logout, sessionCookie} from '../../../lib/auth.mjs';
+import {checkOrigin, jsonBody, errorResponse, httpError} from '../../../lib/http.mjs';
+import {repository} from '../../../lib/postgres.mjs';
+import {getState, publicJobs, demoCandidatePreview} from '../../../lib/service.mjs';
+import {requestAuthEmail, completeEmailAction} from '../../../lib/email-auth.mjs';
+import {rateLimit} from '../../../lib/auth.mjs';
+export const runtime = 'nodejs';
+export async function POST(request: Request) {
+ try {
+  checkOrigin(request);
+  const body = await jsonBody(request), repo = repository();
+  if (['request-verification','forgot-password'].includes(body.action)) {
+   return Response.json(await requestAuthEmail(body, request), {headers:{'Cache-Control':'no-store'}});
   }
-  if(body.action!=='login')return Response.json({error:'Неизвестное действие.'},{status:400});
-  // Temporary identity bridge for Sites hosting. Email authentication will
-  // replace this bridge; logout never calls the hosting signout endpoint.
-  const user=await getChatGPTUser();
-  if(!user)return Response.json({error:'Сначала откройте сайт через вход хостинга.'},{status:401});
-  if(!env.DB)throw new Error('Database binding unavailable');
-  const repo=repository(env.DB),account=await accountFor(repo,{id:user.userId,email:user.email,name:user.displayName});
-  return Response.json({authenticated:true,...await getState(repo,account,body.role==='employer'?'employer':'candidate')},{headers:{'Set-Cookie':appSessionCookie(false,request.url),'Cache-Control':'no-store'}});
- }catch{return Response.json({error:'Не удалось изменить состояние входа. Попробуйте ещё раз.'},{status:500,headers:{'Cache-Control':'no-store'}});}
+  if (['verify-email','reset-password'].includes(body.action)) {
+   await rateLimit(`email-link:ip:${request.headers.get('x-fsp-client-ip') || 'local'}`, 30, 600000);
+   return Response.json(await completeEmailAction(body), {headers:{'Cache-Control':'no-store', ...(body.action === 'reset-password' ? {'Set-Cookie':sessionCookie()} : {})}});
+  }
+  if (body.action === 'logout') {
+   await logout(request.headers.get('cookie'));
+   return Response.json({authenticated:false, candidatePreview:demoCandidatePreview(), jobs:await publicJobs(repo)}, {headers:{'Set-Cookie':sessionCookie(), 'Cache-Control':'no-store'}});
+  }
+  if (!['login', 'register'].includes(body.action)) throw httpError('Неизвестное действие.');
+  const user = body.action === 'login' && !body.email ? await getAppUser() : null;
+  if (!user && !body.email) throw httpError('Войдите по email и паролю.', 401);
+  const result = user ? {account:await repo.account(user.userId), token:null} : await authenticate(body, request);
+  if ('pendingVerification' in result && result.pendingVerification) {
+   return Response.json({authenticated:false, pendingVerification:true, email:result.account.email, emailQueued:result.emailQueued}, {headers:{'Cache-Control':'no-store','Set-Cookie':sessionCookie()}});
+  }
+  const data = {authenticated:true, ...await getState(repo, result.account, body.role === 'employer' ? 'employer' : 'candidate')};
+  return Response.json(data, {headers:{'Cache-Control':'no-store', ...(result.token ? {'Set-Cookie':sessionCookie(result.token)} : {})}});
+ } catch (error) { return errorResponse(error, 'Не удалось войти. Попробуйте ещё раз.'); }
 }

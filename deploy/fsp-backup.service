@@ -1,0 +1,7 @@
+[Unit]
+Description=FSP Career PostgreSQL backup
+Requires=docker.service
+After=docker.service
+[Service]
+Type=oneshot
+ExecStart=/opt/fsp-career/current/deploy/backup.sh
