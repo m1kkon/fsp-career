@@ -2,7 +2,7 @@ import {getAppUser} from '../../app-auth';
 import {authenticate, logout, sessionCookie} from '../../../lib/auth.mjs';
 import {checkOrigin, jsonBody, errorResponse, httpError} from '../../../lib/http.mjs';
 import {repository} from '../../../lib/postgres.mjs';
-import {getState, publicJobs} from '../../../lib/service.mjs';
+import {getState, publicJobs, demoCandidatePreview} from '../../../lib/service.mjs';
 import {requestAuthEmail, completeEmailAction} from '../../../lib/email-auth.mjs';
 import {rateLimit} from '../../../lib/auth.mjs';
 export const runtime = 'nodejs';
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   }
   if (body.action === 'logout') {
    await logout(request.headers.get('cookie'));
-   return Response.json({authenticated:false, jobs:await publicJobs(repo)}, {headers:{'Set-Cookie':sessionCookie(), 'Cache-Control':'no-store'}});
+   return Response.json({authenticated:false, candidatePreview:demoCandidatePreview(), jobs:await publicJobs(repo)}, {headers:{'Set-Cookie':sessionCookie(), 'Cache-Control':'no-store'}});
   }
   if (!['login', 'register'].includes(body.action)) throw httpError('Неизвестное действие.');
   const user = body.action === 'login' && !body.email ? await getAppUser() : null;

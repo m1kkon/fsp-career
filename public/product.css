@@ -1,0 +1,661 @@
+/* Shared product layer: readable type, quiet surfaces and consistent controls. */
+.product-ui {
+  --purple: #6535c8;
+  --purple-dark: #4e25a6;
+  --text: #20232b;
+  --ink: #20232b;
+  --muted: #626975;
+  --line: #e0e3e9;
+  --pale: #f4f1fa;
+  --bg: #f7f8fa;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+.product-ui:has(.public-main) { background: #fff; }
+.product-ui * { box-sizing: border-box; }
+.product-ui button { cursor: pointer; }
+.product-ui button:disabled { cursor: default; }
+.product-ui .button {
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  background: var(--purple);
+  color: #fff;
+  box-shadow: none;
+}
+.product-ui .button:hover { background: var(--purple-dark); }
+.product-ui .button.secondary {
+  border-color: var(--line);
+  background: #fff;
+  color: var(--text);
+}
+.product-ui .button.secondary:hover { background: #f4f5f8; border-color: #c2c7d2; }
+.product-ui .button:focus-visible, .product-ui a:focus-visible,
+.product-ui button:focus-visible { outline: 3px solid #a794d8; outline-offset: 3px; }
+.product-ui .icon-button { min-width: 40px; min-height: 40px; color: #677080; }
+.product-ui .text-button { font-size: 14px; color: var(--purple); font-weight: 500; }
+.product-ui .badge, .product-ui .pill { font-size: 12px; line-height: 1.5; border-radius: 5px; }
+.product-ui .pill { padding: 4px 9px; background: #f1f3f6; color: #505866; }
+.product-ui .badge.green { background: #eef5f1; color: #356249; }
+.product-ui .tags { gap: 7px; flex-wrap: wrap; }
+.product-ui .eyebrow { font-size: 12px; letter-spacing: .07em; color: var(--muted); }
+.product-ui .site-container { max-width: 1384px; padding: 0 32px; }
+.product-ui .site-header { position: sticky; top: 0; z-index: 35; border-color: var(--line); background: #fff; }
+.product-ui .header-inner { max-width: 1384px; min-height: 84px; padding: 16px 32px; gap: 24px; }
+.product-ui .brand { gap: 10px; font-size: 23px; letter-spacing: -.6px; }
+.product-ui .brand-icon { width: 42px; height: 42px; border-radius: 10px; font-size: 23px; }
+.product-ui .audience-switch { display: flex; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 9px; background: #f4f5f8; flex-shrink: 0; }
+.product-ui .audience-switch button { padding: 8px 13px; border: 0; background: transparent; border-radius: 6px; color: #687080; font-size: 14px; font-weight: 500; white-space: nowrap; }
+.product-ui .audience-switch button[aria-pressed="true"] { background: #fff; color: var(--text); box-shadow: 0 1px 4px #22283a12; }
+.product-ui .public-nav { gap: 20px; font-size: 14px; }
+.product-ui .header-actions { gap: 12px; }
+.product-ui .header-actions .button { min-height: 42px; padding: 10px 15px; font-size: 14px; white-space: nowrap; }
+.product-ui .header-location { display: flex; align-items: center; gap: 7px; padding: 10px 0; max-width: 190px; border: 0; background: transparent; color: #4e5663; font-size: 14px; }
+.product-ui .header-location span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.product-ui .account-switch { font-size: 14px; color: #4e5663; }
+.product-ui .header-mobile-label { display: none; }
+.product-ui .header-signout { font-size: 13px; color: var(--muted); }
+.product-ui .product-nav { gap: 24px; padding: 14px 0 0; border-bottom: 1px solid var(--line); }
+.product-ui .nav-item { border-radius: 0; min-height: 50px; padding: 12px 0 15px; background: transparent; color: #687080; font-size: 14px; border-bottom: 3px solid transparent; }
+.product-ui .nav-item:hover { color: var(--text); background: transparent; }
+.product-ui .nav-item.active { background: transparent; color: var(--purple); border-color: var(--purple); font-weight: 600; }
+.product-ui .cabinet-main { padding-top: 32px; }
+.product-ui .public-main { padding-top: 36px; }
+.product-ui .page-heading { margin: 0 0 28px; align-items: center; gap: 24px; }
+.product-ui .page-heading h1 { font-size: 34px; font-weight: 650; letter-spacing: -.9px; line-height: 1.2; }
+.product-ui .page-heading p { margin-top: 9px; font-size: 16px; color: var(--muted); line-height: 1.6; }
+.product-ui main p { font-size: 16px; line-height: 1.65; }
+.product-ui main :is(.subtext,.resume-meta,.job-meta,.job-company,.result-count,.result-count span,.resume-topline,.resume-person,.resume-proof,.resume-match,.resume-match .match-score,.corpus-note,.score-legend,.quick-filter-bar,.results-toolbar,.need-context-line,.saved-snapshot,.inbox-top small,.inbox-actions span,.checklist,.setting-row p,.test-progress,.survey-question>p,.survey-confirm,.survey-summary>p,.survey-index button) { font-size: 14px; line-height: 1.6; }
+.product-ui main :is(.panel small,.survey-progress span,.survey-card legend small,.survey-submit span,.survey-history-item summary span,.fsp-disclaimer,.resume-builder-saved,.competency small) { font-size: 12px; line-height: 1.6; color: var(--muted); }
+.product-ui .panel { padding: 28px; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: none; }
+.product-ui .panel h2 { font-size: 23px; line-height: 1.35; font-weight: 600; letter-spacing: -.4px; }
+.product-ui .panel h3 { font-size: 18px; line-height: 1.4; }
+.product-ui .section-heading { margin-bottom: 24px; align-items: center; }
+.product-ui .section-heading h2 { font-size: 28px; font-weight: 600; line-height: 1.3; letter-spacing: -.6px; }
+.product-ui .section-heading p { font-size: 15px; margin-top: 7px; }
+.product-ui .section-heading>a, .product-ui .section-heading>span { font-size: 14px; color: var(--muted); }
+/* The homepage starts with a usable search, with separate journeys for both audiences. */
+.product-ui .product-hero { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 58px; align-items: start; padding: 32px 0 52px; }
+.product-ui .product-hero .hero-copy { max-width: none; min-width: 0; }
+.product-ui .product-hero h1 { font-size: clamp(42px,4.7vw,66px); line-height: 1.07; font-weight: 650; letter-spacing: -2.3px; margin: 20px 0 22px; }
+.product-ui .product-hero .hero-copy>p { max-width: 680px; font-size: 18px; color: #5e6470; line-height: 1.65; }
+.product-ui .hero-search { display: flex; gap: 10px; width: 100%; margin: 30px 0 0; }
+.product-ui .hero-search-field { display: flex; align-items: center; flex: 1; min-width: 0; gap: 12px; padding-left: 18px; border: 1px solid #c9ced8; border-radius: 10px; background: #fff; }
+.product-ui .hero-search-field .icon { color: #747c8a; flex-shrink: 0; }
+.product-ui .hero-search-field:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px #6535c81a; }
+.product-ui .hero-search .hero-search-field input { height: 62px; min-height: 62px; width: 100%; padding: 16px 12px 16px 0; font-size: 16px; background: transparent; border: 0; border-radius: 10px; box-shadow: none; outline: none; }
+.product-ui .hero-search .button { min-height: 64px; padding: 16px 24px; font-size: 16px; flex: 0 0 auto; }
+.product-ui .popular-queries { margin-top: 14px; gap: 9px 15px; flex-wrap: wrap; align-items: baseline; font-size: 13px; line-height: 1.8; }
+.product-ui .popular-queries button { font-size: 13px; color: #505966; text-decoration-color: #c0c5ce; }
+.product-ui .entry-heading { display: flex; align-items: center; gap: 9px; font-size: 13px; color: #686072; }
+.product-ui .entry-heading .icon { color: var(--purple); }
+.product-ui .home-directions { padding: 30px 0 42px; border-top: 1px solid var(--line); }
+.product-ui .specialization-grid { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; }
+.product-ui .specialization-grid button { display: grid; gap: 8px; padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: #fff; text-align: left; transition: border-color 150ms,background 150ms; }
+.product-ui .specialization-grid button:hover { border-color: #a893cf; background: #faf8fe; }
+.product-ui .specialization-grid strong { font-size: 19px; font-weight: 600; }
+.product-ui .specialization-grid span { font-size: 13px; color: var(--muted); }
+.product-ui .home-vacancies { padding: 0 0 36px; }
+.product-ui .home-vacancy-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.product-ui .home-vacancy { padding: 24px; border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; background: #fff; }
+.product-ui .home-vacancy .job-company { gap: 8px; flex-wrap: wrap; }
+.product-ui .home-vacancy .job-company strong { font-weight: 500; }
+.product-ui .home-vacancy h3 { font-size: 21px; line-height: 1.35; margin: 18px 0 12px; min-height: 56px; }
+.product-ui .home-vacancy h3 button { border: 0; padding: 0; background: transparent; text-align: left; color: var(--text); font: inherit; font-weight: 600; }
+.product-ui .home-vacancy h3 button:hover { color: var(--purple); }
+.product-ui .home-vacancy-salary { font-size: 20px; font-weight: 600; }
+.product-ui .home-vacancy p { font-size: 13px; color: var(--muted); margin: 10px 0 20px; }
+.product-ui .home-vacancy .tags { margin-top: auto; }
+.product-ui .reverse-flow { margin-top: 12px; padding: 32px 0; border-top: 1px solid var(--line); }
+.product-ui .reverse-flow ol { border: 0; gap: 24px; margin-top: 24px; }
+.product-ui .reverse-flow li { padding: 0 20px 0 0; border: 0; background: transparent; }
+.product-ui .reverse-flow li>span { font-size: 13px; color: var(--purple); }
+.product-ui .reverse-flow h3 { font-size: 18px; margin: 13px 0 8px; }
+.product-ui .reverse-flow p { font-size: 14px; }
+/* Working screens use the same hierarchy as the public search. */
+.product-ui .dashboard-grid { grid-template-columns: minmax(0,1fr) 320px; gap: 24px; }
+.product-ui .dashboard-feature { padding: 32px; border: 1px solid #e4e0ed; border-radius: 12px; background: #f4f2f8; }
+.product-ui .dashboard-feature h2 { font-size: 32px; line-height: 1.2; letter-spacing: -.8px; }
+.product-ui .dashboard-feature p { color: #606575; font-size: 16px; }
+.product-ui .dashboard-search input { height: 50px; font-size: 16px; border-color: #c9ced8; }
+.product-ui .dashboard-stats { border-radius: 12px; background: #fff; margin: 24px 0; }
+.product-ui .dashboard-stats strong { font-size: 32px; color: var(--text); font-weight: 600; }
+.product-ui .dashboard-stats span { font-size: 14px; }
+.product-ui .dashboard-panel .section-heading h2 { font-size: 23px; }
+.product-ui .dashboard-side { display: flex; flex-direction: column; gap: 20px; }
+.product-ui .dashboard-side .button { font-size: 14px; }
+.product-ui .activity-row { padding: 18px 0; }
+.product-ui .activity-row strong { font-size: 16px; }
+.product-ui .activity-row p { font-size: 14px; color: var(--muted); }
+.product-ui .help-note { font-size: 14px; background: transparent; color: var(--muted); }
+.product-ui .help-note p { font-size: 14px; }
+.product-ui main[data-page="catalog"], .product-ui main[data-page="jobs"] { max-width: 1100px; margin: auto; }
+.product-ui .marketplace-search { padding: 24px; border: 1px solid var(--line); background: #fff; border-radius: 12px; margin-bottom: 24px; }
+.product-ui .marketplace-search-form { gap: 12px; }
+.product-ui .marketplace-search .marketplace-query input { height: 52px; font-size: 16px; border-radius: 9px; border-color: #c9ced8; padding: 13px 16px; }
+.product-ui .marketplace-search-form>.button { height: 52px; }
+.product-ui .quick-filter-bar { gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.product-ui .quick-filter-bar :is(select,.filter-control) { min-height: 44px; font-size: 14px; border-radius: 7px; background-color: #fff; border: 1px solid var(--line); color: #505966; }
+.product-ui .team-context { margin-top: 18px; padding-top: 16px; border-color: var(--line); }
+.product-ui .team-context summary { font-size: 14px; color: #505966; }
+.product-ui .need-summary { border-radius: 10px; background: #f1eef8; border-color: #e3dced; padding: 20px; }
+.product-ui .need-summary p { font-size: 14px; }
+.product-ui .category-strip { gap: 12px; }
+.product-ui .category-suggestion { border-radius: 10px; background: #fff; }
+.product-ui .results-heading { margin-top: 28px; gap: 20px; }
+.product-ui .results-heading h1 { font-size: 28px; letter-spacing: -.6px; line-height: 1.3; }
+.product-ui .results-toolbar { margin: 18px 0; gap: 16px; }
+.product-ui .results-toolbar select { min-height: 44px; font-size: 14px; background-color: #fff; border-radius: 7px; }
+.product-ui .corpus-note { padding: 12px 16px; background: #eff1f5; color: #667080; border-radius: 8px; margin-bottom: 20px; }
+.product-ui .candidate-grid { grid-template-columns: 1fr; gap: 16px; }
+.product-ui .candidate-card { padding: 28px; border-radius: 12px; border: 1px solid var(--line); box-shadow: none; background: #fff; }
+.product-ui .candidate-card:hover { border-color: #bec4cf; box-shadow: none; }
+.product-ui .resume-position { font-size: 25px; letter-spacing: -.4px; line-height: 1.3; margin-top: 16px; }
+.product-ui .resume-compensation { font-size: 22px; margin: 12px 0 18px; flex-wrap: wrap; gap: 8px 14px; }
+.product-ui .resume-compensation small, .product-ui .experience-chip { font-size: 13px; color: var(--muted); }
+.product-ui .resume-person { flex-wrap: wrap; gap: 10px; }
+.product-ui .resume-person>button { font-size: 16px; }
+.product-ui .verified-label { font-size: 12px; color: #427055; }
+.product-ui .resume-proof { flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.product-ui .resume-proof>span { font-size: 13px; border-radius: 5px; background: #f1f3f6; color: #596170; }
+.product-ui .resume-proof>span.matched { background: #f0ebf8; color: var(--purple); }
+.product-ui .resume-match { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px; }
+.product-ui .resume-actions { gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.product-ui .resume-actions>.button { font-size: 14px; }
+.product-ui .resume-actions>span { font-size: 12px; color: var(--muted); }
+.product-ui .candidate-compared { border-color: var(--purple); box-shadow: 0 0 0 1px var(--purple); }
+.product-ui .job-search { gap: 12px; margin: 24px 0; }
+.product-ui .job-search :is(input,select) { height: 50px; font-size: 16px; border-color: #c9ced8; border-radius: 9px; background-color: #fff; }
+.product-ui .job-grid { gap: 16px; }
+.product-ui .job-card { padding: 28px; border-radius: 12px; border: 1px solid var(--line); background: #fff; }
+.product-ui .job-title { font-size: 25px; line-height: 1.3; margin: 18px 0 12px; }
+.product-ui .job-title button:hover { color: var(--purple); }
+.product-ui .job-salary { font-size: 23px; font-weight: 600; }
+.product-ui .job-description { color: #5a6371; font-size: 16px; }
+.product-ui .job-actions .button { font-size: 14px; }
+.product-ui .profile-layout { grid-template-columns: minmax(0,1fr) 300px; gap: 24px; }
+.product-ui .resume-summary { padding: 28px; }
+.product-ui .resume-summary h2 { font-size: 27px; }
+.product-ui .profile-avatar { width: 64px; height: 64px; border-radius: 12px; background: #efebf6; color: var(--purple); }
+.product-ui .resume-section { margin-bottom: 20px; }
+.product-ui .resume-section h2 { margin-bottom: 18px; }
+.product-ui .profile-salary { font-size: 25px; font-weight: 600; }
+.product-ui .profile-layout>aside { display: block; }
+.product-ui .inbox-card { padding: 28px; }
+.product-ui .inbox-card h2 { font-size: 25px; }
+.product-ui .inbox-card>p { font-size: 16px; color: #5a6371; }
+.product-ui .offer-salary { font-size: 26px; font-weight: 600; }
+.product-ui .saved-grid { gap: 20px; }
+.product-ui .saved-card h2 { font-size: 22px; }
+.product-ui .settings-layout { gap: 24px; }
+.product-ui .setting-row { padding: 22px 0; gap: 24px; }
+.product-ui .setting-row strong { font-size: 16px; }
+.product-ui .setting-row p { margin-top: 6px; color: var(--muted); }
+/* Forms and dialogs share a 48px control size and predictable action placement. */
+.product-ui .field { margin-bottom: 20px; }
+.product-ui .field label { font-size: 14px; font-weight: 500; color: #434b59; margin-bottom: 8px; }
+.product-ui .field :is(input:not([type="checkbox"]):not([type="radio"]),select) { height: 48px; min-height: 48px; font-size: 16px; line-height: 24px; border-color: #cbd0d9; border-radius: 8px; padding-top: 11px; padding-bottom: 11px; }
+.product-ui .field textarea { font-size: 16px; line-height: 1.6; padding: 13px; border-color: #cbd0d9; border-radius: 8px; min-height: 120px; }
+.product-ui .field :is(input,select,textarea):focus-visible { border-color: var(--purple); box-shadow: 0 0 0 3px #6535c81a; }
+.product-ui input::placeholder, .product-ui textarea::placeholder { color: #87909f; opacity: 1; }
+.product-ui input[type="checkbox"], .product-ui input[type="radio"] { accent-color: var(--purple); }
+.product-ui .form-row { gap: 20px; }
+.product-ui .check-row { font-size: 14px; line-height: 1.6; }
+.product-ui .inline-note { padding: 16px; font-size: 14px; line-height: 1.6; border-radius: 8px; background: #f4f5f8; color: #626975; }
+.product-ui .form-error { font-size: 14px; color: #b32b2b; }
+.product-ui .overlay { padding: 28px; background: #18203170; backdrop-filter: blur(3px); }
+.product-ui .modal { width: 660px; padding: 32px; border-radius: 14px; box-shadow: 0 20px 80px #10182826; max-height: calc(100dvh - 56px); }
+.product-ui .wide-modal { width: 940px; }
+.product-ui .modal-header { margin-bottom: 28px; gap: 20px; }
+.product-ui .modal-header h2 { font-size: 28px; line-height: 1.25; letter-spacing: -.6px; }
+.product-ui .modal-header p { font-size: 15px; color: var(--muted); }
+.product-ui .modal-actions { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); gap: 12px; }
+.product-ui .modal-actions .button { font-size: 15px; }
+.product-ui .modal :is(p,.detail-section p,.detail-section li) { font-size: 16px; line-height: 1.65; }
+.product-ui .location-presets { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+.product-ui .location-presets button { padding: 8px 13px; border: 1px solid var(--line); border-radius: 7px; background: #fff; font-size: 14px; }
+.product-ui .location-presets button:hover { border-color: var(--purple); color: var(--purple); }
+.product-ui .resume-editor-nav { gap: 8px; top: -32px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.product-ui .resume-editor-nav button { font-size: 14px; padding: 9px 14px; border-radius: 6px; }
+.product-ui .resume-builder-section h3 { font-size: 20px; }
+.product-ui .resume-builder-section>p { font-size: 14px; }
+.product-ui .resume-builder-item { border-radius: 10px; padding: 20px; background: #fafbfc; }
+.product-ui .resume-builder-item-head strong { font-size: 15px; }
+.product-ui .resume-builder-remove { font-size: 13px; }
+.product-ui .resume-builder-add { font-size: 14px; }
+.product-ui .survey-intro { background: #f3f1f7; padding: 28px; }
+.product-ui .survey-kicker { font-size: 12px; }
+.product-ui .survey-intro h2 { font-size: 27px; }
+.product-ui .survey-layout { grid-template-columns: minmax(0,1fr) 285px; }
+.product-ui .survey-card { padding: 28px; }
+.product-ui .survey-card legend strong { font-size: 20px; }
+.product-ui .survey-question>h3 { font-size: 16px; }
+.product-ui .choice-grid label { font-size: 14px; padding: 16px; border-radius: 8px; }
+.product-ui .survey-submit strong { font-size: 14px; }
+.product-ui .survey-history-content dd, .product-ui .survey-history-content p { font-size: 14px; }
+.product-ui .survey-history-content dt { font-size: 12px; }
+.product-ui .survey-index { padding: 20px; }
+.product-ui .survey-index h3 { font-size: 16px; }
+.product-ui .test-start { padding: 32px; }
+.product-ui .test-start h2 { font-size: 28px; }
+.product-ui .test-start>p { font-size: 16px; color: var(--muted); }
+.product-ui .test-workspace { max-width: 850px; }
+.product-ui .test-question { padding: 32px; }
+.product-ui .test-question h2 { font-size: 26px; line-height: 1.45; }
+.product-ui .answer-option { font-size: 16px; line-height: 1.5; min-height: 62px; padding: 18px; border-radius: 9px; border-color: #ccd1db; }
+.product-ui .test-countdown { font-size: 14px; background: #eceff4; }
+.product-ui .empty { background: #fff; border: 1px dashed #cdd3de; border-radius: 12px; padding: 48px 28px; color: var(--muted); }
+.product-ui .empty h2, .product-ui .empty h3 { font-size: 22px; color: var(--text); }
+.product-ui .empty p { font-size: 15px; }
+.product-ui .employer-hero { background: #f4f2f8; padding: 48px; border: 1px solid #e5e1ed; }
+.product-ui .employer-hero h1 { font-size: clamp(42px,5vw,64px); letter-spacing: -2px; line-height: 1.1; }
+.product-ui .employer-hero p { font-size: 18px; }
+.product-ui .feature-columns { gap: 32px; }
+.product-ui .feature-columns p, .product-ui .employer-example p { font-size: 16px; }
+.product-ui .site-footer { margin-top: 64px; padding: 36px 0; font-size: 14px; color: #626975; gap: 36px; }
+.product-ui .site-footer strong { font-size: 15px; }
+.product-ui .site-footer small { font-size: 12px; max-width: 290px; line-height: 1.7; }
+.product-ui .site-footer .footer-brand { font-size: 23px; }
+.product-ui .toast { font-size: 14px; border-radius: 10px; }
+@media (max-width: 1250px) {
+  .product-ui .header-inner { gap: 16px; }
+  .product-ui .public-nav { display: none; }
+  .product-ui .product-hero { gap: 36px; grid-template-columns: minmax(0,1fr) 300px; }
+  .product-ui .product-hero h1 { font-size: 56px; }
+  .product-ui .hero-search .button { padding: 16px 20px; }
+}
+@media (max-width: 980px) {
+  .product-ui .header-inner { flex-wrap: wrap; gap: 12px 18px; padding: 14px 24px; }
+  .product-ui .header-actions { margin-left: auto; }
+  .product-ui .account-switch span { display: none; }
+  .product-ui .header-signout { display: none; }
+  .product-ui .site-container { padding: 0 24px; }
+  .product-ui .product-hero { grid-template-columns: minmax(0,1fr); padding: 24px 0 36px; }
+  .product-ui .product-hero h1 { font-size: 58px; max-width: 780px; }
+  .product-ui .specialization-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .product-ui .home-vacancy-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .product-ui .home-vacancy:last-child { display: none; }
+  .product-ui .dashboard-grid, .product-ui .profile-layout, .product-ui .survey-layout { grid-template-columns: minmax(0,1fr); }
+  .product-ui .dashboard-side { display: grid; grid-template-columns: 1fr 1fr; }
+  .product-ui .profile-layout>aside { display: grid; grid-template-columns: 1fr 1fr; }
+  .product-ui .survey-aside { position: static; }
+  .product-ui .reverse-flow ol { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 680px) {
+  .product-ui .header-inner { padding: 12px 16px; gap: 12px; min-height: 0; }
+  .product-ui .brand { font-size: 19px; gap: 8px; }
+  .product-ui .brand-icon { width: 35px; height: 35px; font-size: 20px; border-radius: 8px; }
+  .product-ui .audience-switch { order: 3; width: 100%; padding: 3px; }
+  .product-ui .audience-switch button { flex: 1; font-size: 14px; padding: 9px 8px; }
+  .product-ui .header-actions { gap: 8px; }
+  .product-ui .header-actions .button { display: inline-flex; padding: 8px 11px; min-height: 38px; font-size: 14px; }
+  .product-ui .header-desktop-label { display: none; }
+  .product-ui .header-mobile-label { display: inline; }
+  .product-ui .header-actions>.button:last-child { display: none; }
+  .product-ui .header-location { max-width: 106px; font-size: 12px; }
+  .product-ui .header-location .icon { display: none; }
+  .product-ui .account-switch { display: none; }
+  .product-ui .site-container { padding: 0 16px; }
+  .product-ui .public-main { padding-top: 22px; }
+  .product-ui .cabinet-main { padding-top: 24px; }
+  .product-ui .product-nav { gap: 20px; padding-top: 7px; }
+  .product-ui .nav-item { font-size: 14px; min-height: 46px; }
+  .product-ui .product-hero { padding: 14px 0 30px; gap: 0; }
+  .product-ui .product-hero h1 { font-size: clamp(35px,8.6vw,48px); line-height: 1.12; letter-spacing: -1.35px; margin: 15px 0 18px; }
+  .product-ui .product-hero .hero-copy>p { font-size: 16px; }
+  .product-ui .hero-search { display: grid; gap: 10px; margin-top: 24px; }
+  .product-ui .hero-search .hero-search-field input { height: 54px; min-height: 54px; font-size: 16px; }
+  .product-ui .hero-search .button { min-height: 52px; width: 100%; font-size: 16px; }
+  .product-ui .popular-queries { gap: 6px 12px; }
+  .product-ui .popular-queries button { font-size: 12px; }
+  .product-ui .home-directions { padding: 25px 0 30px; }
+  .product-ui .section-heading { align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .product-ui .section-heading h2 { font-size: 23px; letter-spacing: -.5px; }
+  .product-ui .section-heading>span { font-size: 12px; }
+  .product-ui .specialization-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .product-ui .specialization-grid button { padding: 17px 14px; }
+  .product-ui .specialization-grid strong { font-size: 17px; }
+  .product-ui .specialization-grid span { font-size: 12px; }
+  .product-ui .home-vacancy-grid { grid-template-columns: minmax(0,1fr); }
+  .product-ui .home-vacancy { padding: 22px; }
+  .product-ui .home-vacancy h3 { min-height: 0; }
+  .product-ui .reverse-flow ol { grid-template-columns: minmax(0,1fr); gap: 22px; }
+  .product-ui .reverse-flow li { padding: 0; border: 0; }
+  .product-ui .page-heading h1 { font-size: 28px; }
+  .product-ui .page-heading p { font-size: 15px; }
+  .product-ui .page-heading { gap: 16px; margin-bottom: 24px; }
+  .product-ui .panel, .product-ui .job-card, .product-ui .candidate-card { padding: 22px; }
+  .product-ui .dashboard-feature { padding: 24px; }
+  .product-ui .dashboard-feature h2 { font-size: 27px; }
+  .product-ui .dashboard-side, .product-ui .profile-layout>aside { display: block; }
+  .product-ui .dashboard-side>.panel { margin-bottom: 18px; }
+  .product-ui .dashboard-stats>div { padding: 18px 12px; }
+  .product-ui .dashboard-stats strong { font-size: 26px; }
+  .product-ui .dashboard-stats span { font-size: 12px; }
+  .product-ui .marketplace-search { padding: 18px; }
+  .product-ui .marketplace-search-form { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
+  .product-ui .marketplace-query { grid-column: 1 / -1; }
+  .product-ui .marketplace-search-form>.button { height: auto; min-height: 46px; font-size: 14px; white-space: normal; padding: 11px 12px; }
+  .product-ui .quick-filter-bar :is(select,.filter-control) { font-size: 14px; max-width: 100%; }
+  .product-ui .results-heading { flex-wrap: wrap; }
+  .product-ui .results-heading h1 { font-size: 25px; }
+  .product-ui .results-toolbar { flex-wrap: wrap; }
+  .product-ui .resume-position, .product-ui .job-title { font-size: 23px; }
+  .product-ui .resume-compensation { font-size: 21px; }
+  .product-ui .resume-actions>.button { flex: 1 1 auto; font-size: 14px; }
+  .product-ui .resume-actions>span { width: 100%; }
+  .product-ui .job-search { flex-wrap: wrap; }
+  .product-ui .job-search>input { flex-basis: 100%; }
+  .product-ui .job-search>select { flex: 1 1 0; width: auto; font-size: 14px; }
+  .product-ui .job-search>.button { flex: 0 0 auto; }
+  .product-ui .form-row { grid-template-columns: minmax(0,1fr); gap: 0; }
+  .product-ui .overlay { padding: 12px; }
+  .product-ui .modal { padding: 24px; max-height: calc(100dvh - 24px); width: 100%; }
+  .product-ui .modal-header h2 { font-size: 24px; }
+  .product-ui .modal-actions .button { flex: 1; font-size: 14px; }
+  .product-ui .resume-editor-nav { top: -24px; }
+  .product-ui .resume-history-editor .resume-history-dates { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .product-ui .survey-card { padding: 22px 18px; }
+  .product-ui .survey-card legend strong { font-size: 18px; }
+  .product-ui .choice-grid { grid-template-columns: minmax(0,1fr); }
+  .product-ui .test-question { padding: 24px; }
+  .product-ui .test-question h2 { font-size: 23px; }
+  .product-ui .answer-option { font-size: 16px; padding: 16px; }
+  .product-ui .site-footer { grid-template-columns: 1fr 1fr; gap: 28px 20px; margin-top: 40px; }
+  .product-ui .site-footer>div:first-child { grid-column: 1 / -1; }
+  .product-ui .employer-hero { padding: 28px; }
+  .product-ui .employer-hero h1 { font-size: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .product-ui *, .product-ui *::before, .product-ui *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}
+/* Secondary search explanations stay available without pushing results below the fold. */
+.product-ui .need-summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px 20px; }
+.product-ui .need-summary-head { display: grid; gap: 4px; margin: 0; }
+.product-ui .need-summary-head small { font-size: 12px; color: #687080; }
+.product-ui .need-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.product-ui .need-chip { padding: 7px 10px; border-radius: 6px; background: #fff; font-size: 14px; }
+.product-ui .need-chip strong { font-size: 14px; font-weight: 500; }
+.product-ui .need-summary[data-confirmed="true"] .need-chip small { display: none; }
+.product-ui .need-summary+.button { margin: 12px 0 16px; font-size: 14px; min-height: 42px; padding: 9px 15px; }
+.product-ui .category-discovery { margin: 0 0 20px; padding: 0; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+.product-ui .category-discovery>summary { padding: 14px 18px; font-size: 15px; color: #4f5867; cursor: pointer; }
+.product-ui .category-discovery>summary>span { float: right; font-size: 13px; color: var(--muted); }
+.product-ui .category-discovery .category-strip { margin: 0; padding: 0 18px 18px; }
+.product-ui .category-strip-head { padding-top: 8px; }
+.product-ui .category-strip-head h2 { font-size: 18px; }
+.product-ui .category-card { border-radius: 8px; padding: 16px; }
+.product-ui .category-card strong { font-size: 16px; }
+.product-ui .category-card :is(span,small) { font-size: 13px; line-height: 1.5; }
+.product-ui .category-card.active { background: #faf8fe; border-color: #8e72c1; }
+.product-ui .team-context summary { align-items: center; }
+.product-ui .team-context summary>span { white-space: nowrap; font-size: 14px; }
+.product-ui .dashboard-panel .empty { background: transparent; border: 0; padding: 32px 0; }
+@media(max-width:680px) {
+  .product-ui .need-summary { display: grid; gap: 12px; padding: 16px; }
+  .product-ui .need-summary-head { display: flex; justify-content: space-between; flex-wrap: wrap; }
+  .product-ui .category-discovery>summary { font-size: 14px; padding: 14px; }
+  .product-ui .category-discovery>summary>span { font-size: 12px; }
+  .product-ui .team-context summary { gap: 8px; font-size: 14px; }
+  .product-ui .team-context summary>small { display: none; }
+}
+/* Vacancy URLs lead to a complete, shareable reading surface. */
+.product-ui .job-title a,.product-ui .home-vacancy h3 a { color: var(--text); text-decoration: none; font: inherit; font-weight: 600; }
+.product-ui .job-title a:hover,.product-ui .home-vacancy:hover h3 a { color: var(--purple); }
+.product-ui .company-logo { width: 44px; height: 44px; object-fit: contain; background: transparent; padding: 0; border: 0; display: block; flex: 0 0 44px; border-radius: 8px; }
+.product-ui .home-vacancy .company-logo { width: 32px; height: 32px; flex-basis: 32px; }
+.product-ui .vacancy-breadcrumb { display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: 14px; padding: 8px 0 24px; }
+.product-ui .vacancy-breadcrumb a { color: var(--purple); text-decoration: none; }
+.product-ui .vacancy-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 40px; align-items: start; }
+.product-ui .vacancy-content { min-width: 0; }
+.product-ui .vacancy-header { padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.product-ui .vacancy-header .job-company { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.product-ui .vacancy-header h1 { font-size: clamp(30px,3.2vw,44px); line-height: 1.2; font-weight: 600; letter-spacing: -1.2px; margin: 24px 0 18px; }
+.product-ui .vacancy-salary { font-size: 29px; font-weight: 600; line-height: 1.4; }
+.product-ui .vacancy-salary small { display: block; color: var(--muted); font-size: 14px; font-weight: 400; margin-top: 4px; }
+.product-ui .vacancy-facts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 24px; margin: 28px 0; }
+.product-ui .vacancy-facts dt { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.product-ui .vacancy-facts dd { margin: 0; font-size: 16px; font-weight: 500; }
+.product-ui .vacancy-demo-note { max-width: 700px; font-size: 13px; line-height: 1.6; color: var(--muted); margin: 18px 0 0; }
+.product-ui .vacancy-section { padding: 30px 0 0; max-width: 780px; }
+.product-ui .vacancy-section h2 { font-size: 24px; line-height: 1.3; letter-spacing: -.4px; margin: 0 0 16px; }
+.product-ui .vacancy-section p,.product-ui .vacancy-section li { font-size: 16px; line-height: 1.8; color: #444c59; }
+.product-ui .vacancy-section p+p { margin-top: 16px; }
+.product-ui .vacancy-section ul { padding-left: 22px; display: grid; gap: 8px; }
+.product-ui .vacancy-sidebar { position: sticky; top: 108px; display: grid; gap: 20px; }
+.product-ui .vacancy-company-card { padding: 26px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.product-ui .vacancy-company-card>.company-logo { width: 56px; height: 56px; }
+.product-ui .vacancy-company-card h2 { font-size: 24px; margin: 16px 0 12px; }
+.product-ui .vacancy-company-card p { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+.product-ui .vacancy-company-card hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+.product-ui .sidebar-vacancy-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+.product-ui .sidebar-vacancy-salary { display: block; font-size: 19px; margin-bottom: 18px; }
+.product-ui .vacancy-company-card .button { width: 100%; }
+.product-ui .vacancy-company-card>small { display: block; font-size: 12px; line-height: 1.6; color: var(--muted); margin-top: 14px; }
+.product-ui .vacancy-profile-note { padding: 24px; border-radius: 12px; background: #f6f4fa; }
+.product-ui .vacancy-profile-note>svg { color: var(--purple); width: 24px; height: 24px; }
+.product-ui .vacancy-profile-note h3 { font-size: 18px; margin: 16px 0 12px; }
+.product-ui .vacancy-profile-note p { font-size: 14px; line-height: 1.7; color: var(--muted); margin-bottom: 20px; }
+.product-ui .vacancy-bottom-action { display: flex; gap: 20px; align-items: center; padding: 32px 0; margin-top: 32px; border-top: 1px solid var(--line); }
+.product-ui .vacancy-bottom-action span { font-size: 14px; color: var(--muted); max-width: 420px; }
+.product-ui .related-vacancies { border-top: 1px solid var(--line); padding-top: 36px; margin-top: 40px; }
+.product-ui .related-vacancies .job-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.product-ui .related-vacancies .job-title { font-size: 22px; }
+.product-ui .demand-interpretation { display: flex; align-items: center; gap: 16px; }
+.product-ui .demand-interpretation .need-summary { flex: 1; margin-bottom: 12px; }
+.product-ui .demand-interpretation>.button { margin-bottom: 12px; height: 40px; min-height: 40px; font-size: 14px; }
+/* Restrained feedback and scroll entrances, with a complete reduced-motion path. */
+.product-ui .home-vacancy { position: relative; transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease; }
+.product-ui .home-vacancy h3 a::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
+.product-ui .home-vacancy:focus-within { outline: 2px solid var(--purple); outline-offset: 3px; }
+.product-ui .home-vacancy:active { transform: translateY(-1px); }
+.product-ui .specialization-grid>button { transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease; }
+.product-ui .button { transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.product-ui .button:active { transform: translateY(1px); }
+.product-ui [data-motion="pending"] { opacity: 0; transform: translateY(14px); }
+.product-ui [data-motion="visible"] { animation: product-appear 420ms ease backwards; animation-delay: var(--motion-delay,0ms); }
+@keyframes product-appear { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@media (hover:hover) {
+ .product-ui .home-vacancy:hover { transform: translateY(-4px); border-color: #bfb0dc; box-shadow: 0 12px 28px rgba(37,25,62,.08); }
+ .product-ui .specialization-grid>button:hover { transform: translateY(-2px); }
+}
+@media (max-width:980px) {
+ .product-ui .vacancy-layout { grid-template-columns: minmax(0,1fr) 270px; gap: 24px; }
+ .product-ui .vacancy-company-card { padding: 20px; }
+ .product-ui .vacancy-profile-note { display: none; }
+}
+@media (max-width:680px) {
+ .product-ui .vacancy-layout { grid-template-columns: 1fr; }
+ .product-ui .vacancy-sidebar { position: static; }
+ .product-ui .vacancy-facts { gap: 18px 16px; }
+ .product-ui .vacancy-header h1 { letter-spacing: -.6px; }
+ .product-ui .vacancy-salary { font-size: 24px; }
+ .product-ui .vacancy-bottom-action { flex-direction: column; align-items: stretch; }
+ .product-ui .vacancy-bottom-action .button { width: 100%; }
+ .product-ui .vacancy-company-card hr,.product-ui .sidebar-vacancy-title,.product-ui .sidebar-vacancy-salary,.product-ui .vacancy-company-card>.button,.product-ui .vacancy-company-card>small { display: none; }
+ .product-ui .related-vacancies .job-grid { grid-template-columns: 1fr; }
+ .product-ui .demand-interpretation { flex-wrap: wrap; gap: 0; margin-bottom: 8px; }
+ .product-ui .demand-interpretation .need-summary { flex-basis: 100%; }
+ .product-ui .home-vacancy h3 { min-height: auto; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .product-ui [data-motion] { opacity: 1; transform: none; animation: none; }
+ .product-ui .home-vacancy,.product-ui .specialization-grid>button,.product-ui .button { transition: none; }
+ .product-ui .home-vacancy:hover,.product-ui .specialization-grid>button:hover,.product-ui .button:active { transform: none; }
+}
+/* The first screen is search, with a quiet technical backdrop and real company identities. */
+.product-ui .product-hero { position: relative; isolation: isolate; overflow: clip; grid-template-columns: minmax(0,1fr) 340px; gap: 44px; padding: 64px 0 48px; }
+.product-ui .product-hero::before { content: ''; position: absolute; z-index: -1; pointer-events: none; inset: -30px -24px -16px 52%; background-image: linear-gradient(#e7e9ee 1px,transparent 1px),linear-gradient(90deg,#e7e9ee 1px,transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse at 72% 44%,#000 0,transparent 68%); opacity: .65; }
+.product-ui .product-hero::after { content: ''; position: absolute; z-index: -1; pointer-events: none; width: 280px; height: 280px; right: 18px; top: 104px; border: 1px solid #e2dce9; border-radius: 40px; transform: rotate(16deg); background: #faf9fc; }
+.product-ui .hero-copy { position: relative; z-index: 1; }
+.product-ui .hero-resume-link { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 28px; }
+.product-ui .hero-resume-link>span { font-size: 14px; color: var(--muted); }
+.product-ui .hero-resume-link>.button { padding: 0; height: auto; min-height: 30px; border: 0; color: var(--purple); background: transparent; font-size: 14px; box-shadow: none; }
+.product-ui .hero-resume-link>.button:hover { text-decoration: underline; }
+.product-ui .hero-companies { position: relative; padding: 36px 0 0; align-self: center; }
+.product-ui .hero-company-caption { font-size: 12px; letter-spacing: .5px; color: #85828d; margin: 0 0 22px 12px; }
+.product-ui .hero-company-mosaic { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; padding: 0 8px; }
+.product-ui .hero-company-tile { display: flex; flex-direction: column; align-items: flex-start; padding: 24px; background: #fff; border: 1px solid #e6e5eb; border-radius: 14px; box-shadow: 0 7px 20px rgba(31,25,45,.035); text-decoration: none; transition: transform 220ms ease, box-shadow 220ms ease; }
+.product-ui .hero-company-tile:nth-child(even) { transform: translateY(24px); }
+.product-ui .hero-company-tile .company-logo { width: 44px; height: 44px; margin-bottom: 22px; }
+.product-ui .hero-company-tile strong { color: var(--text); font-size: 17px; font-weight: 600; }
+.product-ui .hero-company-tile span { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.product-ui .hero-company-disclaimer { font-size: 12px; text-align: center; color: #8a8692; margin-top: 48px; }
+@media (hover:hover) {
+ .product-ui .hero-company-tile:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(31,25,45,.08); }
+ .product-ui .hero-company-tile:nth-child(even):hover { transform: translateY(21px); }
+}
+@media (max-width:1100px) {
+ .product-ui .product-hero { grid-template-columns: minmax(0,1fr) 280px; gap: 28px; }
+ .product-ui .hero-company-tile { padding: 20px; }
+ .product-ui .hero-copy h1 { font-size: 52px; }
+}
+@media (max-width:980px) {
+ .product-ui .product-hero { grid-template-columns: 1fr; padding: 44px 0 36px; }
+ .product-ui .hero-companies { display: none; }
+ .product-ui .product-hero::before { inset: 0 -20px 0 50%; opacity: .45; }
+ .product-ui .product-hero::after { width: 160px; height: 160px; right: -60px; top: 10px; background: transparent; opacity: .5; }
+}
+@media (max-width:680px) {
+ .product-ui .hero-copy h1 { font-size: 39px; }
+ .product-ui .product-hero { padding: 36px 0 28px; }
+ .product-ui .hero-resume-link { gap: 8px; margin-top: 20px; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .product-ui .hero-company-tile { transition: none; }
+ .product-ui .hero-company-tile:hover { transform: none; }
+ .product-ui .hero-company-tile:nth-child(even):hover { transform: translateY(24px); }
+}
+
+.product-ui img.company-logo[src$="yandex.png"] { border-radius: 50%; }
+.product-ui img.company-logo[src$="avito.svg"],.product-ui img.company-logo[src$="avito-wordmark.svg"] { object-fit: contain; border-radius: 0; }
+.product-ui img.company-logo[src$="tochka-bank.svg"] { width: 94px; flex-basis: 94px; border-radius: 0; }
+.product-ui .home-vacancy img.company-logo[src$="tochka-bank.svg"] { width: 82px; height: 32px; flex-basis: 82px; }
+.product-ui .vacancy-company-card>img.company-logo[src$="tochka-bank.svg"] { width: 138px; height: 44px; }
+.product-ui .hero-company-tile img.company-logo[src$="tochka-bank.svg"] { width: 108px; flex-basis: 44px; }
+.product-ui .job-results-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.product-ui .job-results-summary .result-count { margin: 0; }
+.product-ui .demo-catalog-note { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 0; }
+.product-ui .job-pagination { display: flex; justify-content: center; gap: 8px; align-items: center; padding: 32px 0 8px; }
+.product-ui .page-number { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); font-size: 14px; cursor: pointer; }
+.product-ui .page-number[aria-current="page"] { background: var(--purple); border-color: var(--purple); color: #fff; }
+.product-ui .job-pagination .button { height: 44px; min-height: 44px; font-size: 14px; padding: 0 18px; }
+@media (max-width:680px) {
+ .product-ui .job-results-summary { display: block; }
+ .product-ui .demo-catalog-note { margin-top: 8px; }
+ .product-ui .job-pagination { gap: 5px; flex-wrap: wrap; }
+ .product-ui .page-number { width: 35px; }
+ .product-ui .job-pagination .button { padding: 0 12px; }
+}
+
+.product-ui .job-company:has(img[src$="tochka-bank.svg"])>strong { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+.product-ui .hero-shortlist { position: relative; align-self: center; padding: 22px 0; }
+.product-ui .shortlist-caption { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding: 0 4px; font-size: 13px; color: var(--muted); }
+.product-ui .shortlist-caption .icon { color: #827b92; }
+.product-ui .shortlist-preview { display: grid; gap: 12px; }
+.product-ui .shortlist-person { position: relative; width: 100%; display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 14px; text-align: left; border: 1px solid #e5e2eb; border-radius: 12px; padding: 20px; background: #fff; box-shadow: 0 6px 16px rgba(35,26,55,.035); cursor: pointer; transition: transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease; }
+.product-ui .shortlist-person:nth-child(2) { transform: translateX(-14px); }
+.product-ui .shortlist-avatar { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: #ece8f4; color: #654d87; font-size: 13px; font-weight: 600; }
+.product-ui .shortlist-avatar.tone-1 { background: #e8f0ec; color: #537965; }
+.product-ui .shortlist-avatar.tone-2 { background: #f4ede3; color: #8b6a3f; }
+.product-ui .shortlist-person strong { display: block; font-size: 15px; color: var(--text); font-weight: 600; }
+.product-ui .shortlist-category { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #525769; margin-top: 5px; }
+.product-ui .shortlist-category .icon { color: #5b8d73; width: 14px; height: 14px; }
+.product-ui .shortlist-stack { display: block; font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+.product-ui .shortlist-format { grid-column: 2; font-size: 12px; color: #827d89; margin-top: -5px; }
+.product-ui .shortlist-note { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; line-height: 1.6; color: #817b8c; margin: 20px 4px 0; }
+.product-ui .shortlist-note>.icon { color: #8e82a1; flex-shrink: 0; }
+.product-ui .hero-hiring-points { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; margin-top: 26px; }
+.product-ui .hero-hiring-points>span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #707581; }
+.product-ui .hero-hiring-points .icon { width: 15px; height: 15px; color: #7c6f93; }
+.product-ui .product-hero[data-audience="employer"]::after { border-radius: 24px; transform: none; width: 280px; height: 350px; top: 105px; right: -14px; }
+@media (hover:hover) {
+ .product-ui .shortlist-person:hover { border-color: #c2b6d7; transform: translateY(-2px); box-shadow: 0 12px 24px rgba(35,26,55,.065); }
+ .product-ui .shortlist-person:nth-child(2):hover { transform: translate(-14px,-2px); }
+}
+@media (max-width:980px) {
+ .product-ui .hero-shortlist { display: none; }
+ .product-ui .product-hero[data-audience="employer"]::after { width: 160px; height: 160px; right: -60px; top: 30px; }
+}
+@media (max-width:680px) {
+ .product-ui .hero-hiring-points { gap: 12px; }
+ .product-ui .hero-hiring-points>span { font-size: 12px; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .product-ui .shortlist-person { transition: none; }
+ .product-ui .shortlist-person:hover { transform: none; }
+ .product-ui .shortlist-person:nth-child(2):hover { transform: translateX(-14px); }
+}
+
+/* A company profile explains the workplace, independently of a person's resume. */
+.product-ui .company-profile-banner { display: flex; gap: 20px; align-items: center; padding: 28px 0 32px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.product-ui .company-profile-mark { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 72px; height: 72px; border-radius: 16px; background: #eee9f8; color: var(--purple); font-size: 25px; font-weight: 600; }
+.product-ui .company-profile-banner h2 { margin: 0 0 6px; font-size: 26px; }
+.product-ui .company-profile-banner p { margin: 0 0 8px; color: var(--muted); font-size: 16px; }
+.product-ui .company-profile-banner small { font-size: 13px; color: var(--muted); }
+.product-ui .company-editor-layout { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 28px; align-items: start; }
+.product-ui .company-editor { min-width: 0; }
+.product-ui .company-editor-section { margin-bottom: 24px; scroll-margin-top: 112px; }
+.product-ui .company-editor-section>header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 28px; }
+.product-ui .company-editor-section>header>span { flex-shrink: 0; white-space: nowrap; color: var(--purple); font-size: 13px; font-weight: 600; border-radius: 7px; background: #f0ecf8; padding: 8px; }
+.product-ui .company-editor-section h2 { margin: 0 0 6px; }
+.product-ui .company-editor-section header p { margin: 0; color: var(--muted); font-size: 15px; }
+.product-ui .company-editor-section textarea { min-height: 120px; resize: vertical; }
+.product-ui .company-editor-section .field { margin-bottom: 22px; }
+.product-ui .company-editor-section>.field:last-child { margin-bottom: 0; }
+.product-ui .company-editor-section>small { display: block; margin: -8px 0 0; }
+.product-ui .company-formats { border: 0; margin: 0 0 24px; padding: 0; }
+.product-ui .company-formats legend { margin-bottom: 12px; font-size: 14px; font-weight: 500; }
+.product-ui .company-formats .choice-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.product-ui .company-formats label { font-size: 14px; }
+.product-ui .company-editor-sidebar { position: sticky; top: 112px; }
+.product-ui .company-completion>strong { font-size: 22px; }
+.product-ui .company-completion p, .product-ui .company-preview-note p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+.product-ui .company-progress-track { height: 5px; overflow: hidden; border-radius: 9px; background: #eeedf2; margin: 20px 0; }
+.product-ui .company-progress-track span { display: block; height: 100%; background: var(--purple); transition: width .2s ease; }
+.product-ui .company-completion nav { display: grid; gap: 6px; }
+.product-ui .company-completion nav button { display: flex; align-items: center; gap: 10px; text-align: left; padding: 9px 0; background: transparent; color: #555e6d; font-size: 14px; }
+.product-ui .company-completion nav button:hover { color: var(--purple); }
+.product-ui .company-preview-note { margin-top: 20px; }
+.product-ui .company-preview-note .button { width: 100%; margin: 8px 0 12px; }
+.product-ui .company-preview-note small { display: block; }
+.product-ui .company-save-bar { margin-bottom: 20px; }
+.product-ui .company-save-bar>div { display: flex; gap: 20px; align-items: center; justify-content: space-between; }
+.product-ui .company-save-bar span { font-size: 14px; color: var(--muted); }
+.product-ui .company-save-bar .button { flex-shrink: 0; }
+.product-ui .company-public-heading { display: flex; gap: 20px; align-items: center; padding: 0 0 28px; }
+.product-ui .company-public-heading>div { min-width: 0; }
+.product-ui .company-public-heading h2 { margin: 0 0 8px; font-size: 26px; }
+.product-ui .company-public-heading p { margin: 0 0 10px; font-size: 17px; }
+.product-ui .company-public-heading small { color: var(--muted); font-size: 13px; }
+.product-ui .company-public-section { border-top: 1px solid var(--line); padding: 24px 0; }
+.product-ui .company-public-section h3 { font-size: 21px; margin: 0 0 14px; }
+.product-ui .company-public-section p, .product-ui .company-public-section li { font-size: 16px; line-height: 1.75; overflow-wrap: anywhere; }
+.product-ui .company-public-section p { margin: 0 0 14px; }
+.product-ui .company-public-section ul { padding-left: 22px; }
+.product-ui .company-public-links { display: flex; gap: 24px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid var(--line); }
+.product-ui .company-public-links a { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--purple); }
+.product-ui .vacancy-company-card>.button { width: 100%; margin: 14px 0; }
+@media(max-width:980px) {
+ .product-ui .company-editor-layout { grid-template-columns: minmax(0,1fr); }
+ .product-ui .company-editor-sidebar { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+ .product-ui .company-preview-note { margin: 0; }
+}
+@media(max-width:680px) {
+ .product-ui .company-profile-banner { gap: 14px; padding: 12px 0 24px; }
+ .product-ui .company-profile-mark { width: 56px; height: 56px; border-radius: 12px; font-size: 20px; }
+ .product-ui .company-profile-banner h2, .product-ui .company-public-heading h2 { font-size: 23px; overflow-wrap: anywhere; }
+ .product-ui .company-editor-sidebar { grid-template-columns: minmax(0,1fr); }
+ .product-ui .company-editor-section { scroll-margin-top: 135px; }
+ .product-ui .company-save-bar>div { flex-direction: column; align-items: stretch; gap: 14px; }
+ .product-ui .company-save-bar .button { white-space: normal; }
+ .product-ui .company-public-heading { align-items: flex-start; gap: 14px; }
+ .product-ui .company-formats .choice-grid { grid-template-columns: minmax(0,1fr); }
+}

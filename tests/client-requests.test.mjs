@@ -7,17 +7,17 @@ import {historyDefaults} from '../public/resume-history.mjs';
 const source=fs.readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
 const requests=source.slice(source.indexOf('async function requestData('),source.indexOf('function go(next)'));
 const pdf=source.slice(source.indexOf('let pdfExporting='),source.indexOf("document.addEventListener('click'"));
-const auth=source.slice(source.indexOf('function completeLogin('),source.indexOf('function onboarding('));
+const auth=source.slice(source.indexOf('async function completeLogin('),source.indexOf('function onboarding('));
 const empty=source.slice(source.indexOf('const emptyState='),source.indexOf('let role='));
 function client(fetch){
  const button={textContent:'Сохранить',disabled:false,setAttribute(){},removeAttribute(){}};
  const error={textContent:'',focus(){}};
  const context=vm.createContext({fetch,AbortController,setTimeout,clearTimeout,Date,JSON,Error,URLSearchParams,
   needContext:{},needSpec:'',needGrade:'',needStack:'',needConfirmed:false,compare:[],contextDraft:null,activeNeed:null,contextFields:()=>({}),
-  role:'candidate',query:'',page:'profile',busy:false,
+  role:'candidate',query:'',page:'profile',busy:false,pendingHomeSearch:false,homeMode:'candidate',
   state:{authenticated:true,user:{id:'a',email:'a@example.test'},roles:['candidate'],profile:{name:'Original'},privacy:{fspVisible:true},invites:[]},
   overlay:{querySelector:s=>s==='[data-error]'?error:button},app:{querySelector:()=>null},
-  test:{id:'old-attempt'},result:{score:90},answers:[1],jobQuery:'old',localStorage:{setItem(){}},
+  test:{id:'old-attempt'},result:{score:90},answers:[1],jobQuery:'old',localStorage:{getItem(){return null;},setItem(){}},
   close(){context.closed=true;},render(){},go(page){context.page=page;},onboarding(){context.onboarded=true;},toast(message){context.toastMessage=message;}
  });
  vm.runInContext(empty+requests+pdf+auth,context);
@@ -35,7 +35,7 @@ test('email link tokens leave the URL immediately and opening a link does not co
 test('a fresh mail link rerenders even when its page is already open',()=>{
  let handler,renders=0;
  const location={hash:'#reset-password?token='+'c'.repeat(64),pathname:'/',search:''};
- const context=vm.createContext({page:'reset-password',URLSearchParams,location,window:{history:{replaceState:(_state,_title,url)=>{location.hash=url.slice(url.indexOf('#'));}},addEventListener:(_event,fn)=>{handler=fn;},scrollTo(){}},close(){},render(){renders++;}});
+ const context=vm.createContext({page:'reset-password',routePage:route=>route,URLSearchParams,location,window:{history:{replaceState:(_state,_title,url)=>{location.hash=url.slice(url.indexOf('#'));}},addEventListener:(_event,fn)=>{handler=fn;},scrollTo(){}},close(){},render(){renders++;}});
  vm.runInContext(source.slice(source.indexOf('let emailLinkToken='),source.indexOf('function verificationModal(')),context);
  vm.runInContext(source.slice(source.indexOf("window.addEventListener('hashchange'"),source.indexOf("document.addEventListener('keydown'")),context);
  handler();assert.equal(renders,1);assert.equal(location.hash,'#reset-password');
