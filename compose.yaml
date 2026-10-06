@@ -58,6 +58,7 @@ services:
     restart: unless-stopped
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN}
+      SITE_REDIRECT_DOMAINS: ${SITE_REDIRECT_DOMAINS:-localhost}
     ports: ["80:80", "443:443"]
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro

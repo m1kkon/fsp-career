@@ -68,6 +68,8 @@ npm audit --omit=dev
 
 ## Развёртывание
 
+Рабочий сайт: https://fspcareer.space (Cloudflare Full strict, HTTPS).
+
 GCP Compute Engine, Docker Compose: Next.js + PostgreSQL + Caddy. На VM включены Docker при загрузке, перезапуск контейнеров, ежедневный `pg_dump` и снимки диска GCP. Подробные команды обновления, восстановления, SSH, логов и подключения своего домена: [docs/deployment.md](docs/deployment.md). Старые файлы Sites/Vinext в starter-окружении не участвуют в сборке и запуске этой версии; D1 не требуется.
 
 ## Сквозная демонстрация

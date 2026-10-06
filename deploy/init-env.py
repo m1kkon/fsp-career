@@ -15,6 +15,17 @@ if not re.fullmatch(r'[a-z0-9.-]+', args.domain) or not re.fullmatch(r'[a-zA-Z0-
     raise SystemExit('Invalid domain/version')
 target = Path(args.file)
 values = dict(line.split('=', 1) for line in target.read_text().splitlines() if '=' in line) if target.exists() else {}
+aliases = {f'www.{args.domain}'}
+previous_domain = values.get('SITE_DOMAIN')
+if previous_domain and previous_domain != args.domain:
+    aliases.add(previous_domain)
+for alias in values.get('SITE_REDIRECT_DOMAINS', '').split(','):
+    alias = alias.strip()
+    if alias and alias != args.domain:
+        aliases.add(alias)
+if any(not re.fullmatch(r'[a-z0-9.-]+', alias) for alias in aliases):
+    raise SystemExit('Invalid redirect domain')
+redirect_domains = ', '.join(sorted(aliases))
 password = values.get('POSTGRES_PASSWORD') or secrets.token_hex(32)
 if not re.fullmatch(r'[a-f0-9]{64}', password):
     raise SystemExit('Expected a generated URL-safe database password')
@@ -22,7 +33,7 @@ target.parent.mkdir(parents=True, exist_ok=True)
 temporary = target.with_suffix('.tmp')
 fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
 with os.fdopen(fd, 'w') as stream:
-    stream.write(f'POSTGRES_PASSWORD={password}\nSITE_DOMAIN={args.domain}\nAPP_VERSION={args.version}\n')
+    stream.write(f'POSTGRES_PASSWORD={password}\nSITE_DOMAIN={args.domain}\nAPP_VERSION={args.version}\nSITE_REDIRECT_DOMAINS={redirect_domains}\n')
 os.chmod(temporary, 0o600)
 os.replace(temporary, target)
 print('Deployment environment saved; database password preserved/generated.')
