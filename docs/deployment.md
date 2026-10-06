@@ -7,7 +7,7 @@
 ## Доступ и расположение файлов
 
 ```sh
-gcloud compute ssh fsp-career --zone=europe-north1-a --tunnel-through-iap --project=project-4c60f7e8-37f9-44bb-b05
+gcloud compute ssh fsp-career --zone=europe-north1-a --tunnel-through-iap --project=project-4c60f7e8-37f9-44bb-b05 --account=workingww00@gmail.com
 sudo -i
 cd /opt/fsp-career/current
 docker compose ps
@@ -16,7 +16,33 @@ docker compose logs --tail=100 app caddy
 
 SSH доступен только через Google IAP. Собственная VPC `fsp-career`; firewall разрешает 80/443 из интернета и 22 из диапазона IAP. Приложение и PostgreSQL не публикуют свои порты на хост. У VM нет service account. Приватный `/opt/fsp-career/.env` доступен root (0600), содержит пароль БД, домен, тег образа, RESEND_API_KEY, EMAIL_FROM и независимый MAIL_TOKEN_KEY. Не выводите docker compose config или содержимое .env в общие логи. Файл не хранится в Git или исходном архиве. В `/opt/fsp-career/releases/` лежат версии кода, `current` указывает на последнюю успешную.
 
-## Обновление
+## Автодеплой GitHub Actions
+
+Workflow `.github/workflows/deploy.yml` работает при пуше в `main` и ручном `workflow_dispatch`. Pull request в `main` выполняет только проверки. Вначале запускаются сборка Next.js, тесты (включая настоящую PostgreSQL 17 и проверки отката), TypeScript и lint. Только успешная проверка разрешает deploy. Actions закреплены по SHA, образ PostgreSQL — по digest.
+
+После проверки архивируются только отслеживаемые Git файлы. Архив передаётся через IAP; серверный `/opt/fsp-career/bin/deploy-archive` запускает обновление отдельным systemd job. Разрыв SSH не прерывает сборку. GitHub выполняет релизы последовательно; сервер дополнительно использует `flock`. Коммит, уже вытесненный новым `main`, пропускается перед передачей. После деплоя workflow проверяет публичный `/api/health`: `status: ok`, `revision` совпадает с SHA коммита.
+
+Перед обновлением сохраняется `pg_dump`. Пароль PostgreSQL, ключ Resend и `MAIL_TOKEN_KEY` остаются в root-only `.env` на VM; GitHub не получает их. Ошибка сборки, readiness, настройки таймеров или резервного копирования возвращает прежние `.env`, `current` и контейнеры. Миграции схемы не откатываются автоматически: изменения БД должны быть совместимы с предыдущим приложением. Сохраняются пять последних CI-релизов, а также текущий и предыдущий; старые образы удаляются, том PostgreSQL сохраняется.
+
+### Доступ GitHub к GCP
+
+Используется Workload Identity Federation, без JSON-ключа service account и без GitHub Secrets:
+
+- Project number: `517647198997`; pool `fsp-career-ci`; provider `github`.
+- Service account: `fsp-github-deploy@project-4c60f7e8-37f9-44bb-b05.iam.gserviceaccount.com`.
+- OIDC допускает только repository ID `1404898475`, owner ID `150428399`, ref `refs/heads/main`, workflow `m1kkon/fsp-career/.github/workflows/deploy.yml@refs/heads/main` и события `push`/`workflow_dispatch`.
+- `roles/iam.workloadIdentityUser` на service account предоставлен principalSet этого repository ID.
+- `roles/compute.osAdminLogin` выдан только на VM `fsp-career`. OS Login включён только у неё. У владельца `workingww00@gmail.com` также сохранён OS Admin Login.
+- Проектная custom role `fspGithubComputeRead` содержит только `compute.projects.get`, `compute.instances.list`, `serviceusage.services.use` для gcloud.
+- `roles/iap.tunnelResourceAccessor` ограничен условием `destination.ip == "10.44.0.2" && destination.port == 22`.
+
+Доступ позволяет workflow управлять контейнерами от root на этой VM. Изменения `main` и workflow должны делать доверенные участники репозитория. При смене имени репозитория/ветки/файла workflow обновите условие OIDC; при смене внутреннего IP — условие IAP. Другая VM `sitewatch` не получает доступ через эту настройку.
+
+Статус и логи: [GitHub Actions](https://github.com/m1kkon/fsp-career/actions/workflows/deploy.yml). Для повтора текущего `main` используйте `Run workflow`. На сервере: `journalctl -u fsp-deploy-<run-id>-<attempt> --no-pager`. Чтобы немедленно отключить доступ GitHub, отключите provider `github` в pool `fsp-career-ci` либо удалите его привязку `roles/iam.workloadIdentityUser` с service account.
+
+Ручной откат приложения после успешного, но нежелательного релиза: из root-shell проверьте путь в `/opt/fsp-career/previous-release`, перейдите в него и выполните `bash deploy/release.sh fspcareer.space <его-тег> <его-SHA>`. Для прежних ручных релизов SHA можно опустить. После этого исправьте или откатите соответствующий коммит в `main`, чтобы следующий автоматический запуск не вернул нежелательную версию.
+
+## Ручное обновление
 
 Передавайте исходники без `.git`, `node_modules`, `.env*`, `.next`, `.wrangler` и локальных файлов. Распакуйте новый архив в отдельный `/opt/fsp-career/releases/<version>`, затем от root в этом каталоге выполните:
 

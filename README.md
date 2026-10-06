@@ -59,10 +59,10 @@ docker compose up -d --build --wait
 ## Проверки
 
 ```sh
+npm run build
 npm test
 npx tsc --noEmit
 npm run lint
-npm run build
 npm audit --omit=dev
 ```
 
@@ -71,6 +71,8 @@ npm audit --omit=dev
 ## Развёртывание
 
 Рабочий сайт: https://fspcareer.space (Cloudflare Full strict, HTTPS).
+
+Пуш в `main` автоматически запускает GitHub Actions: сборку, тесты с PostgreSQL, TypeScript и lint, затем развёртывание на VM через Google IAP. Pull request запускает только проверки. Ручной повтор доступен через `Run workflow`; подробности и откат — в [инструкции автодеплоя](docs/deployment.md#автодеплой-github-actions).
 
 GCP Compute Engine, Docker Compose: Next.js + PostgreSQL + Caddy. На VM включены Docker при загрузке, перезапуск контейнеров, ежедневный `pg_dump` и снимки диска GCP. Подробные команды обновления, восстановления, SSH, логов и подключения своего домена: [docs/deployment.md](docs/deployment.md). Старые файлы Sites/Vinext в starter-окружении не участвуют в сборке и запуске этой версии; D1 не требуется.
 

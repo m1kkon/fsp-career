@@ -9,10 +9,13 @@ import secrets
 parser = argparse.ArgumentParser()
 parser.add_argument('--domain', required=True)
 parser.add_argument('--version', required=True)
+parser.add_argument('--revision', default='')
 parser.add_argument('--file', default='/opt/fsp-career/.env')
 args = parser.parse_args()
 if not re.fullmatch(r'[a-z0-9.-]+', args.domain) or not re.fullmatch(r'[a-zA-Z0-9_.-]+', args.version):
     raise SystemExit('Invalid domain/version')
+if args.revision and not re.fullmatch(r'[a-f0-9]{40}', args.revision):
+    raise SystemExit('Invalid commit revision')
 target = Path(args.file)
 values = dict(line.split('=', 1) for line in target.read_text().splitlines() if '=' in line) if target.exists() else {}
 aliases = {f'www.{args.domain}'}
@@ -39,6 +42,7 @@ target.parent.mkdir(parents=True, exist_ok=True)
 temporary = target.with_suffix('.tmp')
 fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
 with os.fdopen(fd, 'w') as stream:
+    stream.write(f'RELEASE_SHA={args.revision}\n')
     stream.write(f'POSTGRES_PASSWORD={password}\nSITE_DOMAIN={args.domain}\nAPP_VERSION={args.version}\nSITE_REDIRECT_DOMAINS={redirect_domains}\n')
     for key, value in mail_values.items():
         stream.write(f'{key}={value}\n')

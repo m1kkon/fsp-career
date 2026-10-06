@@ -14,3 +14,6 @@ output
 tmp
 *.tsbuildinfo
 *.log
+
+# Ephemeral GitHub OIDC credentials.
+gha-creds-*.json

@@ -52,3 +52,6 @@ next-env.d.ts
 /output/
 /public/assets/
 /app/asset-urls.ts
+
+# Ephemeral GitHub OIDC credentials.
+gha-creds-*.json

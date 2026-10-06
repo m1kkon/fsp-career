@@ -40,6 +40,7 @@ services:
     environment:
       DATABASE_URL: postgres://fsp:${POSTGRES_PASSWORD}@postgres:5432/fsp
       APP_URL: https://${SITE_DOMAIN:?Set SITE_DOMAIN}
+      RELEASE_SHA: ${RELEASE_SHA:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
       MAIL_TOKEN_KEY: ${MAIL_TOKEN_KEY:-}
