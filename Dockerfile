@@ -14,6 +14,7 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/public ./public
 COPY --from=builder --chown=node:node /app/scripts/migrate.mjs ./scripts/migrate.mjs
 COPY --from=builder --chown=node:node /app/scripts/reset-password.mjs ./scripts/reset-password.mjs
+COPY --from=builder --chown=node:node /app/scripts/send-mail.mjs ./scripts/send-mail.mjs
 COPY --from=builder --chown=node:node /app/lib ./lib
 COPY --from=builder --chown=node:node /app/db/migrations ./db/migrations
 USER node

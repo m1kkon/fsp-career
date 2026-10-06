@@ -29,11 +29,19 @@ redirect_domains = ', '.join(sorted(aliases))
 password = values.get('POSTGRES_PASSWORD') or secrets.token_hex(32)
 if not re.fullmatch(r'[a-f0-9]{64}', password):
     raise SystemExit('Expected a generated URL-safe database password')
+mail_key = values.get('MAIL_TOKEN_KEY') or secrets.token_hex(32)
+if not re.fullmatch(r'[a-f0-9]{64}', mail_key):
+    raise SystemExit('Invalid mail encryption key')
+mail_values = {'MAIL_TOKEN_KEY': mail_key, 'RESEND_API_KEY': values.get('RESEND_API_KEY', ''), 'EMAIL_FROM': values.get('EMAIL_FROM') or f'ФСП Карьера <no-reply@{args.domain}>'}
+if any('\n' in value or '\r' in value for value in mail_values.values()):
+    raise SystemExit('Invalid mail setting')
 target.parent.mkdir(parents=True, exist_ok=True)
 temporary = target.with_suffix('.tmp')
 fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
 with os.fdopen(fd, 'w') as stream:
     stream.write(f'POSTGRES_PASSWORD={password}\nSITE_DOMAIN={args.domain}\nAPP_VERSION={args.version}\nSITE_REDIRECT_DOMAINS={redirect_domains}\n')
+    for key, value in mail_values.items():
+        stream.write(f'{key}={value}\n')
 os.chmod(temporary, 0o600)
 os.replace(temporary, target)
 print('Deployment environment saved; database password preserved/generated.')

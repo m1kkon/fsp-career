@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "ФСП Карьера MVP API",
-    "version": "2.0.0",
-    "description": "Node.js/PostgreSQL API. Собственная регистрация по email и паролю (12–128 символов), scrypt, серверная сессия 30 дней в HttpOnly/Secure/SameSite=Lax cookie. Email пока не подтверждается; почтовый сервис подключается отдельно. role выбирает представление, права выдаются только при создании профиля. Запись требует Origin, совпадающий с APP_URL. Заголовки идентичности Sites не принимаются."
+    "version": "2.1.0",
+    "description": "Node.js/PostgreSQL API. Собственная регистрация по email и паролю (12–128 символов), scrypt, серверная сессия 30 дней в HttpOnly/Secure/SameSite=Lax cookie. Вход только после подтверждения email через Resend; ссылки одноразовые, подтверждение 24 часа, восстановление 30 минут. role выбирает представление, права выдаются только при создании профиля. Запись требует Origin, совпадающий с APP_URL. Заголовки идентичности Sites не принимаются."
   },
   "servers": [
     {
@@ -398,8 +398,8 @@
     },
     "/api/session": {
       "post": {
-        "summary": "Регистрация, вход и выход",
-        "description": "register создаёт аккаунт и сессию; login принимает email/password либо восстанавливает существующую сессию без credentials; logout удаляет сессию из PostgreSQL и очищает cookie. Ограничение попыток хранится в базе.",
+        "summary": "Регистрация, вход, подтверждение email и восстановление пароля",
+        "description": "register создаёт неподтверждённый аккаунт и ставит письмо в очередь без выдачи сессии. login неподтверждённого аккаунта возвращает pendingVerification=true. request-verification и forgot-password всегда возвращают одинаковое сообщение независимо от наличия аккаунта. verify-email принимает одноразовый token; reset-password принимает token и password (12–128 символов), подтверждает владение email и отзывает все сессии и ссылки. login подтверждённого аккаунта создаёт сессию; logout отзывает её. Ограничения запросов хранятся в PostgreSQL.",
         "requestBody": {
           "required": true,
           "content": {
@@ -415,7 +415,11 @@
                     "enum": [
                       "login",
                       "register",
-                      "logout"
+                      "logout",
+                      "request-verification",
+                      "forgot-password",
+                      "verify-email",
+                      "reset-password"
                     ]
                   },
                   "role": {
@@ -434,7 +438,7 @@
                     "type": "string",
                     "maxLength": 128,
                     "writeOnly": true,
-                    "description": "Для регистрации минимум 12 символов"
+                    "description": "Для register/reset-password минимум 12 символов"
                   },
                   "name": {
                     "type": "string",
@@ -443,6 +447,12 @@
                   "terms": {
                     "type": "boolean",
                     "description": "Для register обязательно true — согласие на обработку данных аккаунта"
+                  },
+                  "token": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$",
+                    "writeOnly": true,
+                    "description": "Одноразовый токен из ссылки в письме"
                   }
                 }
               }
@@ -451,11 +461,32 @@
         },
         "responses": {
           "200": {
-            "description": "register/login: собственное State; logout: authenticated=false и публичные jobs. Новая сессия и выход устанавливают Set-Cookie.",
+            "description": "register или неподтверждённый login: authenticated=false, pendingVerification=true, email, emailQueued. Подтверждённый login: State и Set-Cookie. Почтовые действия: message; reset-password очищает cookie. logout: публичное состояние.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/State"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/State"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        },
+                        "pendingVerification": {
+                          "type": "boolean"
+                        },
+                        "emailQueued": {
+                          "type": "boolean"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -464,7 +495,7 @@
             "description": "Некорректные данные"
           },
           "401": {
-            "description": "Нет доверенной идентичности хостинга для входа"
+            "description": "Неверный email/пароль или отсутствующая сессия"
           },
           "403": {
             "description": "Недопустимый origin"
@@ -477,6 +508,9 @@
           },
           "429": {
             "description": "Слишком много попыток"
+          },
+          "503": {
+            "description": "Почтовая конфигурация отсутствует"
           }
         }
       }

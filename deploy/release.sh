@@ -18,6 +18,7 @@ trap rollback ERR
 python3 deploy/init-env.py --domain "$domain" --version "$version"
 ln -sfn /opt/fsp-career/.env .env
 docker compose build
+docker compose run --rm --no-deps app node --input-type=module -e 'import {requireMail} from "./lib/mail.mjs"; requireMail();'
 docker compose up -d --wait --wait-timeout 180
 trap - ERR
 ln -sfn "$release" /opt/fsp-career/current
@@ -26,7 +27,9 @@ if [ -n "$previous" ] && [ "$previous" != "$release" ]; then
 fi
 chmod 750 deploy/backup.sh
 cp deploy/fsp-backup.service deploy/fsp-backup.timer /etc/systemd/system/
+cp deploy/fsp-mail.service deploy/fsp-mail.timer /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now fsp-backup.timer
+systemctl enable --now fsp-mail.timer
 ./deploy/backup.sh
 echo "Release healthy: https://$domain"

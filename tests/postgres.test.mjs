@@ -6,6 +6,8 @@ import pg from 'pg';
 import {repository,transaction} from '../lib/postgres.mjs';
 import {accountFor,action,getState} from '../lib/service.mjs';
 import {authenticate,currentUser,logout,rateLimit} from '../lib/auth.mjs';
+import {completeEmailAction} from '../lib/email-auth.mjs';
+import {decryptMail} from '../lib/mail.mjs';
 
 test('PostgreSQL integration: persistence, rollback, concurrent writes, roles and sessions', {skip:!process.env.TEST_DATABASE_URL}, async t => {
  const url=new URL(process.env.TEST_DATABASE_URL);
@@ -14,8 +16,10 @@ test('PostgreSQL integration: persistence, rollback, concurrent writes, roles an
  await admin.query(`CREATE SCHEMA "${schema}"`);
  const pool=new pg.Pool({connectionString:url.href,options:`-c search_path=${schema}`,max:8});
  globalThis.__fspPool=pool;process.env.DATABASE_URL=url.href;
+ const previousEnv={...process.env};Object.assign(process.env,{RESEND_API_KEY:'test-only',EMAIL_FROM:'test@example.test',MAIL_TOKEN_KEY:'a'.repeat(64),APP_URL:'https://example.test'});
  try {
   await pool.query(await readFile(new URL('../db/migrations/001_initial.sql',import.meta.url),'utf8'));
+  await pool.query(await readFile(new URL('../db/migrations/002_email_auth.sql',import.meta.url),'utf8'));
   const repo=repository(pool);
   await t.test('account and JSONB records round-trip through new queries and failed transactions roll back',async()=>{
    const a=await accountFor(repo,{id:'candidate',email:'candidate@example.test',name:'Кандидат'});
@@ -42,7 +46,12 @@ test('PostgreSQL integration: persistence, rollback, concurrent writes, roles an
   });
   await t.test('email/password auth persists sessions as hashes and revokes them at logout',async()=>{
    const request=new Request('https://example.test',{headers:{'x-fsp-client-ip':'test'}}), body={action:'register',terms:true,email:'  User@Example.Test ',password:'a long test password',name:'Пользователь'};
-   const result=await authenticate(body,request);
+   const pending=await authenticate(body,request);
+   assert.equal(pending.pendingVerification,true);assert.equal(pending.token,null);
+   const queued=decryptMail((await pool.query('SELECT payload FROM auth_mail_outbox')).rows[0].payload);
+   const token=queued.text.match(/token=([a-f0-9]{64})/)[1];
+   await completeEmailAction({action:'verify-email',token},pool);
+   const result=await authenticate({...body,action:'login'},request);
    assert.equal(result.account.email,'user@example.test');
    assert.equal((await currentUser('fsp_session='+result.token,pool)).userId,result.account.id);
    const stored=(await pool.query('SELECT * FROM auth_sessions')).rows[0];assert.notEqual(stored.token_hash,result.token);
@@ -58,5 +67,5 @@ test('PostgreSQL integration: persistence, rollback, concurrent writes, roles an
    assert.equal(results.filter(x=>x.status==='fulfilled').length,2);
    assert.equal(results.filter(x=>x.status==='rejected'&&x.reason.status===429).length,3);
   });
- }finally{delete globalThis.__fspPool;await pool.end();await admin.query(`DROP SCHEMA "${schema}" CASCADE`);await admin.end();}
+ }finally{for(const key of ['RESEND_API_KEY','EMAIL_FROM','MAIL_TOKEN_KEY','APP_URL']){if(previousEnv[key]===undefined)delete process.env[key];else process.env[key]=previousEnv[key];}delete globalThis.__fspPool;await pool.end();await admin.query(`DROP SCHEMA "${schema}" CASCADE`);await admin.end();}
 });
