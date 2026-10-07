@@ -1,0 +1,12 @@
+[Unit]
+Description=Send FSP Career authentication emails
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/fsp-career/current
+ExecStart=/usr/bin/docker compose exec -T app node scripts/send-mail.mjs
+TimeoutStartSec=300
+User=root
+

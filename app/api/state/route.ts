@@ -1,6 +1,17 @@
-import { env } from 'cloudflare:workers';
-import { getChatGPTUser } from '../../chatgpt-auth';
-import {repository,accountFor,getState,publicJobs} from '../../../lib/service.mjs';
-import {seed} from '../../../lib/seed.mjs';
-export const dynamic='force-dynamic';
-export async function GET(request:Request){try{const user=await getChatGPTUser();if(!user)return Response.json({authenticated:false,jobs:env.DB?await publicJobs(repository(env.DB)):seed.jobs},{headers:{'Cache-Control':'no-store'}});if(!env.DB)throw new Error('Database binding unavailable');const repo=repository(env.DB);const account=await accountFor(repo,{id:user.userId,email:user.email,name:user.displayName});const url=new URL(request.url);return Response.json({authenticated:true,...await getState(repo,account,url.searchParams.get('role')||'candidate',url.searchParams.get('query')||'',{spec:url.searchParams.get('spec'),grade:url.searchParams.get('grade'),stack:url.searchParams.get('stack'),confirmed:url.searchParams.get('confirmed')==='1'})},{headers:{'Cache-Control':'no-store'}});}catch(e){return Response.json({error:'Не удалось загрузить данные сервиса.'},{status:500});}}
+import {getAppUser} from '../../app-auth';
+import {repository,transaction} from '../../../lib/postgres.mjs';
+import {assessmentAccount} from '../../../lib/test-maintainer.mjs';
+import {getState, publicJobs, demoCandidatePreview} from '../../../lib/service.mjs';
+import {errorResponse} from '../../../lib/http.mjs';
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export async function GET(request: Request) {
+ try {
+  const user = await getAppUser(), repo = repository();
+  if (!user) return Response.json({authenticated:false, candidatePreview:demoCandidatePreview(), jobs:await publicJobs(repo)}, {headers:{'Cache-Control':'no-store'}});
+  const url = new URL(request.url);
+  // Expiry can finish an assessment and update its profile proof during a read.
+  const state = await transaction(async current => getState(current, assessmentAccount(await current.account(user.userId)), url.searchParams.get('role') || 'candidate', url.searchParams.get('query') || '', Object.fromEntries(url.searchParams)));
+  return Response.json({authenticated:true, ...state}, {headers:{'Cache-Control':'no-store'}});
+ } catch (error) { return errorResponse(error, 'Не удалось загрузить данные сервиса.'); }
+}

@@ -1,0 +1,112 @@
+name: Validate and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fsp-career-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+        env:
+          POSTGRES_USER: fsp
+          POSTGRES_PASSWORD: ci-test-password
+          POSTGRES_DB: fsp_ci_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U fsp -d fsp_ci_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://fsp:ci-test-password@127.0.0.1:5432/fsp_ci_test
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --include=dev --include=optional
+      # Build generates the content-hashed asset manifest used by TypeScript.
+      - run: npm run build
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npm run lint
+
+  deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GCP_PROJECT: project-4c60f7e8-37f9-44bb-b05
+      GCP_ZONE: europe-north1-a
+      GCP_INSTANCE: fsp-career
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Skip superseded commits
+        id: head
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$latest" = "$GITHUB_SHA" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'current=false' >> "$GITHUB_OUTPUT"
+            echo 'A newer main commit is queued; skipping this deployment.'
+          fi
+      - name: Archive tracked source
+        if: steps.head.outputs.current == 'true'
+        run: |
+          umask 077
+          git archive --format=tar.gz --output="$RUNNER_TEMP/fsp-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.tar.gz" HEAD
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        if: steps.head.outputs.current == 'true'
+        with:
+          project_id: project-4c60f7e8-37f9-44bb-b05
+          workload_identity_provider: projects/517647198997/locations/global/workloadIdentityPools/fsp-career-ci/providers/github
+          service_account: fsp-github-deploy@project-4c60f7e8-37f9-44bb-b05.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+        if: steps.head.outputs.current == 'true'
+      - name: Transfer over IAP
+        if: steps.head.outputs.current == 'true'
+        run: |
+          gcloud compute scp "$RUNNER_TEMP/fsp-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.tar.gz" \
+            "$GCP_INSTANCE:/tmp/fsp-$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT.tar.gz" \
+            --project="$GCP_PROJECT" --zone="$GCP_ZONE" --tunnel-through-iap \
+            --ssh-key-expire-after=30m --quiet
+      - name: Deploy in a persistent systemd job
+        if: steps.head.outputs.current == 'true'
+        run: |
+          unit="fsp-deploy-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          gcloud compute ssh "$GCP_INSTANCE" \
+            --project="$GCP_PROJECT" --zone="$GCP_ZONE" --tunnel-through-iap \
+            --ssh-key-expire-after=30m --quiet \
+            --command="status=0; sudo systemd-run --unit=$unit --wait --collect --property=Type=exec --property=RuntimeMaxSec=1500 /opt/fsp-career/bin/deploy-archive $GITHUB_SHA $GITHUB_RUN_ID $GITHUB_RUN_ATTEMPT || status=\$?; sudo journalctl -u $unit --no-pager -n 100; exit \$status"
+      - name: Check the public release
+        if: steps.head.outputs.current == 'true'
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 \
+            https://fspcareer.space/api/health > "$RUNNER_TEMP/health.json"
+          node -e "const h=require(process.env.RUNNER_TEMP+'/health.json');if(h.status!=='ok'||h.revision!==process.env.GITHUB_SHA)throw Error('Public site does not serve the expected commit')"
+          echo "Deployed [$GITHUB_SHA](https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA) to https://fspcareer.space" >> "$GITHUB_STEP_SUMMARY"

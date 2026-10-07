@@ -46,3 +46,12 @@ next-env.d.ts
 /work/
 
 *.tsbuildinfo
+
+# Local document render checks; never include personal examples in source.
+/tmp/
+/output/
+/public/assets/
+/app/asset-urls.ts
+
+# Ephemeral GitHub OIDC credentials.
+gha-creds-*.json

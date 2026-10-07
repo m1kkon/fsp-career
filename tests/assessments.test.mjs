@@ -1,0 +1,309 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {assessmentAction,assessmentState,assessmentView,maintainerState,assemble,correctAnswer,parseNumeric,validateQuestion,bank,assembleVariant,assembleAdaptiveVariant,specifications} from '../lib/assessments.mjs';
+import {MODULES,ROLES,INITIAL_QUESTIONS,DEFAULT_SPECS as ADAPTIVE_SPECS} from '../lib/question-bank.mjs';
+const DEFAULT_SPECS=MODULES.map(m=>({id:`spec-${m.id}-v2`,moduleId:m.id,version:2,scoredCount:6,difficultyCounts:{1:2,2:2,3:2},competencies:m.competencies,numericMin:1,numericMax:3,questionSeconds:20,seconds:120,experimentalSeconds:20,thresholds:{Junior:50,Middle:70,Senior:90},created:0}));
+import {BANK_EXPANSION} from '../lib/question-bank-expansion.mjs';
+function memory(){const records=new Map(),accounts=new Map(),copy=x=>x?structuredClone(x):null;return{records:async k=>[...records.values()].filter(x=>x.kind===k).map(copy),scoped:async(k,o)=>[...records.values()].filter(x=>x.kind===k&&(x.owner===o||x.recipient===o)).map(copy),record:async id=>copy(records.get(id)),saveDay:async(r,v,status)=>{const old=records.get(r.id);if(old?.kind!=='test-day'||old.version!==v||old.status!==status)return false;records.set(r.id,{...copy(r),kind:'test-day'});return true;},cancelRegistration:async(id,owner,at)=>{const r=records.get(id);if(r?.kind!=='assessment-registration'||r.owner!==owner||r.status!=='registered')return false;records.set(id,{...copy(r),status:'cancelled',cancelledAt:at});return true;},setAssessmentVisibility:async(id,owner,hidden,at)=>{const r=records.get(id);if(r?.kind!=='assessment'||r.owner!==owner||!['finished','incomplete'].includes(r.status))return false;records.set(id,{...copy(r),hiddenFromHistory:hidden,hiddenAt:hidden?at:null});return true;},startAssessment:async(t,r)=>{if(records.get(r.id)?.status!=='registered'||[...records.values()].some(x=>x.kind==='assessment'&&x.owner===t.owner&&x.status==='active'))return false;records.set(t.id,{...copy(t),kind:'assessment'});records.set(r.id,{...copy(r),status:'started',attemptId:t.id});return true;},put:async(k,r)=>records.set(r.id,{...copy(r),kind:k}),saveAssessment:async(r,v)=>{const old=records.get(r.id);if(!old||old.status!=='active'||old.owner!==r.owner||old.revision!==v)return false;records.set(r.id,{...copy(r),kind:'assessment'});return true;},saveAccount:async a=>accounts.set(a.id,copy(a)),account:async id=>copy(accounts.get(id))};}
+const candidate=()=>({id:'candidate',roles:['candidate'],profile:{name:'Candidate',verified:false},maintainer:false});
+const admin={id:'maintainer',roles:['candidate'],maintainer:true};
+// Historical sessions keep their six-question snapshots; adaptive sessions use current specifications.
+async function day(repo,experimentalCounts={},moduleIds=MODULES.map(m=>m.id),adaptive=false){
+ let dayId;
+ if(adaptive||(await repo.records('module-spec')).length){
+  ({dayId}=await assessmentAction(repo,admin,{action:'maintainer-day-save',name:'Сессия',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,experimentalCounts,moduleIds,tools:'Без внешних инструментов'}));
+ }else{
+  dayId=crypto.randomUUID();const specs=DEFAULT_SPECS.filter(s=>moduleIds.includes(s.moduleId));
+  const all=(await bank(repo)).filter(q=>!q.seedOrigin&&['working','experimental'].includes(q.status)).map(q=>({...q,scored:q.status==='working'}));
+  const pool=specs.flatMap(spec=>{const available=all.filter(q=>q.moduleId===spec.moduleId),assigned=assembleVariant(available,spec,experimentalCounts[spec.moduleId]||0),ids=new Set(assigned.map(q=>q.id));return [...assigned,...available.filter(q=>q.scored&&!ids.has(q.id)).slice(0,2)];});
+  await repo.put('test-day',{id:dayId,owner:admin.id,name:'Историческая сессия',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,created:Date.now(),status:'draft',version:1,breakSeconds:0,experimentalCounts:Object.fromEntries(moduleIds.map(id=>[id,experimentalCounts[id]||0])),moduleIds,specs,pool,tools:'Без внешних инструментов'});
+ }
+ await assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId});const d=await repo.record(dayId);d.opensAt=Date.now()-1000;await repo.put('test-day',d);return d;
+}
+async function start(repo,a,d,targetId){const {registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId});return(await assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true})).assessment;}
+async function answer(repo,a,id,q,value){const t=await repo.record(id);return(await assessmentAction(repo,a,{action:'assessment-answer',id,revision:t.revision,questionId:q.id,answer:value,activeMs:3000})).assessment;}
+async function complete(repo,a,id,allCorrect=true){const t=await repo.record(id),m=t.modules[t.moduleIndex],index=m.questions.findIndex(q=>q.id===m.activeQuestionId);let view;for(const q of m.questions.slice(index))view=await answer(repo,a,id,q,allCorrect?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);return view;}
+
+test('initial bank has 1800 unique fixed questions, 12 skills and 6 integration modules',()=>{assert.equal(INITIAL_QUESTIONS.length,1800);assert.equal(MODULES.filter(m=>!m.integration).length,12);assert.equal(MODULES.filter(m=>m.integration).length,6);assert.equal(ROLES.length,6);assert.equal(new Set(INITIAL_QUESTIONS.map(q=>q.id)).size,1800);assert.ok(INITIAL_QUESTIONS.every(q=>q.status==='working'));for(const q of INITIAL_QUESTIONS){assert.ok(validateQuestion(q));assert.ok(correctAnswer(q,q.format==='choice'?q.correct:q.numeric.expected));}});
+test('each module has exactly 100 working questions covering all competencies, difficulties and formats',()=>{
+ for(const m of MODULES){
+  const qs=INITIAL_QUESTIONS.filter(q=>q.moduleId===m.id);
+  assert.equal(qs.length,100,m.id);
+  assert.ok(qs.every(q=>q.status==='working'));
+  for(const c of m.competencies)assert.ok(qs.some(q=>q.competencies.includes(c)),`${m.id}: ${c}`);
+  for(const d of [1,2,3])assert.ok(qs.some(q=>q.difficulty===d),`${m.id}: difficulty ${d}`);
+  for(const format of ['choice','numeric'])assert.ok(qs.some(q=>q.format===format));
+ }
+ assert.equal(INITIAL_QUESTIONS.filter(q=>!q.seedOrigin&&q.format==='numeric').length,76);
+});
+test('the 96 added instances introduce distinct families and declare the skills they integrate',()=>{
+ const added=Object.entries(BANK_EXPANSION).flatMap(([moduleId,rows])=>rows.map(([family])=>INITIAL_QUESTIONS.find(q=>q.id===`bank-${moduleId}-${family}-v1`)));
+ assert.equal(added.length,96);
+ assert.equal(new Set(added.map(q=>q.familyId)).size,96);
+ for(const q of added){
+  assert.equal(INITIAL_QUESTIONS.filter(other=>other.familyId===q.familyId).length,1,q.id);
+  const m=MODULES.find(m=>m.id===q.moduleId);
+  if(m.integration){assert.ok(q.skills.length>=2,q.id);assert.deepEqual(q.competencies,q.skills);assert.ok(q.skills.every(s=>m.skills.includes(s)));}
+ }
+});
+test('new numeric keys match independent calculations, including negative division and fractional answers',()=>{
+ const calculations={
+  'python:negative-floor-division':Math.floor(-7/3),
+  'javascript:optional-call-short-circuit':(()=>{let calls=0;const service=null;service?.send(++calls);return calls;})(),
+  'sql:sum-ignores-null':[10,null,20,null].filter(x=>x!==null).reduce((a,b)=>a+b,0),
+  'browser:em-parent-font-size':20*1.5,
+  'statistics:conditional-probability':10/40*100,
+  'statistics:pooled-conversion-rate':(10+90)/(100+300)*100,
+  'ml:accuracy-confusion':(30+50)/(30+50+10+10)*100,
+  'ml-engineering:padding-token-overhead':[3,5,8].reduce((sum,length)=>sum+8-length,0),
+  'test-design:transition-edge-coverage':new Set(['created-paid','paid-shipped','paid-cancelled']).size,
+  'automation:ci-shard-work-count':24/4,
+  'integration-backend:sql-python-line-total':[[2,30],[1,40]].reduce((sum,[quantity,price])=>sum+quantity*price,0),
+  'integration-backend:api-limit-extra-row':Math.min(6,5),
+  'integration-frontend:js-react-page-slice':Array.from({length:10},(_,i)=>i+1).slice(3,6).length,
+  'integration-frontend:react-css-two-columns':(420-20)/2,
+  'integration-qa:qa-filtered-fixture-count':[true,true,true,true,true,false,false,false].filter(Boolean).length,
+  'integration-qa:qa-boundary-param-count':[17,18,19,59,60,61].filter(age=>age>=18&&age<=60).length,
+  'integration-devops:python-ci-check-count':[0,1,0,2,0].filter(code=>code!==0).length,
+  'integration-devops:python-backoff-total-delay':[1,2,4].reduce((a,b)=>a+b,0),
+  'integration-ds:python-sql-mse':[[2,1],[4,3]].reduce((sum,[actual,predicted])=>sum+(actual-predicted)**2,0)/2,
+  'integration-ds:sql-python-weighted-baseline':(0*3+10*1)/(3+1),
+  'integration-mle:python-serving-threshold-count':[0.2,0.6,0.9,0.4].filter(p=>p>=0.6).length,
+  'integration-mle:python-serving-cache-hits':10-4,
+ };
+ const addedNumeric=Object.entries(BANK_EXPANSION).flatMap(([id,rows])=>rows.filter(row=>row.length===5).map(row=>`${id}:${row[0]}`));
+ assert.deepEqual(Object.keys(calculations).sort(),addedNumeric.sort());
+ for(const [familyId,expected] of Object.entries(calculations)){
+  const q=INITIAL_QUESTIONS.find(q=>q.familyId===familyId);
+  assert.equal(q.numeric.expected,expected,familyId);
+  assert.ok(correctAnswer(q,String(expected).replace('.',',')),familyId);
+  assert.equal(correctAnswer(q,String(expected+1)),false,familyId);
+ }
+});
+test('every module assembles the full common specification, without duplicate families',()=>{for(const spec of DEFAULT_SPECS){for(let i=0;i<8;i++){const qs=assemble(INITIAL_QUESTIONS.filter(q=>q.moduleId===spec.moduleId),spec);assert.equal(qs.length,spec.scoredCount);assert.equal(new Set(qs.map(q=>q.familyId)).size,qs.length);for(const d of [1,2,3])assert.equal(qs.filter(q=>q.difficulty===d).length,spec.difficultyCounts[d]);for(const c of spec.competencies)assert.ok(qs.some(q=>q.competencies.includes(c)));assert.ok(qs.filter(q=>q.format==='numeric').length>=spec.numericMin);}}});
+test('numeric grading supports comma, scientific notation, rounding and tolerance; rejects expressions',()=>{assert.equal(parseNumeric('1,5'),1.5);assert.equal(parseNumeric('2e2'),200);for(const bad of ['','Infinity','NaN','1/2','1 + 1','0x10','1,2,3'])assert.equal(parseNumeric(bad),null);const q={format:'numeric',numeric:{expected:1.23,tolerance:0,decimals:2,equivalents:[]}};assert.equal(correctAnswer(q,'1.234'),true);assert.equal(correctAnswer(q,'1.236'),false);assert.equal(correctAnswer({...q,numeric:{...q.numeric,tolerance:.01,decimals:null}},'1,24'),true);});
+test('maintainer authorization cannot be forged by body or candidate role',async()=>{const repo=memory(),a=candidate();for(const action of ['maintainer-state','maintainer-day-save','maintainer-question-save'])await assert.rejects(assessmentAction(repo,a,{action,maintainer:true,role:'maintainer'}),e=>e.status===403);});
+test('new questions start as drafts and content review is required before experimentation',async()=>{const repo=memory();const input=INITIAL_QUESTIONS.find(q=>q.moduleId==='python');const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',question:input});assert.equal(question.status,'draft');await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'experiment',reason:'Проверен корректный ключ'}));await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'experiment',reviewed:true,reason:'Проверены условие и корректный ключ'});assert.equal((await repo.record(question.id)).status,'experimental');await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'admit',difficulty:0,reason:'Достаточные измерительные свойства'}));});
+test('day requires a complete blueprint and is immutable after publication',async()=>{const repo=memory();const {dayId}=await assessmentAction(repo,admin,{action:'maintainer-day-save',name:'Неполный пул',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,moduleIds:['python'],questionIds:[INITIAL_QUESTIONS[0].id]});await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId}));const d=await day(repo);await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-day-publish',id:d.id}));});
+test('candidate must register and accept rules, can start only during session',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const {registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'python'});await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id}));d.opensAt=Date.now()+100000;await repo.put('test-day',d);await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true}));});
+test('all assigned modules are fixed before start; resume preserves questions, deadline and revision',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const attempt=await start(repo,a,d,'backend-developer');assert.equal(attempt.modules.length,4);assert.ok(attempt.currentModule.questions.slice(1).every(q=>q.prompt===undefined&&q.options===undefined));const raw=await repo.record(attempt.id);assert.ok(raw.modules.every(m=>m.questions.length===6));const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:attempt.id})).assessment;const expected=assessmentView(raw);assert.deepEqual({...resumed,serverTime:0},{...expected,serverTime:0});assert.ok(resumed.serverTime>=attempt.serverTime);assert.equal(resumed.currentModule.expiresAt,attempt.currentModule.expiresAt);const serialized=JSON.stringify(attempt);assert.ok(!serialized.includes('"correct":'));assert.ok(!serialized.includes('"numeric":'));assert.ok(!serialized.includes('"scored":'));assert.ok(!serialized.includes('"familyId":'));assert.ok(!serialized.includes('"status":"experimental"'));});
+test('confirmation closes only the current question; previous and future questions cannot be reopened',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');const raw=await repo.record(view.id),q=raw.modules[0].questions[0],future=raw.modules[0].questions[2];assert.equal(view.currentModule.questionSeconds,20);assert.equal(view.currentModule.expiresAt-view.currentModule.questionStartedAt,20000);await assert.rejects(answer(repo,a,view.id,future,null),e=>e.status===409);let r=await answer(repo,a,view.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));assert.equal(r.currentModule.questionIndex,1);assert.equal(r.currentModule.expiresAt-r.currentModule.questionStartedAt,20000);await assert.rejects(answer(repo,a,view.id,q,null),e=>e.status===409);const current=await repo.record(view.id);await assert.rejects(assessmentAction(repo,a,{action:'assessment-view',id:view.id,revision:current.revision,questionId:q.id}),e=>e.status===409);await assert.rejects(assessmentAction(repo,a,{action:'assessment-submit-module',id:view.id,revision:current.revision}),e=>e.status===409);r=await complete(repo,a,view.id);assert.equal(r.results[0].score,100);assert.equal(r.currentModule,null);assert.equal(a.profile.verified,false);});
+
+test('foreign candidates and invalid choices cannot write to an attempt',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'sql');let t=await repo.record(view.id);while(t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId).format!=='choice'){await answer(repo,a,view.id,t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId),null);t=await repo.record(view.id);}const q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);await assert.rejects(assessmentAction(repo,{...candidate(),id:'other'},{action:'assessment-resume',id:view.id}));await assert.rejects(answer(repo,a,view.id,q,4));await assert.rejects(answer(repo,a,view.id,q,-1));});
+test('concurrent saves use compare-and-swap revision; only one wins',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'sql'),q=view.currentModule.questions[0];const results=await Promise.allSettled([0,1].map(answer=>assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer})));assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal((await repo.record(view.id)).revision,1);});
+test('expiry skips one question, gives the next its own timer and rejects a late answer',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');const raw=await repo.record(view.id),q=raw.modules[0].questions[0];raw.modules[0].expiresAt=Date.now()-10000;await repo.put('assessment',raw);await assert.rejects(answer(repo,a,view.id,q,q.format==='choice'?q.correct:String(q.numeric.expected)),e=>e.status===409);const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;assert.equal(resumed.status,'active');assert.equal(resumed.currentModule.questionIndex,1);assert.equal(resumed.currentModule.answers[q.id],null);assert.equal(resumed.currentModule.expiresAt-resumed.currentModule.questionStartedAt,20000);assert.equal((await repo.record(view.id)).modules[0].answers[q.id].timedOut,true);const deadline=resumed.currentModule.expiresAt;const again=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;assert.equal(again.currentModule.expiresAt,deadline);const finished=await complete(repo,a,view.id,false);assert.equal(finished.status,'finished');assert.equal(finished.results[0].score,0);});
+
+test('role progresses after failure; required module thresholds cannot be compensated',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'devops-engineer');let r=await complete(repo,a,view.id,false);assert.equal(r.status,'active');for(let i=1;i<3;i++){const t=await repo.record(view.id);r=(await assessmentAction(repo,a,{action:'assessment-next-module',id:t.id,revision:t.revision})).assessment;r=await complete(repo,a,view.id,true);}assert.equal(r.status,'finished');assert.equal(r.roleResult.level,'Ниже Junior');assert.equal(r.results.length,3);assert.equal(r.roleResult.integration.score,100);assert.equal(a.profile.verified,false);});
+test('full role retains full module results and separate integration score',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'backend-developer');let r;for(let i=0;i<4;i++){if(i){const t=await repo.record(view.id);await assessmentAction(repo,a,{action:'assessment-next-module',id:t.id,revision:t.revision});}r=await complete(repo,a,view.id);}assert.equal(r.roleResult.level,'Senior');assert.equal(r.results.length,4);assert.equal(a.profile.grade,'Senior');assert.ok(r.results.every(r=>r.total===6));const s=await assessmentState(repo,a);assert.equal(s.history[0].results.length,4);});
+test('abandoned roles are incomplete, keep finished skills and do not lower qualification',async()=>{const repo=memory(),a=candidate();a.profile={verified:true,grade:'Middle',spec:'Backend',score:80};const d=await day(repo),v=await start(repo,a,d,'backend-developer');await complete(repo,a,v.id);const t=await repo.record(v.id);const r=(await assessmentAction(repo,a,{action:'assessment-abandon',id:t.id,revision:t.revision})).assessment;assert.equal(r.status,'incomplete');assert.equal(r.roleResult.level,null);assert.equal(r.results.length,1);assert.equal(a.profile.grade,'Middle');});
+test('experimental items are additive, hidden, excluded and never become scored retroactively',async()=>{const repo=memory(),a=candidate();const q={...INITIAL_QUESTIONS.find(q=>q.moduleId==='python'),familyId:'python:experimental-additive',prompt:'Какой объект возвращает iter([1, 2])?',options:['Итератор','Число','Словарь','Строка']};const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',question:q});await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'experiment',reviewed:true,reason:'Проверена однозначность и ключ'});const d=await day(repo,{python:1}),v=await start(repo,a,d,'python');assert.equal(v.currentModule.questions.length,7);assert.equal(v.currentModule.seconds,140);assert.equal(v.currentModule.questionSeconds,20);const raw=await repo.record(v.id),experimental=raw.modules[0].questions.find(q=>!q.scored);assert.equal(experimental.id,question.id);for(const item of raw.modules[0].questions)await answer(repo,a,v.id,item,item.scored?(item.format==='choice'?item.correct:String(item.numeric.expected)):null);let r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.results[0].score,100);assert.equal(r.results[0].total,6);await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'admit',difficulty:2,reason:'Команда рассмотрела статистику и допустила задание'});r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.results[0].total,6);assert.equal((await repo.record(v.id)).modules[0].questions.find(q=>q.id===question.id).scored,false);assert.equal(d.pool.find(q=>q.id===question.id).scored,false);});
+test('editing creates a separate version and specification changes affect only future pools',async()=>{const repo=memory(),d=await day(repo);const old=INITIAL_QUESTIONS[0];const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',id:old.id,question:{...old,prompt:'Новое проверенное условие для следующей версии вопроса'}});assert.notEqual(question.id,old.id);assert.equal(question.version,2);assert.equal((await bank(repo)).find(q=>q.id===old.id).prompt,old.prompt);await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...DEFAULT_SPECS[0],questionSeconds:40}});const frozen=await repo.record(d.id);assert.equal(frozen.specs.find(s=>s.moduleId==='python').questionSeconds,20);});
+test('quality analytics records distractors, skips and score strata without automatic promotion',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'sql');const raw=await repo.record(v.id),q=raw.modules[0].questions[0];await assessmentAction(repo,a,{action:'assessment-view',id:v.id,revision:raw.revision,questionId:q.id});await answer(repo,a,v.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));await complete(repo,a,v.id,false);const adminState=await maintainerState(repo,admin),stat=adminState.analytics.find(x=>x.id===q.id);assert.equal(stat.shown,1);assert.equal(stat.correct,1);assert.equal(stat.groups.low.n,1);assert.equal((await bank(repo)).find(x=>x.id===q.id).status,'working');});
+
+test('concurrent starts atomically claim registration and allow only one active attempt',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const {registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'python'});await Promise.allSettled([1,2].map(()=>assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true})));assert.equal((await repo.records('assessment')).length,1);assert.equal((await repo.record(registration.id)).status,'started');});
+test('numeric key cannot be silently converted from empty input to zero',()=>{const q=INITIAL_QUESTIONS.find(q=>q.format==='numeric');for(const expected of ['',null,undefined])assert.throws(()=>validateQuestion({...q,numeric:{...q.numeric,expected}}));assert.ok(validateQuestion({...q,numeric:{...q.numeric,expected:0}}));});
+
+test('draft day editing increments its version, and published pools reject edits',async()=>{const repo=memory();const input={action:'maintainer-day-save',name:'Первая версия',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,moduleIds:['python']};const {dayId}=await assessmentAction(repo,admin,input);await assessmentAction(repo,admin,{...input,id:dayId,name:'Вторая версия'});assert.equal((await repo.record(dayId)).version,2);await assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId});await assert.rejects(assessmentAction(repo,admin,{...input,id:dayId}));assert.equal((await repo.record(dayId)).status,'published');});
+test('two concurrent publications cannot overwrite a locked day',async()=>{const repo=memory();const {dayId}=await assessmentAction(repo,admin,{action:'maintainer-day-save',name:'Сессия',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,moduleIds:['python']});const r=await Promise.allSettled([1,2].map(()=>assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId})));assert.equal(r.filter(x=>x.status==='fulfilled').length,1);});
+test('breaks cannot be bypassed and a new role never skips a previously completed skill',async()=>{const repo=memory(),a=candidate(),d=await day(repo);await complete(repo,a,(await start(repo,a,d,'python')).id);d.breakSeconds=60;await repo.put('test-day',d);const role=await start(repo,a,d,'backend-developer');assert.equal(role.modules[0].id,'python');assert.equal(role.modules[0].status,'active');await complete(repo,a,role.id);const raw=await repo.record(role.id);await assert.rejects(assessmentAction(repo,a,{action:'assessment-next-module',id:raw.id,revision:raw.revision}));raw.nextModuleAt=Date.now()-1;raw.sessionClosesAt=Date.now()-1;await repo.put('assessment',raw);await assert.rejects(assessmentAction(repo,a,{action:'assessment-next-module',id:raw.id,revision:raw.revision}));});
+
+test('distractor analytics maps shuffled candidate options back to bank labels',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');await complete(repo,a,view.id);const raw=await repo.record(view.id),stats=await maintainerState(repo,admin);for(const q of raw.modules[0].questions.filter(q=>q.format==='choice')){const source=INITIAL_QUESTIONS.find(x=>x.id===q.id),row=stats.analytics.find(x=>x.id===q.id);assert.equal(row.distractors[source.correct],1);assert.equal(row.distractors.reduce((a,b)=>a+b),1);}});
+
+test('experimental items sharing a working family never cause duplicate families or start failures',async()=>{const repo=memory(),a=candidate();const original=INITIAL_QUESTIONS.find(q=>q.moduleId==='python');const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',question:original});await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'experiment',reviewed:true,reason:'Проверены условие и ключ; новый экземпляр узкого семейства'});const d=await day(repo,{python:1},['python']);for(let i=0;i<8;i++){const v=await start(repo,a,d,'python'),raw=await repo.record(v.id),qs=raw.modules[0].questions;assert.equal(qs.length,7);assert.equal(new Set(qs.map(q=>q.familyId)).size,7);assert.equal(qs.filter(q=>q.scored).length,6);assert.equal(qs.find(q=>!q.scored).id,question.id);await complete(repo,a,v.id);}});
+
+test('concurrent expiry reads persist only one skip and return the same next question',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'python'),raw=await repo.record(v.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);const views=await Promise.all([1,2].map(()=>assessmentAction(repo,a,{action:'assessment-resume',id:v.id})));assert.ok(views.every(r=>r.assessment.status==='active'&&r.assessment.currentModule.questionIndex===1));assert.equal((await repo.record(v.id)).revision,1);assert.equal(views[0].assessment.currentModule.expiresAt,views[1].assessment.currentModule.expiresAt);assert.equal(Object.keys((await repo.record(v.id)).modules[0].answers).length,1);});
+
+test('automatic daily pool selects a blueprint and reserve instead of copying the entire bank',async()=>{const repo=memory(),d=await day(repo,{},['python']);assert.equal(d.pool.length,8);assert.equal(new Set(d.pool.map(q=>q.familyId)).size,8);assert.ok(d.pool.length<INITIAL_QUESTIONS.filter(q=>q.moduleId==='python').length);assert.ok(d.pool.every(q=>q.scored));assert.equal(assemble(d.pool,d.specs[0]).length,6);});
+
+test('per-question deadlines apply equally to standalone, role and integration modules',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const single=await start(repo,a,d,'python');assert.equal(single.currentModule.questionSeconds,20);await complete(repo,a,single.id);const role=await start(repo,a,d,'backend-developer');for(let i=0;i<4;i++){let view=role;if(i){const raw=await repo.record(role.id);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:role.id,revision:raw.revision})).assessment;}assert.equal(view.currentModule.questionSeconds,single.currentModule.questionSeconds);assert.equal(view.currentModule.expiresAt-view.currentModule.questionStartedAt,20000);await complete(repo,a,role.id);}assert.equal((await repo.record(role.id)).modules[3].moduleId,'integration-backend');});
+test('last question timeout completes the module and preserves previously confirmed answers',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'python');let raw=await repo.record(v.id);for(const q of raw.modules[0].questions.slice(0,-1))await answer(repo,a,v.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));raw=await repo.record(v.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);const r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.status,'finished');assert.equal(r.results[0].correct,5);assert.equal(r.results[0].skipped,1);assert.equal(r.currentModule,null);});
+test('old published pools receive per-question timing without rewriting the pool or finished history',async()=>{const repo=memory(),a=candidate(),d=await day(repo);for(const spec of d.specs){delete spec.questionSeconds;spec.seconds=600;spec.experimentalSeconds=90;}for(const config of Object.values(d.moduleConfigs)){delete config.questionSeconds;config.seconds=600;}await repo.put('test-day',d);const v=await start(repo,a,d,'python');assert.equal(v.currentModule.seconds,120);assert.equal(v.currentModule.questionSeconds,20);assert.equal((await repo.record(d.id)).moduleConfigs.python.seconds,600);const state=await assessmentState(repo,a);assert.equal(state.days[0].moduleConfigs.python.seconds,120);await complete(repo,a,v.id);const before=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-resume',id:v.id});assert.deepEqual(await repo.record(v.id),before);});
+test('a new timing specification affects future pools and freezes the per-question deadline',async()=>{const repo=memory(),a=candidate(),old=await day(repo,{},['python']);await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...DEFAULT_SPECS[0],questionSeconds:35}});const next=await day(repo,{},['python']);assert.equal(old.moduleConfigs.python.questionSeconds,20);assert.equal(next.moduleConfigs.python.questionSeconds,35);const v=await start(repo,a,next,'python');assert.equal(v.currentModule.expiresAt-v.currentModule.questionStartedAt,35000);assert.equal(v.currentModule.seconds,1120);});
+
+test('unfinished attempts upgrade once from a module timer and retain their answers and assigned variant',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'backend-developer');const raw=await repo.record(v.id);delete raw.timingRule;const m=raw.modules[0];delete m.questionSeconds;delete m.spec.questionSeconds;m.seconds=600;m.expiresAt=Date.now()+600000;m.answers[m.questions[0].id]={value:null,savedAt:Date.now()};const assigned=raw.modules.map(m=>m.questions.map(q=>q.id));await repo.put('assessment',raw);const first=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(first.currentModule.questionSeconds,20);assert.equal(first.currentModule.expiresAt-first.currentModule.questionStartedAt,20000);const updated=await repo.record(v.id);assert.equal(updated.timingRule,'per-question-v1');assert.deepEqual(updated.modules.map(m=>m.questions.map(q=>q.id)),assigned);assert.deepEqual(updated.modules[0].answers,m.answers);const again=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(again.currentModule.expiresAt,first.currentModule.expiresAt);assert.equal(again.revision,first.revision);});
+
+test('skill and role bookings can be cancelled and rebooked without creating an attempt',async()=>{for(const targetId of ['python','backend-developer']){const repo=memory(),a=candidate(),d=await day(repo),{registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId});await assessmentAction(repo,a,{action:'assessment-cancel-registration',id:registration.id});const cancelled=await repo.record(registration.id);assert.equal(cancelled.status,'cancelled');assert.ok(cancelled.cancelledAt);assert.equal((await repo.records('assessment')).length,0);await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true}),e=>e.status===404);await assessmentAction(repo,a,{action:'assessment-cancel-registration',id:registration.id});const rebooked=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId});assert.notEqual(rebooked.registration.id,registration.id);assert.equal(rebooked.registration.status,'registered');}});
+test('cancellation rejects foreign bookings and started attempts without changing their records',async()=>{const repo=memory(),a=candidate(),d=await day(repo),{registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'sql'});await assert.rejects(assessmentAction(repo,{...a,id:'other'},{action:'assessment-cancel-registration',id:registration.id}),e=>e.status===404);assert.equal((await repo.record(registration.id)).status,'registered');const attempt=(await assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true})).assessment;await assert.rejects(assessmentAction(repo,a,{action:'assessment-cancel-registration',id:registration.id}),e=>e.status===409);assert.equal((await repo.record(registration.id)).status,'started');assert.equal((await repo.record(attempt.id)).status,'active');await assert.rejects(assessmentAction(repo,a,{action:'assessment-cancel-registration',id:d.id}),e=>e.status===404);});
+test('concurrent cancellation and start cannot both claim the same booking',async()=>{for(const cancelFirst of [false,true]){const repo=memory(),a=candidate(),d=await day(repo),{registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'python'}),cancel={action:'assessment-cancel-registration',id:registration.id},start={action:'assessment-start',registrationId:registration.id,rulesAccepted:true};const results=await Promise.allSettled((cancelFirst?[cancel,start]:[start,cancel]).map(body=>assessmentAction(repo,a,body)));assert.equal(results.filter(r=>r.status==='fulfilled').length,1);const stored=await repo.record(registration.id),attempts=await repo.records('assessment');assert.ok(['cancelled','started'].includes(stored.status));assert.equal(attempts.length,stored.status==='started'?1:0);}});
+
+test('hiding a skill removes it from candidate history while retaining answers, results and analytics',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'python');await complete(repo,a,v.id);const before=await repo.record(v.id),analyticsBefore=(await maintainerState(repo,admin)).analytics;await assessmentAction(repo,a,{action:'assessment-history-hide',id:v.id});const after=await repo.record(v.id);const {hiddenFromHistory,hiddenAt,...unchanged}=after;assert.equal(hiddenFromHistory,true);assert.ok(hiddenAt);assert.deepEqual(unchanged,before);const state=await assessmentState(repo,a);assert.equal(state.history.length,0);assert.equal(state.hiddenHistory.length,1);assert.equal(state.hiddenHistory[0].id,v.id);assert.equal(state.hiddenHistory[0].results,undefined);assert.deepEqual((await maintainerState(repo,admin)).analytics,analyticsBefore);await assessmentAction(repo,a,{action:'assessment-history-restore',id:v.id});const restored=await assessmentState(repo,a);assert.equal(restored.history.length,1);assert.equal(restored.hiddenHistory.length,0);assert.deepEqual(restored.history[0].results,before.modules.map(m=>m.result));});
+test('hiding a complete role removes its role and all skill results together, leaving other attempts visible',async()=>{const repo=memory(),a=candidate(),d=await day(repo),skill=await start(repo,a,d,'sql');await complete(repo,a,skill.id);const v=await start(repo,a,d,'backend-developer');for(let i=0;i<4;i++){if(i){const t=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:t.revision});}await complete(repo,a,v.id);}const before=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-history-hide',id:v.id});const state=await assessmentState(repo,a);assert.deepEqual(state.history.map(h=>h.id),[skill.id]);assert.ok(!state.history.flatMap(h=>h.results).some(r=>r.moduleId==='python'));assert.deepEqual((await repo.record(v.id)).modules,before.modules);await assessmentAction(repo,a,{action:'assessment-history-restore',id:v.id});assert.equal((await assessmentState(repo,a)).history.find(h=>h.id===v.id).results.length,4);});
+test('only the owner may hide closed attempts; unfinished roles can be hidden after abandonment',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'backend-developer');for(const action of ['assessment-history-hide','assessment-history-restore']){await assert.rejects(assessmentAction(repo,{...a,id:'other'},{action,id:v.id}),e=>e.status===404);await assert.rejects(assessmentAction(repo,a,{action,id:v.id}),e=>e.status===409);await assert.rejects(assessmentAction(repo,a,{action,id:d.id}),e=>e.status===404);}await complete(repo,a,v.id);const raw=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-abandon',id:v.id,revision:raw.revision});await assessmentAction(repo,a,{action:'assessment-history-hide',id:v.id});assert.equal((await assessmentState(repo,a)).history.length,0);assert.equal((await repo.record(v.id)).status,'incomplete');assert.equal((await repo.record(v.id)).modules[0].result.score,100);});
+
+test('ongoing roles disclose no module scores through actions, resume, history or profile state',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'backend-developer');const closed=await complete(repo,a,v.id);const assertWithheld=view=>{assert.equal(view.resultsAvailable,false);assert.deepEqual(view.results,[]);assert.deepEqual(view.roleResult.requirements,[]);assert.equal(view.roleResult.integration,null);assert.equal(view.roleResult.level,null);if(view.modules)assert.ok(view.modules.every(m=>m.result===undefined));const payload=JSON.stringify(view);for(const key of ['score','correct','thresholds'])assert.ok(!payload.includes('"'+key+'":'));};assertWithheld(closed);const raw=await repo.record(v.id);assert.equal(raw.modules[0].result.score,100);assert.equal(closed.modules[0].status,'completed');assertWithheld((await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment);let state=await assessmentState(repo,a);assertWithheld(state.active);assertWithheld(state.history.find(h=>h.id===v.id));const second=(await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:raw.revision})).assessment;assertWithheld(second);state=await assessmentState(repo,a);assertWithheld(state.history.find(h=>h.id===v.id));assert.ok((await maintainerState(repo,admin)).analytics.some(q=>q.correct>0));});
+test('all role scores become available together after the final integration module',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'backend-developer');let view=v;for(let i=0;i<4;i++){if(i){const raw=await repo.record(v.id);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:raw.revision})).assessment;}assert.equal(view.resultsAvailable,false);view=await complete(repo,a,v.id);if(i<3){assert.deepEqual(view.results,[]);assert.equal(view.resultsAvailable,false);}}assert.equal(view.status,'finished');assert.equal(view.resultsAvailable,true);assert.equal(view.results.length,4);assert.equal(view.roleResult.level,'Senior');assert.equal(view.roleResult.requirements.length,4);assert.equal(view.roleResult.integration.score,100);assert.ok(view.modules.every(m=>m.result.score===100));const state=await assessmentState(repo,a);assert.equal(state.active,null);assert.equal(state.history.find(h=>h.id===v.id).results.length,4);assert.equal((await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment.results.length,4);});
+test('standalone scores remain immediate and abandoned roles retain completed module results',async()=>{const repo=memory(),a=candidate(),d=await day(repo),skill=await start(repo,a,d,'python');const done=await complete(repo,a,skill.id);assert.equal(done.resultsAvailable,true);assert.equal(done.results[0].score,100);const role=await start(repo,a,d,'backend-developer');await complete(repo,a,role.id);const raw=await repo.record(role.id);const abandoned=(await assessmentAction(repo,a,{action:'assessment-abandon',id:role.id,revision:raw.revision})).assessment;assert.equal(abandoned.resultsAvailable,true);assert.equal(abandoned.results.length,1);assert.equal(abandoned.roleResult.level,null);assert.equal(abandoned.roleResult.completed,false);});
+
+async function completeAdaptivePart(repo,a,id,correct=true,experimentalCorrect=correct){
+ const t=await repo.record(id),m=t.modules[t.moduleIndex],startIndex=m.questions.findIndex(q=>q.id===m.activeQuestionId);
+ const qs=m.questions.slice(startIndex);let view;
+ for(const q of qs)view=await answer(repo,a,id,q,(q.scored?correct:experimentalCorrect)?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);
+ return view;
+}
+test('all 18 adaptive blueprints assemble both 16-question routes without repeated families',()=>{
+ for(const spec of ADAPTIVE_SPECS)for(let i=0;i<10;i++){
+  const pool=INITIAL_QUESTIONS.filter(q=>q.moduleId===spec.moduleId).map(q=>({...q,scored:true}));
+  const tree=assembleAdaptiveVariant(pool,spec);
+  assert.equal(tree.first.length,16);
+  for(const [route,qs] of Object.entries(tree.routes)){
+   assert.equal(qs.length,16);const path=[...tree.first,...qs];
+   assert.equal(new Set(path.map(q=>q.id)).size,32);
+   assert.equal(new Set(path.map(q=>q.familyId)).size,32);
+   for(const d of [1,2,3])assert.equal(qs.filter(q=>q.difficulty===d).length,spec.adaptive.routes[route][d]);
+   for(const part of [tree.first,qs])for(const c of spec.competencies)assert.ok(part.some(q=>q.competencies.includes(c)));
+  }
+ }
+});
+test('automatic adaptive pools include both possible routes and are validated before publishing',async()=>{
+ const repo=memory(),d=await day(repo,{},MODULES.map(m=>m.id),true);
+ for(const s of d.specs){assert.equal(s.scoredCount,32);assert.equal(d.moduleConfigs[s.moduleId].seconds,640);assert.equal(d.moduleConfigs[s.moduleId].partCount,2);const pool=d.pool.filter(q=>q.moduleId===s.moduleId);assert.ok(pool.length>=32&&pool.length<=100);for(let i=0;i<5;i++)assert.ok(assembleAdaptiveVariant(pool,s));}
+ const {dayId}=await assessmentAction(repo,admin,{action:'maintainer-day-save',name:'Неполное дерево',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,moduleIds:['python'],questionIds:INITIAL_QUESTIONS.filter(q=>q.moduleId==='python'&&!q.seedOrigin).map(q=>q.id)});
+ await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId}),e=>e.status===409);
+});
+test('the diagnostic part opens the fixed advanced or foundation route only after its final answer',async()=>{
+ for(const correct of [true,false]){
+  const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
+  assert.equal(v.currentModule.partIndex,0);assert.equal(v.currentModule.partQuestionCount,16);assert.equal(v.currentModule.totalQuestionCount,32);assert.equal(v.currentModule.seconds,640);
+  assert.equal(v.currentModule.questions.length,16);assert.deepEqual(v.results,[]);
+  const before=await repo.record(v.id);assert.equal(before.modules[0].adaptive.selectedRoute,null);
+  const second=await completeAdaptivePart(repo,a,v.id,correct),raw=await repo.record(v.id),m=raw.modules[0],route=correct?'advanced':'foundation';
+  assert.equal(m.adaptive.selectedRoute,route);assert.equal(m.questions.length,32);assert.equal(m.status,'active');assert.equal(m.result,undefined);
+  assert.equal(second.currentModule.partIndex,1);assert.equal(second.currentModule.partQuestionIndex,0);assert.equal(second.currentModule.partQuestionCount,16);assert.deepEqual(second.results,[]);
+  assert.deepEqual(m.questions.slice(16),before.modules[0].adaptive.routes[route]);
+  assert.equal(second.currentModule.expiresAt-second.currentModule.questionStartedAt,20000);
+  const serial=JSON.stringify(second);for(const key of ['correct','numeric','difficulty','routes','selectedRoute','decision'])assert.ok(!serial.includes('"'+key+'":'));
+  const finished=await completeAdaptivePart(repo,a,v.id,true);assert.equal(finished.status,'finished');assert.equal(finished.results[0].total,32);
+  assert.equal(finished.results[0].score,correct?100:37);assert.equal(finished.results[0].level,correct?'Senior':'Ниже Junior');assert.equal(finished.results[0].maximumPoints,70);assert.equal(finished.results[0].secondPartRoute,route);
+ }
+});
+test('route snapshots survive resume, bank edits and stale answer replay',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo,{},['sql'],true),v=await start(repo,a,d,'sql');const before=await repo.record(v.id),first=before.modules[0].questions[0];
+ await completeAdaptivePart(repo,a,v.id,true);const chosen=await repo.record(v.id),m=chosen.modules[0];
+ await repo.put('question',{...m.questions[16],prompt:'Изменение банка после назначения не подменяет сохранённый вариант',status:'retired'});
+ const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;
+ assert.equal(resumed.currentModule.partIndex,1);assert.equal(resumed.currentModule.questions[16].prompt,m.questions[16].prompt);
+ assert.equal(resumed.currentModule.expiresAt,m.expiresAt);assert.deepEqual((await repo.record(v.id)).modules[0].adaptive,m.adaptive);
+ await assert.rejects(answer(repo,a,v.id,first,first.correct),e=>e.status===409);
+ const raw=await repo.record(v.id);const state=(await assessmentAction(repo,a,{action:'assessment-view',id:v.id,revision:raw.revision,questionId:m.activeQuestionId,route:'foundation'})).assessment;
+ assert.equal(state.currentModule.partIndex,1);assert.equal((await repo.record(v.id)).modules[0].adaptive.selectedRoute,'advanced');
+});
+test('concurrent final diagnostic confirmations commit one route decision',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
+ let raw=await repo.record(v.id);for(const q of raw.modules[0].questions.slice(0,15))await answer(repo,a,v.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));
+ raw=await repo.record(v.id);const q=raw.modules[0].questions[15];
+ const body={action:'assessment-answer',id:v.id,revision:raw.revision,questionId:q.id,answer:q.format==='choice'?q.correct:String(q.numeric.expected)};
+ const r=await Promise.allSettled([assessmentAction(repo,a,body),assessmentAction(repo,a,body)]);assert.equal(r.filter(x=>x.status==='fulfilled').length,1);
+ const stored=await repo.record(v.id);assert.equal(stored.modules[0].questions.length,32);assert.equal(stored.modules[0].adaptive.selectedRoute,'advanced');assert.equal(stored.revision,16);
+});
+test('timeout on the last diagnostic question selects once and starts a fresh per-question timer',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
+ const first=(await repo.record(v.id)).modules[0].questions;for(const q of first.slice(0,15))await answer(repo,a,v.id,q,null);
+ const raw=await repo.record(v.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);
+ const r=await Promise.all([assessmentAction(repo,a,{action:'assessment-resume',id:v.id}),assessmentAction(repo,a,{action:'assessment-resume',id:v.id})]);
+ const stored=await repo.record(v.id);assert.equal(stored.modules[0].adaptive.selectedRoute,'foundation');assert.equal(stored.modules[0].questions.length,32);assert.equal(stored.modules[0].answers[first[15].id].timedOut,true);
+ for(const {assessment} of r){assert.equal(assessment.currentModule.partIndex,1);assert.equal(assessment.currentModule.expiresAt-assessment.currentModule.questionStartedAt,20000);assert.equal(assessment.currentModule.questionIndex,16);}
+});
+test('experimental answers cannot alter the adaptive route or the 32-question scored result',async()=>{
+ const repo=memory(),a=candidate();const source=INITIAL_QUESTIONS.find(q=>q.moduleId==='python');
+ await repo.put('question',{...source,id:'experimental-routing',familyId:'python:experimental-routing',status:'experimental'});
+ const d=await day(repo,{python:1},['python'],true),v=await start(repo,a,d,'python');assert.equal(v.currentModule.questions.length,17);assert.equal(v.currentModule.seconds,660);
+ await completeAdaptivePart(repo,a,v.id,true,false);let raw=await repo.record(v.id);assert.equal(raw.modules[0].adaptive.selectedRoute,'advanced');assert.equal(raw.modules[0].questions.length,33);
+ const finished=await completeAdaptivePart(repo,a,v.id,true);assert.equal(finished.results[0].total,32);assert.equal(finished.results[0].score,100);
+ await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:'experimental-routing',decision:'admit',difficulty:1,reason:'Содержательная проверка и собранные данные рассмотрены'});
+ raw=await repo.record(v.id);assert.equal(raw.modules[0].questions.find(q=>q.id==='experimental-routing').scored,false);assert.equal(raw.modules[0].result.score,100);
+});
+test('a complete adaptive role uses two parts for every base and integration module, withholding all scores until the end',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo,{},undefined,true),v=await start(repo,a,d,'devops-engineer');let view=v;
+ for(let i=0;i<3;i++){
+  if(i){const raw=await repo.record(v.id);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:raw.revision})).assessment;}
+  assert.equal(view.currentModule.partIndex,0);assert.equal(view.currentModule.seconds,640);assert.deepEqual(view.results,[]);
+  view=await completeAdaptivePart(repo,a,v.id,true);assert.equal(view.currentModule.partIndex,1);assert.deepEqual(view.results,[]);
+  view=await completeAdaptivePart(repo,a,v.id,true);if(i<2){assert.deepEqual(view.results,[]);assert.equal(view.resultsAvailable,false);}
+ }
+ assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);
+});
+test('legacy saved specifications upgrade for future days without mutating old published snapshots',async()=>{
+ const repo=memory(),old=await day(repo,{},['python']);
+ await repo.put('module-spec',{...DEFAULT_SPECS[0],id:'old-custom',version:4,created:Date.now(),questionSeconds:35});
+ const all=await specifications(repo),newest=all.filter(s=>s.moduleId==='python').sort((a,b)=>b.version-a.version)[0];assert.ok(newest.adaptive);assert.equal(newest.questionSeconds,35);assert.equal(newest.version,5);
+ const next=await day(repo,{},['python'],true);assert.equal(next.specs[0].scoredCount,32);assert.equal(next.moduleConfigs.python.seconds,1120);assert.equal((await repo.record(old.id)).specs[0].scoredCount,6);
+});
+test('routing uses difficulty-weighted evidence, not just the number of correct answers',async()=>{
+ for(const hardEvidence of [false,true]){
+  const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
+  const first=(await repo.record(v.id)).modules[0].questions;
+  const selected=hardEvidence?[...first.filter(q=>q.difficulty===3),...first.filter(q=>q.difficulty===2).slice(0,3),...first.filter(q=>q.difficulty===1).slice(0,3)]:first.filter(q=>q.difficulty<3);
+  assert.equal(selected.length,11);const ids=new Set(selected.map(q=>q.id));
+  for(const q of first)await answer(repo,a,v.id,q,ids.has(q.id)?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);
+  const raw=await repo.record(v.id);assert.equal(raw.modules[0].adaptive.selectedRoute,hardEvidence?'advanced':'foundation');assert.equal(raw.modules[0].adaptive.decision.earned,hardEvidence?24:17);assert.equal(raw.modules[0].adaptive.decision.possible,32);
+ }
+});
+
+test('new role results obey category cooldown and successful repetition does not reset its interval',async()=>{
+ for(const locked of [true,false]){
+  const repo=memory(),a=candidate(),at=Date.now()-1000;
+  a.profile={...a.profile,spec:locked?'Frontend':'Backend',grade:'Senior',score:90,verified:true,gradeChangedAt:at};
+  const d=await day(repo,{},['python','sql','backend','integration-backend']),v=await start(repo,a,d,'backend-developer');
+  let view;
+  for(let i=0;i<4;i++){view=await complete(repo,a,v.id);if(i<3){const t=await repo.record(v.id);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:t.revision})).assessment;}}
+  assert.equal(view.roleResult.locked,locked);assert.equal(view.roleResult.applied,!locked);
+  assert.equal(a.profile.spec,locked?'Frontend':'Backend');assert.equal(a.profile.gradeChangedAt,at);
+ }
+});
+
+test('a completed role below an existing grade retains the saved qualification and proof',async()=>{
+ const repo=memory(),a=candidate();a.profile={...a.profile,spec:'Backend',grade:'Senior',score:95,verified:true,verificationAttemptId:'prior-proof',gradeChangedAt:Date.now()-100*86400000};
+ const d=await day(repo,{},['python','sql','backend','integration-backend']),v=await start(repo,a,d,'backend-developer');
+ let view;
+ for(let moduleIndex=0;moduleIndex<4;moduleIndex++){
+  const t=await repo.record(v.id),m=t.modules[t.moduleIndex];
+  for(const [index,q] of m.questions.entries())view=await answer(repo,a,v.id,q,index<4?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);
+  if(moduleIndex<3){const stored=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:stored.revision});}
+ }
+ assert.equal(view.roleResult.level,'Junior');assert.equal(view.roleResult.lower,true);assert.equal(view.roleResult.applied,false);
+ assert.equal(a.profile.grade,'Senior');assert.equal(a.profile.score,95);assert.equal(a.profile.verificationAttemptId,'prior-proof');
+});
+
+
+test('autosaved choices survive resume, can be changed without extending the deadline and count on expiry',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');
+ let raw=await repo.record(view.id),q=raw.modules[0].questions[0];
+ while(q.format!=='choice'){await answer(repo,a,view.id,q,null);raw=await repo.record(view.id);q=raw.modules[0].questions.find(q=>q.id===raw.modules[0].activeQuestionId);}
+ const deadline=raw.modules[0].expiresAt,index=raw.modules[0].questions.findIndex(x=>x.id===q.id);
+ for(const value of [(q.correct+1)%4,q.correct]){
+  const {assessment}=await assessmentAction(repo,a,{action:'assessment-draft',id:raw.id,revision:raw.revision,questionId:q.id,answer:value});
+  assert.equal(assessment.currentModule.questionIndex,index);assert.equal(assessment.currentModule.expiresAt,deadline);
+  raw=await repo.record(raw.id);assert.equal(raw.modules[0].answers[q.id].draft,true);
+ }
+ const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id})).assessment;
+ assert.equal(resumed.currentModule.answers[q.id],q.correct);
+ raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);
+ const replies=await Promise.all([1,2].map(()=>assessmentAction(repo,a,{action:'assessment-resume',id:raw.id})));
+ for(const {assessment} of replies){assert.equal(assessment.currentModule.questionIndex,index+1);assert.equal(assessment.currentModule.answers[q.id],q.correct);}
+ raw=await repo.record(raw.id);assert.equal(raw.modules[0].answers[q.id].draft,false);assert.equal(raw.modules[0].answers[q.id].timedOut,true);
+ const finished=(await repo.record(raw.id)).status==='finished'?(await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id})).assessment:await complete(repo,a,raw.id,false);assert.equal(finished.results[0].correct,1);
+});
+
+test('clearing a selection and numeric validation prevent stale or invalid autosaved answers',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'sql');
+ let raw=await repo.record(view.id),q=raw.modules[0].questions[0];
+ while(q.format!=='numeric'){await answer(repo,a,view.id,q,null);raw=await repo.record(view.id);q=raw.modules[0].questions.find(q=>q.id===raw.modules[0].activeQuestionId);}
+ const save=value=>assessmentAction(repo,a,{action:'assessment-draft',id:raw.id,revision:raw.revision,questionId:q.id,answer:value});
+ await assert.rejects(save('1 + 2'));await assert.rejects(save('Infinity'));
+ await save('0');raw=await repo.record(raw.id);assert.equal(raw.modules[0].answers[q.id].value,'0');
+ await save(null);raw=await repo.record(raw.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);
+ await assert.rejects(save(String(q.numeric.expected)),e=>e.status===409);
+ await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id});assert.equal((await repo.record(raw.id)).modules[0].answers[q.id].value,null);
+});
+
+test('autosaved numeric answers are graded on timeout and late drafts cannot change a closed question',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'sql');
+ let raw=await repo.record(view.id),q=raw.modules[0].questions[0];
+ while(q.format!=='numeric'){await answer(repo,a,view.id,q,null);raw=await repo.record(view.id);q=raw.modules[0].questions.find(q=>q.id===raw.modules[0].activeQuestionId);}
+ const value=String(q.numeric.expected).replace('.',',');
+ await assessmentAction(repo,a,{action:'assessment-draft',id:raw.id,revision:raw.revision,questionId:q.id,answer:value});
+ raw=await repo.record(raw.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);
+ const {assessment}=await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id});assert.equal((await repo.record(raw.id)).modules[0].answers[q.id].value,value);
+ await assert.rejects(assessmentAction(repo,a,{action:'assessment-draft',id:raw.id,revision:assessment.revision,questionId:q.id,answer:'999'}),e=>e.status===409);
+ const finished=(await repo.record(raw.id)).status==='finished'?(await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id})).assessment:await complete(repo,a,raw.id,false);assert.equal(finished.results[0].correct,1);
+});

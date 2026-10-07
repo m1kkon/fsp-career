@@ -1,0 +1,10 @@
+[Unit]
+Description=Process FSP Career authentication email queue
+
+[Timer]
+OnBootSec=20s
+OnUnitInactiveSec=30s
+Unit=fsp-mail.service
+
+[Install]
+WantedBy=timers.target
