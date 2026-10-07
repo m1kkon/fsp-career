@@ -249,6 +249,9 @@
                     "$ref": "#/components/schemas/assessment-answer"
                   },
                   {
+                    "$ref": "#/components/schemas/assessment-run-code"
+                  },
+                  {
                     "$ref": "#/components/schemas/assessment-view"
                   },
                   {
@@ -289,6 +292,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/assessment-result-visibility"
+                  },
+                  {
+                    "$ref": "#/components/schemas/assessment-prepare"
                   }
                 ]
               }
@@ -621,6 +627,53 @@
           },
           "403": {
             "description": "Account ID is not in TEST_MAINTAINER_IDS"
+          }
+        }
+      }
+    },
+    "/api/code-sandbox": {
+      "get": {
+        "summary": "Открытые примеры заданий на кодинг",
+        "responses": {
+          "200": {
+            "description": "Задания с открытыми проверками"
+          }
+        }
+      },
+      "post": {
+        "summary": "Изолированный запуск примера",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "questionId": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string",
+                    "maxLength": 20000
+                  }
+                },
+                "required": [
+                  "questionId",
+                  "source"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Вывод и результаты открытых проверок"
+          },
+          "429": {
+            "description": "Песочница занята"
+          },
+          "503": {
+            "description": "Песочница недоступна"
           }
         }
       }
@@ -2923,7 +2976,8 @@
           "format": {
             "enum": [
               "choice",
-              "numeric"
+              "numeric",
+              "coding"
             ]
           },
           "options": {
@@ -2933,6 +2987,10 @@
             },
             "minItems": 4,
             "maxItems": 4
+          },
+          "coding": {
+            "type": "object",
+            "description": "Язык, начальный код, открытые проверки. Скрытые проверки доступны только мейнтейнеру и серверной оценке."
           }
         },
         "description": "Условие и варианты доступны только для текущего вопроса. Для закрытых и будущих вопросов возвращается только id. Ключи, числовые правила, семейства и зачётность скрыты."
@@ -3095,7 +3153,69 @@
               "object",
               "null"
             ],
-            "description": "При активном комплексном тесте level=null, requirements=[], integration=null; баллы не раскрываются до завершения попытки."
+            "description": "При активном комплексном тесте level=null, requirements=[], integration=null; баллы не раскрываются до завершения попытки. Для новых попыток пять исходов: confirmed-plus-potential, confirmed-plus, confirmed, unconfirmed-lower, unconfirmed. «+» достигается во всех модулях на середине между порогами текущего и следующего грейда (для Senior — между его порогом и 100). Потенциал требует фактического достижения следующего грейда.",
+            "properties": {
+              "targetGrade": {
+                "enum": [
+                  "Junior",
+                  "Middle",
+                  "Senior"
+                ]
+              },
+              "confirmedGrade": {
+                "enum": [
+                  "Junior",
+                  "Middle",
+                  "Senior",
+                  null
+                ]
+              },
+              "confirmedPlus": {
+                "type": "boolean"
+              },
+              "potentialHigher": {
+                "enum": [
+                  "Middle",
+                  "Senior",
+                  null
+                ]
+              },
+              "status": {
+                "enum": [
+                  "confirmed-plus-potential",
+                  "confirmed-plus",
+                  "confirmed",
+                  "unconfirmed-lower",
+                  "unconfirmed",
+                  "confirmed-potential"
+                ],
+                "description": "confirmed-potential — сохранённый исход прежних попыток."
+              },
+              "outcomeRule": {
+                "type": "string"
+              },
+              "plusThresholds": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "moduleId": {
+                      "type": "string"
+                    },
+                    "grade": {
+                      "enum": [
+                        "Junior",
+                        "Middle",
+                        "Senior"
+                      ]
+                    },
+                    "threshold": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
           },
           "serverTime": {
             "type": "integer"
@@ -3178,6 +3298,14 @@
               "type": "boolean"
             },
             "description": "Видимость результатов только в собственном состоянии кандидата; ключ skill:<moduleId> или role:<roleId>."
+          },
+          "targetGrade": {
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ],
+            "description": "Целевой грейд роли. Фиксируется при старте; у теста навыка отсутствует."
           }
         },
         "description": "Вариант фиксируется заранее. У каждого вопроса отдельный таймер; подтверждение, пропуск или истечение времени закрывают его и открывают следующий. Ответы закрытых вопросов неизменны."
@@ -3226,7 +3354,8 @@
           "format": {
             "enum": [
               "choice",
-              "numeric"
+              "numeric",
+              "coding"
             ]
           },
           "prompt": {
@@ -3272,6 +3401,9 @@
                 }
               }
             }
+          },
+          "coding": {
+            "type": "object"
           }
         },
         "description": "Сохраняется только мейнтейнером. Новый экземпляр — черновик; редактирование создаёт отдельную версию."
@@ -3368,17 +3500,26 @@
           },
           "targetId": {
             "type": "string"
+          },
+          "targetGrade": {
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ],
+            "description": "Целевой грейд роли. Фиксируется при старте; у теста навыка отсутствует."
           }
         },
         "required": [
           "action",
           "dayId",
           "targetId"
-        ]
+        ],
+        "deprecated": true
       },
       "assessment-start": {
         "type": "object",
-        "description": "Атомарный запуск; весь вариант и порядок модулей фиксируются заранее.",
+        "description": "Немедленный запуск из суточного пула по targetId; весь вариант и порядок модулей фиксируются заранее. registrationId поддерживается для прежних записей.",
         "properties": {
           "action": {
             "const": "assessment-start"
@@ -3388,12 +3529,35 @@
           },
           "rulesAccepted": {
             "const": true
+          },
+          "targetGrade": {
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ],
+            "description": "Целевой грейд роли. Фиксируется при старте; у теста навыка отсутствует."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "Навык или роль. Текущий суточный пул выбирает сервер."
           }
         },
         "required": [
           "action",
-          "registrationId",
           "rulesAccepted"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "targetId"
+            ]
+          },
+          {
+            "required": [
+              "registrationId"
+            ]
+          }
         ]
       },
       "assessment-resume": {
@@ -3811,6 +3975,50 @@
           "revision",
           "questionId",
           "answer"
+        ]
+      },
+      "assessment-run-code": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "const": "assessment-run-code"
+          },
+          "id": {
+            "type": "string"
+          },
+          "questionId": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "questionId",
+          "revision",
+          "source"
+        ]
+      },
+      "assessment-prepare": {
+        "type": "object",
+        "description": "Подготовить экран начала теста. Возвращает правила и состав модулей суточного пула без вопросов и ключей.",
+        "properties": {
+          "action": {
+            "const": "assessment-prepare"
+          },
+          "targetId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "targetId"
         ]
       }
     },

@@ -1,10 +1,10 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {assessmentAction,assessmentState,assessmentView,maintainerState,assemble,correctAnswer,parseNumeric,validateQuestion,bank,assembleVariant,assembleAdaptiveVariant,specifications} from '../lib/assessments.mjs';
+import {assessmentAction,assessmentState,assessmentView,maintainerState,assemble,correctAnswer,parseNumeric,validateQuestion,bank,assembleVariant,assembleAdaptiveVariant,specifications,ensureDailyPool,dailyPoolWindow} from '../lib/assessments.mjs';
 import {MODULES,ROLES,INITIAL_QUESTIONS,DEFAULT_SPECS as ADAPTIVE_SPECS} from '../lib/question-bank.mjs';
 const DEFAULT_SPECS=MODULES.map(m=>({id:`spec-${m.id}-v2`,moduleId:m.id,version:2,scoredCount:6,difficultyCounts:{1:2,2:2,3:2},competencies:m.competencies,numericMin:1,numericMax:3,questionSeconds:20,seconds:120,experimentalSeconds:20,thresholds:{Junior:50,Middle:70,Senior:90},created:0}));
 import {BANK_EXPANSION} from '../lib/question-bank-expansion.mjs';
-function memory(){const records=new Map(),accounts=new Map(),copy=x=>x?structuredClone(x):null;return{records:async k=>[...records.values()].filter(x=>x.kind===k).map(copy),scoped:async(k,o)=>[...records.values()].filter(x=>x.kind===k&&(x.owner===o||x.recipient===o)).map(copy),record:async id=>copy(records.get(id)),saveDay:async(r,v,status)=>{const old=records.get(r.id);if(old?.kind!=='test-day'||old.version!==v||old.status!==status)return false;records.set(r.id,{...copy(r),kind:'test-day'});return true;},cancelRegistration:async(id,owner,at)=>{const r=records.get(id);if(r?.kind!=='assessment-registration'||r.owner!==owner||r.status!=='registered')return false;records.set(id,{...copy(r),status:'cancelled',cancelledAt:at});return true;},setAssessmentVisibility:async(id,owner,hidden,at)=>{const r=records.get(id);if(r?.kind!=='assessment'||r.owner!==owner||!['finished','incomplete'].includes(r.status))return false;records.set(id,{...copy(r),hiddenFromHistory:hidden,hiddenAt:hidden?at:null});return true;},startAssessment:async(t,r)=>{if(records.get(r.id)?.status!=='registered'||[...records.values()].some(x=>x.kind==='assessment'&&x.owner===t.owner&&x.status==='active'))return false;records.set(t.id,{...copy(t),kind:'assessment'});records.set(r.id,{...copy(r),status:'started',attemptId:t.id});return true;},put:async(k,r)=>records.set(r.id,{...copy(r),kind:k}),saveAssessment:async(r,v)=>{const old=records.get(r.id);if(!old||old.status!=='active'||old.owner!==r.owner||old.revision!==v)return false;records.set(r.id,{...copy(r),kind:'assessment'});return true;},saveAccount:async a=>accounts.set(a.id,copy(a)),account:async id=>copy(accounts.get(id))};}
+function memory(){const records=new Map(),accounts=new Map(),copy=x=>x?structuredClone(x):null;return{records:async k=>[...records.values()].filter(x=>x.kind===k).map(copy),scoped:async(k,o)=>[...records.values()].filter(x=>x.kind===k&&(x.owner===o||x.recipient===o)).map(copy),record:async id=>copy(records.get(id)),saveDay:async(r,v,status)=>{const old=records.get(r.id);if(old?.kind!=='test-day'||old.version!==v||old.status!==status)return false;records.set(r.id,{...copy(r),kind:'test-day'});return true;},cancelRegistration:async(id,owner,at)=>{const r=records.get(id);if(r?.kind!=='assessment-registration'||r.owner!==owner||r.status!=='registered')return false;records.set(id,{...copy(r),status:'cancelled',cancelledAt:at});return true;},setAssessmentVisibility:async(id,owner,hidden,at)=>{const r=records.get(id);if(r?.kind!=='assessment'||r.owner!==owner||!['finished','incomplete'].includes(r.status))return false;records.set(id,{...copy(r),hiddenFromHistory:hidden,hiddenAt:hidden?at:null});return true;},startAssessment:async(t,r)=>{if((r&&records.get(r.id)?.status!=='registered')||[...records.values()].some(x=>x.kind==='assessment'&&x.owner===t.owner&&x.status==='active'))return false;records.set(t.id,{...copy(t),kind:'assessment'});if(r)records.set(r.id,{...copy(r),status:'started',attemptId:t.id});return true;},put:async(k,r)=>records.set(r.id,{...copy(r),kind:k}),putIfAbsent:async(k,r)=>{if(!records.has(r.id))records.set(r.id,{...copy(r),kind:k});return copy(records.get(r.id));},saveAssessment:async(r,v)=>{const old=records.get(r.id);if(!old||old.status!=='active'||old.owner!==r.owner||old.revision!==v)return false;records.set(r.id,{...copy(r),kind:'assessment'});return true;},saveAccount:async a=>accounts.set(a.id,copy(a)),account:async id=>copy(accounts.get(id))};}
 const candidate=()=>({id:'candidate',roles:['candidate'],profile:{name:'Candidate',verified:false},maintainer:false});
 const admin={id:'maintainer',roles:['candidate'],maintainer:true};
 // Historical sessions keep their six-question snapshots; adaptive sessions use current specifications.
@@ -220,7 +220,7 @@ test('a complete adaptive role uses two parts for every base and integration mod
   view=await completeAdaptivePart(repo,a,v.id,true);assert.equal(view.currentModule.partIndex,1);assert.deepEqual(view.results,[]);
   view=await completeAdaptivePart(repo,a,v.id,true);if(i<2){assert.deepEqual(view.results,[]);assert.equal(view.resultsAvailable,false);}
  }
- assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);
+ assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);assert.equal(view.roleResult.targetGrade,'Middle');assert.equal(view.roleResult.status,'confirmed-plus-potential');assert.equal(view.roleResult.confirmedGrade,'Middle');assert.equal(view.roleResult.confirmedPlus,true);assert.equal(view.roleResult.outcomeRule,'target-grade-five-outcomes-midpoint-v2');assert.ok(view.roleResult.plusThresholds.every(r=>r.threshold===80));assert.equal(view.roleResult.potentialHigher,'Senior');
 });
 test('legacy saved specifications upgrade for future days without mutating old published snapshots',async()=>{
  const repo=memory(),old=await day(repo,{},['python']);
@@ -306,4 +306,89 @@ test('autosaved numeric answers are graded on timeout and late drafts cannot cha
  const {assessment}=await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id});assert.equal((await repo.record(raw.id)).modules[0].answers[q.id].value,value);
  await assert.rejects(assessmentAction(repo,a,{action:'assessment-draft',id:raw.id,revision:assessment.revision,questionId:q.id,answer:'999'}),e=>e.status===409);
  const finished=(await repo.record(raw.id)).status==='finished'?(await assessmentAction(repo,a,{action:'assessment-resume',id:raw.id})).assessment:await complete(repo,a,raw.id,false);assert.equal(finished.results[0].correct,1);
+});
+
+test('selected grade is validated at start, frozen with attempt and resolved against role thresholds',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo);
+ const r=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'backend-developer',targetGrade:'Senior'});
+ assert.equal(r.registration.targetGrade,'Senior');
+ await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:r.registration.id,rulesAccepted:true,targetGrade:'Lead'}));
+ const started=await assessmentAction(repo,a,{action:'assessment-start',registrationId:r.registration.id,rulesAccepted:true,targetGrade:'Junior'});
+ assert.equal(started.assessment.targetGrade,'Junior');assert.equal((await repo.record(started.assessment.id)).targetGrade,'Junior');assert.equal((await repo.record(started.assessment.id)).roleOutcomeRule,'target-grade-five-outcomes-midpoint-v2');
+});
+
+test('active role answers expose saved source without hidden coding judgement',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'backend-developer');
+ const stored=await repo.record(view.id),m=stored.modules[0];
+ m.answers['closed-code']={value:{source:'print(6)',judged:true,correct:false,passed:1,total:3},savedAt:Date.now()};
+ const candidateView=assessmentView(stored);
+ assert.equal(candidateView.currentModule.answers['closed-code'],'print(6)');
+ assert.equal(candidateView.resultsAvailable,false);
+ assert.deepEqual(candidateView.results,[]);
+ assert.ok(!JSON.stringify(candidateView.currentModule.answers).includes('passed'));
+});
+
+test('daily coding questions are frozen after two adaptive parts, hide private checks and get their own time limit',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
+ const repo=memory(),a=candidate(),spec=ADAPTIVE_SPECS.find(s=>s.moduleId==='python');
+ await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...spec,codingCount:1,codingSeconds:600}});
+ let {assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});
+ assert.equal((await repo.record(view.id)).dayId,dailyPoolWindow().id);
+ for(let i=0;i<32;i++){const stored=await repo.record(view.id),m=stored.modules[0],q=m.questions.find(q=>q.id===m.activeQuestionId);const answer=q.format==='choice'?q.correct:String(q.numeric.expected);view=(await assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer})).assessment;}
+ const q=view.currentModule.questions[view.currentModule.questionIndex];assert.equal(q.format,'coding');assert.equal(q.coding.tests.length,1);assert.equal(view.currentModule.questionSeconds,600);
+ await assert.rejects(assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer:{correct:true,judged:true}}));
+ view=(await assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer:'import json,sys\nprint(sum(x for x in json.load(sys.stdin) if x%2==0))'})).assessment;
+ assert.equal(view.status,'finished');assert.equal(view.results[0].total,33);assert.equal(view.results[0].score,100);
+});
+
+
+test('daily pools span exactly 24 hours and rotate at Moscow midnight',()=>{
+ const before=dailyPoolWindow(Date.parse('2026-12-31T20:59:59.999Z')),after=dailyPoolWindow(Date.parse('2026-12-31T21:00:00Z'));
+ assert.equal(before.date,'2026-12-31');assert.equal(after.date,'2027-01-01');
+ assert.equal(before.closesAt-before.opensAt,86400000);assert.equal(before.closesAt,after.opensAt);
+});
+
+test('one daily pool is shared, snapshots every module and freezes bank and spec changes until the next day',async()=>{
+ const repo=memory(),at=Date.parse('2026-10-07T09:00:00Z');
+ const [day,again]=await Promise.all([ensureDailyPool(repo,at),ensureDailyPool(repo,at)]);
+ assert.deepEqual(day,again);assert.equal(day.moduleIds.length,18);
+ for(const spec of day.specs){assert.equal(spec.adaptive.firstCount,16);assert.ok(assembleAdaptiveVariant(day.pool.filter(q=>q.moduleId===spec.moduleId),spec));}
+ const first=day.pool.find(q=>q.moduleId==='python'&&q.format!=='coding');
+ await repo.put('question',{...first,status:'retired'});
+ await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...day.specs.find(s=>s.moduleId==='python'),questionSeconds:25}});
+ assert.deepEqual(await ensureDailyPool(repo,at+1000),day);
+ const next=await ensureDailyPool(repo,at+86400000);
+ assert.notEqual(next.id,day.id);assert.equal(next.specs.find(s=>s.moduleId==='python').questionSeconds,25);assert.ok(!next.pool.some(q=>q.id===first.id));
+ assert.equal((await repo.record(day.id)).pool.find(q=>q.id===first.id).status,'working');
+});
+
+test('immediate start requires no booking, uses only today pool and resumes the same frozen variant',async()=>{
+ const repo=memory(),a=candidate();
+ const {preparation}=await assessmentAction(repo,a,{action:'assessment-prepare',targetId:'python'});
+ assert.equal(preparation.day.schedule,'daily');assert.ok(!JSON.stringify(preparation).includes('"correct"'));
+ await assert.rejects(assessmentAction(repo,a,{action:'assessment-prepare',targetId:'integration-backend'}));
+ await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:false}));
+ const {assessment}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});
+ assert.equal((await repo.records('assessment-registration')).length,0);
+ const raw=await repo.record(assessment.id),day=await repo.record(raw.dayId),poolIds=new Set(day.pool.map(q=>q.id));
+ assert.equal(raw.dayId,preparation.day.id);assert.equal(raw.poolSchedule,'daily');assert.equal(raw.sessionClosesAt,null);
+ for(const part of raw.modules)for(const q of [...part.questions,...Object.values(part.adaptive.routes).flat()])assert.ok(poolIds.has(q.id));
+ const resumed=await assessmentAction(repo,a,{action:'assessment-start',targetId:'sql',rulesAccepted:true});
+ assert.equal(resumed.assessment.id,assessment.id);assert.deepEqual((await repo.record(assessment.id)).modules,raw.modules);
+ const other=await assessmentAction(repo,{...candidate(),id:'other'},{action:'assessment-start',targetId:'python',rulesAccepted:true});
+ assert.equal((await repo.record(other.assessment.id)).dayId,raw.dayId);
+});
+
+test('a role begun just before midnight keeps the old pool and can open its next module after rollover',async()=>{
+ const repo=memory(),a=candidate(),clock=Date.now;let at=dailyPoolWindow().closesAt-500;
+ Date.now=()=>at;
+ try{
+  let {assessment}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'backend-developer',targetGrade:'Senior',rulesAccepted:true});
+  const started=await repo.record(assessment.id);assert.equal(started.targetGrade,'Senior');
+  for(let i=0;i<32;i++){const stored=await repo.record(assessment.id),m=stored.modules[0],q=m.questions.find(q=>q.id===m.activeQuestionId);assessment=await answer(repo,a,assessment.id,q,null);}
+  assert.equal(assessment.currentModule,null);assert.equal(assessment.resultsAvailable,false);
+  at+=61000;const tomorrow=await ensureDailyPool(repo);assert.notEqual(tomorrow.id,started.dayId);
+  assessment=(await assessmentAction(repo,a,{action:'assessment-next-module',id:assessment.id,revision:assessment.revision})).assessment;
+  assert.equal(assessment.moduleIndex,1);assert.equal(assessment.currentModule.id,'sql');
+  const continued=await repo.record(assessment.id);assert.equal(continued.dayId,started.dayId);assert.deepEqual(continued.modules[1].questions,started.modules[1].questions);
+ }finally{Date.now=clock;}
 });

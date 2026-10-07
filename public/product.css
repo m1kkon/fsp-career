@@ -660,87 +660,65 @@
  .product-ui .company-formats .choice-grid { grid-template-columns: minmax(0,1fr); }
 }
 
-/* Focused assessment workspace, aligned with the rest of the product. */
-.product-ui.exam-active { background: #f7f8fb; }
-.product-ui .assessment-exam { min-height: 100dvh; background: #f7f8fb; color: var(--text); font-family: 'Golos Text', Arial, sans-serif; }
-.product-ui .assessment-exam .exam-header { height: auto; min-height: 76px; grid-template-columns: 1fr auto 1fr; padding: 12px clamp(20px,4vw,64px); gap: 24px; background: #fff; }
-.product-ui .assessment-exam .exam-back { gap: 8px; min-height: 44px; padding: 0; font: inherit; font-size: 14px; color: var(--muted); }
-.product-ui .assessment-exam .exam-back:hover { color: var(--purple); }
-.product-ui .assessment-exam .exam-back>span { font-size: 27px; color: inherit; }
-.product-ui .assessment-exam .exam-heading { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; }
-.product-ui .assessment-exam .exam-heading .icon { color: var(--purple); }
-.product-ui .assessment-exam .exam-timer { justify-self: end; gap: 9px; padding: 4px 8px 4px 14px; min-height: 44px; min-width: 0; border: 1px solid #ebe7f3; border-radius: 10px; background: #f8f6fc; color: var(--text); }
-.product-ui .assessment-exam .exam-timer-caption { color: var(--muted); font-size: 12px; margin-right: 3px; }
-.product-ui .assessment-exam .exam-timer strong { min-width: 45px; font-size: 16px; font-weight: 600; }
-.product-ui .assessment-exam .exam-timer .icon { color: #8975ae; }
-.product-ui .assessment-exam .exam-timer-toggle { margin: 0; min-width: 36px; min-height: 36px; padding: 6px; border-radius: 6px; }
-.product-ui .assessment-exam .exam-timer-toggle:hover { background: #ede7f7; }
-.product-ui .assessment-exam .exam-timer.time-low { color: #ad3b2b; background: #fff2ee; border-color: #f4d6ce; }
-.product-ui .assessment-exam .exam-timer.time-low .icon { color: #ad3b2b; }
-.product-ui .assessment-exam .exam-progress { height: 3px; background: #ede9f5; }
-.product-ui .assessment-exam .exam-progress>span { background: var(--purple); }
-.product-ui .assessment-exam .exam-content { box-sizing: border-box; width: 100%; max-width: 920px; margin: 0 auto; padding: 38px 24px 24px; }
-.product-ui .assessment-exam .exam-meta { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; font-size: 13px; }
-.product-ui .assessment-exam .exam-course { display: flex; align-items: center; gap: 12px; min-width: 0; font-size: 14px; }
-.product-ui .assessment-exam .exam-course strong { font-weight: 600; color: var(--text); }
-.product-ui .assessment-exam .exam-course span { font-size: 12px; color: var(--muted); }
-.product-ui .assessment-exam .exam-meta .exam-position { display: inline; color: var(--muted); font-size: 13px; }
-.product-ui .assessment-exam .exam-question { padding: 32px 36px 24px; border: 1px solid #e5e7ed; border-radius: 16px; background: #fff; box-shadow: 0 4px 20px #20232b04; }
-.product-ui .assessment-exam .exam-question h1 { margin: 0 0 12px; font-family: inherit; font-size: clamp(20px,1.6vw,24px); font-weight: 550; line-height: 1.5; letter-spacing: -.35px; overflow-wrap: anywhere; }
-.product-ui .assessment-exam .exam-instruction { margin: 0 0 24px; font-size: 14px; line-height: 1.5; color: var(--muted); }
-.product-ui .assessment-exam .exam-answers { gap: 12px; }
-.product-ui .assessment-exam .exam-answer-row { grid-template-columns: minmax(0,1fr) 36px; gap: 8px; }
-.product-ui .assessment-exam .exam-answer { gap: 14px; min-height: 64px; box-sizing: border-box; padding: 14px 16px; border: 1px solid #dfe2e9; border-radius: 10px; transition: border-color 150ms, background 150ms, box-shadow 150ms; }
-.product-ui .assessment-exam .exam-answer:hover { background: #faf8fe; border-color: #af96d9; }
-.product-ui .assessment-exam .exam-answer.is-selected { background: #f6f1fe; border-color: var(--purple); box-shadow: inset 0 0 0 1px var(--purple); }
-.product-ui .assessment-exam .exam-answer:has(input:focus-visible) { outline: 3px solid #c3b0e8; outline-offset: 3px; }
-.product-ui .assessment-exam .exam-letter { width: 30px; height: 30px; border: 1px solid #e3e5ec; border-radius: 8px; background: #f6f7f9; color: #697180; font: inherit; font-size: 13px; font-weight: 500; }
-.product-ui .assessment-exam .is-selected .exam-letter { border-color: var(--purple); background: var(--purple); color: #fff; }
-.product-ui .assessment-exam .exam-answer-text { font-family: inherit; font-size: 16px; line-height: 1.6; }
-.product-ui .assessment-exam .exam-selected-mark { display: flex; flex-shrink: 0; visibility: hidden; color: var(--purple); }
-.product-ui .assessment-exam .is-selected .exam-selected-mark { visibility: visible; }
-.product-ui .assessment-exam .exam-eliminate { width: 36px; height: 44px; padding: 0; border-radius: 8px; color: #9198a5; font: inherit; }
-.product-ui .assessment-exam .exam-eliminate>span { border: 0; width: auto; height: auto; border-radius: 0; font-size: 22px; }
-.product-ui .assessment-exam .exam-eliminate::after { content: none; }
-.product-ui .assessment-exam .exam-eliminate:hover { color: var(--purple); background: #f4f0fa; }
-.product-ui .assessment-exam .is-eliminated .exam-answer { opacity: .5; background: #f7f8fa; border-color: #e3e5ec; box-shadow: none; }
-.product-ui .assessment-exam .is-eliminated .exam-eliminate { color: var(--purple); }
-.product-ui .assessment-exam .exam-support { margin: 28px 0 0; padding-top: 24px; border-top: 1px solid #eceef3; gap: 16px; }
-.product-ui .assessment-exam .exam-check { position: static; transform: none; display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 46px; min-width: 160px; padding: 12px 20px; border-radius: 9px; background: var(--purple); color: #fff; font: inherit; font-size: 15px; font-weight: 500; }
-.product-ui .assessment-exam .exam-check:hover { background: var(--purple-dark); }
-.product-ui .assessment-exam .exam-check:disabled { background: #eeebf4; color: #a6a0b5; cursor: default; }
-.product-ui .assessment-exam .exam-skip { min-height: 44px; padding: 8px 0; font: inherit; font-size: 14px; color: var(--muted); text-decoration: none; }
-.product-ui .assessment-exam .exam-skip:hover { color: var(--purple); }
-.product-ui .assessment-exam .exam-hint { margin: 16px 0 0; font-size: 12px; line-height: 1.8; color: #868d99; }
-.product-ui .assessment-exam .exam-hint kbd { font-size: 11px; border-color: #e2e5eb; box-shadow: none; padding: 1px 5px; }
-.product-ui .assessment-exam .exam-error { font-size: 14px; margin: 14px 0 0; }
-.product-ui .assessment-exam .exam-error:empty { display: none; }
-.product-ui .assessment-exam .assessment-numeric { margin-top: 24px; }
-.product-ui .assessment-exam .assessment-numeric label { font: inherit; font-size: 14px; color: var(--muted); }
-.product-ui .assessment-exam .assessment-numeric input { width: 280px; max-width: 100%; min-height: 56px; font-family: inherit; font-size: 18px; line-height: 1.5; border: 1px solid #dfe2e9; border-radius: 9px; padding: 12px 16px; }
-.product-ui .assessment-exam .assessment-numeric input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px #6535c81c; }
-.product-ui .assessment-exam .assessment-numeric small { font: inherit; font-size: 12px; color: var(--muted); }
-.product-ui .assessment-exam .exam-save-status { min-height: 24px; padding: 0 24px 20px; font-size: 13px; }
-@media(max-width:700px) {
- .product-ui .assessment-exam .exam-header { grid-template-columns: 1fr auto; min-height: 68px; gap: 12px; padding: 10px 16px; }
- .product-ui .assessment-exam .exam-heading { display: none; }
- .product-ui .assessment-exam .exam-back { font-size: 13px; }
- .product-ui .assessment-exam .exam-timer-caption { display: none; }
- .product-ui .assessment-exam .exam-content { padding: 24px 16px 16px; }
- .product-ui .assessment-exam .exam-meta { flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
- .product-ui .assessment-exam .exam-question { padding: 24px 20px 20px; border-radius: 12px; }
- .product-ui .assessment-exam .exam-question h1 { font-size: 20px; }
- .product-ui .assessment-exam .exam-answer { padding: 12px; gap: 10px; }
- .product-ui .assessment-exam .exam-answer-text { font-size: 15px; }
- .product-ui .assessment-exam .exam-answer-row { gap: 4px; grid-template-columns: minmax(0,1fr) 32px; }
- .product-ui .assessment-exam .exam-letter { width: 26px; height: 26px; }
- .product-ui .assessment-exam .exam-eliminate { width: 32px; }
- .product-ui .assessment-exam .exam-check { min-width: 132px; }
- .product-ui .assessment-exam .exam-skip { font-size: 13px; text-align: left; }
- .product-ui .assessment-exam .exam-hint { font-size: 11px; }
-}
-@media(prefers-reduced-motion:reduce) {
- .product-ui .assessment-exam .exam-answer, .product-ui .assessment-exam .exam-progress>span { transition: none; }
+/* SAT-style assessment workspace. */
+.product-ui.exam-active,.product-ui .assessment-exam{background:#fff}
+.product-ui .assessment-exam{--exam-text-size:clamp(18px,1.1vw,28px);--exam-support-size:clamp(13px,1vw,20px);--exam-caption-size:clamp(11px,.85vw,17px);color:#26282c}
+.product-ui .assessment-exam .exam-header{height:64px;min-height:0;padding:0 22px;grid-template-columns:1fr auto 1fr;gap:20px;background:#fff}
+.product-ui .assessment-exam .exam-back{font-size:14px;color:#7d8087}
+.product-ui .assessment-exam .exam-timer{grid-column:2;justify-self:center;min-width:140px;padding:8px 12px;border:0;border-radius:12px;background:#f5f5f6;color:#303238}
+.product-ui .assessment-exam .exam-timer strong{font-size:14px;font-weight:600;min-width:46px}
+.product-ui .assessment-exam .exam-timer .icon{color:#83868c}
+.product-ui .assessment-exam .exam-timer-toggle{background:transparent}
+.product-ui .assessment-exam .exam-progress{height:5px;background:#f0f1f2}
+.product-ui .assessment-exam .exam-progress>span{background:#08c458}
+.product-ui .assessment-exam .exam-content{box-sizing:border-box;width:min(100%,max(628px,49vw));max-width:1256px;margin:0 auto;padding:32px 24px 40px}
+.product-ui .assessment-exam .exam-meta{margin-bottom:20px;font-size:var(--exam-caption-size);color:#858891}
+.product-ui .assessment-exam .exam-meta .exam-course{display:none}
+.product-ui .assessment-exam .exam-meta .exam-position{display:inline;font:inherit;color:inherit}
+.product-ui .assessment-exam .exam-question{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.product-ui .assessment-exam .exam-question h1,.product-ui .assessment-exam .exam-answer-text{font-family:'Times New Roman',Times,serif;font-size:var(--exam-text-size);font-weight:400;line-height:1.5;letter-spacing:0}
+.product-ui .assessment-exam .exam-question h1{margin:0 37px 12px 0;outline:none}
+.product-ui .assessment-exam .exam-answer-row{grid-template-columns:minmax(0,1fr) 28px;gap:9px}
+.product-ui .assessment-exam .exam-answer{box-sizing:border-box;gap:10px;padding:10px 12px;min-height:48px;border:1px solid #575b60;border-radius:10px;background:#fff;box-shadow:none}
+.product-ui .assessment-exam .exam-answer:hover{border-color:#16b3f4;background:#f9fcfe}
+.product-ui .assessment-exam .exam-answer.is-selected{border-color:#16b3f4;box-shadow:inset 0 0 0 1px #16b3f4;background:#fff}
+.product-ui .assessment-exam .exam-answer:has(input:focus-visible){outline:none;border-color:#16b3f4}
+.product-ui .assessment-exam .has-selection .exam-answer{padding-right:104px}
+.product-ui .assessment-exam .exam-letter{width:24px;height:24px;border:1px solid #575b60;border-radius:50%;background:transparent;color:#26282c;font:600 14px Arial,sans-serif}
+.product-ui .assessment-exam .is-selected .exam-letter{background:#16b3f4;border-color:#16b3f4;color:#fff}
+.product-ui .assessment-exam .exam-eliminate{width:28px;height:40px;border-radius:0;color:#575b60;background:transparent}
+.product-ui .assessment-exam .exam-eliminate>span{width:24px;height:24px;border:1px solid currentColor;border-radius:50%;font:14px Arial,sans-serif}
+.product-ui .assessment-exam .exam-eliminate:after{content:'';position:absolute;width:28px;height:1px;background:currentColor;top:50%;left:0}
+.product-ui .assessment-exam .is-eliminated .exam-answer{opacity:.4;background:#f7f7f8;box-shadow:none}
+.product-ui .assessment-exam .is-eliminated .exam-eliminate{color:#039cde}
+.product-ui .assessment-exam .exam-check{position:absolute;right:49px;top:50%;transform:translateY(-50%);min-width:0;min-height:32px;padding:7px 10px;border-radius:10px;background:#16b3f4;color:#fff;font:400 13px 'Golos Text',Arial,sans-serif}
+.product-ui .assessment-exam .exam-check:hover{background:#039cde}
+.product-ui .assessment-exam .exam-check:disabled{opacity:.5;cursor:default}
+.product-ui .assessment-exam .exam-support{margin:18px 37px 0 0;padding:0;border:0;gap:16px}
+.product-ui .assessment-exam .exam-hint{margin:0;font-size:var(--exam-caption-size);line-height:1.8;color:#868990}
+.product-ui .assessment-exam .exam-hint kbd{font:inherit;padding:2px 5px;border:1px solid #d1d3d6;border-radius:5px;background:#f8f8f9;box-shadow:0 1px 0 #d1d3d6}
+.product-ui .assessment-exam .exam-skip{min-height:0;padding:8px 0;font:inherit;font-size:var(--exam-caption-size);color:#747880;text-decoration:underline;text-underline-offset:4px}
+.product-ui .assessment-exam .assessment-numeric{margin-top:22px}
+.product-ui .assessment-exam .assessment-numeric label,.product-ui .assessment-exam .assessment-numeric small{font-size:var(--exam-support-size);font-weight:400;line-height:1.6;color:#858891}
+.product-ui .assessment-exam .assessment-numeric>div{display:flex;align-items:center;gap:14px}
+.product-ui .assessment-exam .assessment-numeric input{box-sizing:border-box;width:240px;max-width:60%;min-width:0;min-height:48px;padding:10px 14px;border:1px solid #747880;border-radius:9px;font:400 var(--exam-text-size)/1.5 'Times New Roman',Times,serif;outline:none;box-shadow:none}
+.product-ui .assessment-exam .assessment-numeric input:focus{border-color:#747880;outline:none;box-shadow:none}
+.product-ui .assessment-exam .assessment-numeric .exam-check,.product-ui .assessment-exam .exam-question>.exam-check{position:static;transform:none;flex-shrink:0;min-height:40px}
+.product-ui .assessment-exam .exam-question>.exam-check{margin-top:20px}
+.product-ui .assessment-exam .exam-error:empty{display:none}
+@media(max-width:800px){
+ .product-ui .assessment-exam{--exam-text-size:18px;--exam-support-size:13px;--exam-caption-size:11px}
+ .product-ui .assessment-exam .exam-header{height:64px;padding:0 16px;grid-template-columns:1fr auto}
+ .product-ui .assessment-exam .exam-timer{grid-column:2;min-width:120px}
+ .product-ui .assessment-exam .exam-content{width:100%;padding:28px 18px}
+ .product-ui .assessment-exam .exam-question h1{margin-right:0}
+ .product-ui .assessment-exam .exam-answer-row{grid-template-columns:minmax(0,1fr) 28px;gap:8px}
+ .product-ui .assessment-exam .exam-answer{padding:11px 10px;gap:9px}
+ .product-ui .assessment-exam .has-selection .exam-answer{padding-right:94px}
+ .product-ui .assessment-exam .exam-check{right:45px;font-size:12px;padding:7px 9px}
+ .product-ui .assessment-exam .exam-support{margin-right:0}
+ .product-ui .assessment-exam .exam-hint{display:none}
+ .product-ui .assessment-exam .exam-skip{margin-left:auto}
 }
 
 /* Read-only source snippets keep task wording and executable text separate. */
@@ -767,3 +745,7 @@
 /* Technical symbols in prose use the same quiet syntax palette as code blocks. */
 .product-ui .assessment-exam .exam-inline-code { display: inline; padding: .06em .25em; border: 1px solid #e7e4ef; border-radius: 5px; background: #f5f3f9; color: #46506a; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: .88em; font-weight: 500; line-height: inherit; letter-spacing: 0; overflow-wrap: anywhere; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .product-ui .assessment-exam .code-type { color: #24707a; }
+.product-ui .assessment-exam .exam-question h1 .exam-inline-code,
+.product-ui .assessment-exam .exam-answer-text .exam-inline-code{padding:0;border:0;border-radius:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit}
+.product-ui .assessment-exam .exam-question h1 .exam-inline-code span,
+.product-ui .assessment-exam .exam-answer-text .exam-inline-code span{color:inherit;font:inherit}
