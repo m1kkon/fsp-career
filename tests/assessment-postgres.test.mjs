@@ -75,7 +75,12 @@ test('PostgreSQL qualification flow keeps attempts, profile proof, permissions a
    const m=raw.modules[raw.moduleIndex];
    if(m.status==='completed'){await run({action:'assessment-next-module',id:attemptId,revision:raw.revision});continue;}
    const q=m.questions.find(q=>q.id===m.activeQuestionId);
-   const result=await run({action:'assessment-answer',id:attemptId,revision:raw.revision,questionId:q.id,answer:q.format==='choice'?q.correct:String(q.numeric.expected)});
+   let result;
+   if(q.format==='coding'){
+    // Exercise persistence and progression using a trusted judge fixture; Docker is checked separately.
+    m.answers[q.id]={value:{source:'judge fixture',judged:true,correct:true,passed:q.coding.tests.length,total:q.coding.tests.length},savedAt:Date.now()};m.expiresAt=Date.now()-1;await repo.put('assessment',raw);
+    result=await run({action:'assessment-resume',id:attemptId});
+   }else result=await run({action:'assessment-answer',id:attemptId,revision:raw.revision,questionId:q.id,answer:q.format==='choice'?q.correct:String(q.numeric.expected)});
    assert.ok(!JSON.stringify(result).includes('"correct":')||!result.assessment.currentModule);
    assert.ok(!JSON.stringify(result.assessment.currentModule||{}).includes('"numeric":'));
   }

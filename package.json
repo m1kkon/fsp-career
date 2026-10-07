@@ -13,7 +13,8 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "bank:audit": "node scripts/question-bank/audit.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -30,8 +31,10 @@
     "lucide-react": "^1.31.0",
     "next": "16.3.8",
     "next-themes": "^0.4.6",
+    "parse5": "8.0.0",
     "pdf-lib": "1.17.1",
     "pg": "^8.23.1",
+    "postcss": "8.5.23",
     "radix-ui": "^1.6.7",
     "react": "19.2.6",
     "react-day-picker": "^10.0.1",

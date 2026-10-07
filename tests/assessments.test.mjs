@@ -1,8 +1,11 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {assessmentAction,assessmentState,assessmentView,maintainerState,assemble,correctAnswer,parseNumeric,validateQuestion,bank,assembleVariant,assembleAdaptiveVariant,specifications,ensureDailyPool,dailyPoolWindow} from '../lib/assessments.mjs';
+import {assessmentAction,assessmentState,assessmentView,maintainerState,assemble,correctAnswer,parseNumeric,validateQuestion,bank,assembleVariant,assembleAdaptiveVariant,specifications,ensureDailyPool,dailyPoolWindow,DAILY_POOL_REVISION} from '../lib/assessments.mjs';
 import {MODULES,ROLES,INITIAL_QUESTIONS,DEFAULT_SPECS as ADAPTIVE_SPECS} from '../lib/question-bank.mjs';
 const DEFAULT_SPECS=MODULES.map(m=>({id:`spec-${m.id}-v2`,moduleId:m.id,version:2,scoredCount:6,difficultyCounts:{1:2,2:2,3:2},competencies:m.competencies,numericMin:1,numericMax:3,questionSeconds:20,seconds:120,experimentalSeconds:20,thresholds:{Junior:50,Middle:70,Senior:90},created:0}));
+import {MIXED_CODING_QUESTIONS,MIXED_CODING_SOLUTIONS} from '../lib/mixed-coding-bank.mjs';
+import {SCORING_RULE} from '../lib/assessment-scoring.mjs';
+import {ROLE_OUTCOME_RULE} from '../lib/role-grade.mjs';
 import {BANK_EXPANSION} from '../lib/question-bank-expansion.mjs';
 function memory(){const records=new Map(),accounts=new Map(),copy=x=>x?structuredClone(x):null;return{records:async k=>[...records.values()].filter(x=>x.kind===k).map(copy),scoped:async(k,o)=>[...records.values()].filter(x=>x.kind===k&&(x.owner===o||x.recipient===o)).map(copy),record:async id=>copy(records.get(id)),saveDay:async(r,v,status)=>{const old=records.get(r.id);if(old?.kind!=='test-day'||old.version!==v||old.status!==status)return false;records.set(r.id,{...copy(r),kind:'test-day'});return true;},cancelRegistration:async(id,owner,at)=>{const r=records.get(id);if(r?.kind!=='assessment-registration'||r.owner!==owner||r.status!=='registered')return false;records.set(id,{...copy(r),status:'cancelled',cancelledAt:at});return true;},setAssessmentVisibility:async(id,owner,hidden,at)=>{const r=records.get(id);if(r?.kind!=='assessment'||r.owner!==owner||!['finished','incomplete'].includes(r.status))return false;records.set(id,{...copy(r),hiddenFromHistory:hidden,hiddenAt:hidden?at:null});return true;},startAssessment:async(t,r)=>{if((r&&records.get(r.id)?.status!=='registered')||[...records.values()].some(x=>x.kind==='assessment'&&x.owner===t.owner&&x.status==='active'))return false;records.set(t.id,{...copy(t),kind:'assessment'});if(r)records.set(r.id,{...copy(r),status:'started',attemptId:t.id});return true;},put:async(k,r)=>records.set(r.id,{...copy(r),kind:k}),putIfAbsent:async(k,r)=>{if(!records.has(r.id))records.set(r.id,{...copy(r),kind:k});return copy(records.get(r.id));},saveAssessment:async(r,v)=>{const old=records.get(r.id);if(!old||old.status!=='active'||old.owner!==r.owner||old.revision!==v)return false;records.set(r.id,{...copy(r),kind:'assessment'});return true;},saveAccount:async a=>accounts.set(a.id,copy(a)),account:async id=>copy(accounts.get(id))};}
 const candidate=()=>({id:'candidate',roles:['candidate'],profile:{name:'Candidate',verified:false},maintainer:false});
@@ -21,8 +24,12 @@ async function day(repo,experimentalCounts={},moduleIds=MODULES.map(m=>m.id),ada
  await assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId});const d=await repo.record(dayId);d.opensAt=Date.now()-1000;await repo.put('test-day',d);return d;
 }
 async function start(repo,a,d,targetId){const {registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId});return(await assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true})).assessment;}
-async function answer(repo,a,id,q,value){const t=await repo.record(id);return(await assessmentAction(repo,a,{action:'assessment-answer',id,revision:t.revision,questionId:q.id,answer:value,activeMs:3000})).assessment;}
-async function complete(repo,a,id,allCorrect=true){const t=await repo.record(id),m=t.modules[t.moduleIndex],index=m.questions.findIndex(q=>q.id===m.activeQuestionId);let view;for(const q of m.questions.slice(index))view=await answer(repo,a,id,q,allCorrect?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);return view;}
+const correctTestAnswer=q=>q.format==='coding'?'correct-code-fixture':q.format==='choice'?q.correct:String(q.numeric.expected);
+async function answer(repo,a,id,q,value){const t=await repo.record(id);
+ // Assembly/routing tests seed the result of the separately tested Docker judge.
+ if(q.format==='coding'&&value==='correct-code-fixture'){const m=t.modules[t.moduleIndex];m.answers[q.id]={value:{source:'judge fixture',judged:true,correct:true,passed:q.coding.tests.length,total:q.coding.tests.length},savedAt:Date.now()};m.expiresAt=Date.now()-1;await repo.put('assessment',t);return(await assessmentAction(repo,a,{action:'assessment-resume',id})).assessment;}
+ return(await assessmentAction(repo,a,{action:'assessment-answer',id,revision:t.revision,questionId:q.id,answer:value,activeMs:3000})).assessment;}
+async function complete(repo,a,id,allCorrect=true){const t=await repo.record(id),m=t.modules[t.moduleIndex],index=m.questions.findIndex(q=>q.id===m.activeQuestionId);let view;for(const q of m.questions.slice(index))view=await answer(repo,a,id,q,allCorrect?(correctTestAnswer(q)):null);return view;}
 
 test('initial bank has 1800 unique fixed questions, 12 skills and 6 integration modules',()=>{assert.equal(INITIAL_QUESTIONS.length,1800);assert.equal(MODULES.filter(m=>!m.integration).length,12);assert.equal(MODULES.filter(m=>m.integration).length,6);assert.equal(ROLES.length,6);assert.equal(new Set(INITIAL_QUESTIONS.map(q=>q.id)).size,1800);assert.ok(INITIAL_QUESTIONS.every(q=>q.status==='working'));for(const q of INITIAL_QUESTIONS){assert.ok(validateQuestion(q));assert.ok(correctAnswer(q,q.format==='choice'?q.correct:q.numeric.expected));}});
 test('each module has exactly 100 working questions covering all competencies, difficulties and formats',()=>{
@@ -87,18 +94,18 @@ test('new questions start as drafts and content review is required before experi
 test('day requires a complete blueprint and is immutable after publication',async()=>{const repo=memory();const {dayId}=await assessmentAction(repo,admin,{action:'maintainer-day-save',name:'Неполный пул',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,moduleIds:['python'],questionIds:[INITIAL_QUESTIONS[0].id]});await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId}));const d=await day(repo);await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-day-publish',id:d.id}));});
 test('candidate must register and accept rules, can start only during session',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const {registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'python'});await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id}));d.opensAt=Date.now()+100000;await repo.put('test-day',d);await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true}));});
 test('all assigned modules are fixed before start; resume preserves questions, deadline and revision',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const attempt=await start(repo,a,d,'backend-developer');assert.equal(attempt.modules.length,4);assert.ok(attempt.currentModule.questions.slice(1).every(q=>q.prompt===undefined&&q.options===undefined));const raw=await repo.record(attempt.id);assert.ok(raw.modules.every(m=>m.questions.length===6));const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:attempt.id})).assessment;const expected=assessmentView(raw);assert.deepEqual({...resumed,serverTime:0},{...expected,serverTime:0});assert.ok(resumed.serverTime>=attempt.serverTime);assert.equal(resumed.currentModule.expiresAt,attempt.currentModule.expiresAt);const serialized=JSON.stringify(attempt);assert.ok(!serialized.includes('"correct":'));assert.ok(!serialized.includes('"numeric":'));assert.ok(!serialized.includes('"scored":'));assert.ok(!serialized.includes('"familyId":'));assert.ok(!serialized.includes('"status":"experimental"'));});
-test('confirmation closes only the current question; previous and future questions cannot be reopened',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');const raw=await repo.record(view.id),q=raw.modules[0].questions[0],future=raw.modules[0].questions[2];assert.equal(view.currentModule.questionSeconds,20);assert.equal(view.currentModule.expiresAt-view.currentModule.questionStartedAt,20000);await assert.rejects(answer(repo,a,view.id,future,null),e=>e.status===409);let r=await answer(repo,a,view.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));assert.equal(r.currentModule.questionIndex,1);assert.equal(r.currentModule.expiresAt-r.currentModule.questionStartedAt,20000);await assert.rejects(answer(repo,a,view.id,q,null),e=>e.status===409);const current=await repo.record(view.id);await assert.rejects(assessmentAction(repo,a,{action:'assessment-view',id:view.id,revision:current.revision,questionId:q.id}),e=>e.status===409);await assert.rejects(assessmentAction(repo,a,{action:'assessment-submit-module',id:view.id,revision:current.revision}),e=>e.status===409);r=await complete(repo,a,view.id);assert.equal(r.results[0].score,100);assert.equal(r.currentModule,null);assert.equal(a.profile.verified,false);});
+test('confirmation closes only the current question; previous and future questions cannot be reopened',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');const raw=await repo.record(view.id),q=raw.modules[0].questions[0],future=raw.modules[0].questions[2];assert.equal(view.currentModule.questionSeconds,20);assert.equal(view.currentModule.expiresAt-view.currentModule.questionStartedAt,20000);await assert.rejects(answer(repo,a,view.id,future,null),e=>e.status===409);let r=await answer(repo,a,view.id,q,correctTestAnswer(q));assert.equal(r.currentModule.questionIndex,1);assert.equal(r.currentModule.expiresAt-r.currentModule.questionStartedAt,20000);await assert.rejects(answer(repo,a,view.id,q,null),e=>e.status===409);const current=await repo.record(view.id);await assert.rejects(assessmentAction(repo,a,{action:'assessment-view',id:view.id,revision:current.revision,questionId:q.id}),e=>e.status===409);await assert.rejects(assessmentAction(repo,a,{action:'assessment-submit-module',id:view.id,revision:current.revision}),e=>e.status===409);r=await complete(repo,a,view.id);assert.equal(r.results[0].score,100);assert.equal(r.currentModule,null);assert.equal(a.profile.verified,false);});
 
 test('foreign candidates and invalid choices cannot write to an attempt',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'sql');let t=await repo.record(view.id);while(t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId).format!=='choice'){await answer(repo,a,view.id,t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId),null);t=await repo.record(view.id);}const q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);await assert.rejects(assessmentAction(repo,{...candidate(),id:'other'},{action:'assessment-resume',id:view.id}));await assert.rejects(answer(repo,a,view.id,q,4));await assert.rejects(answer(repo,a,view.id,q,-1));});
 test('concurrent saves use compare-and-swap revision; only one wins',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'sql'),q=view.currentModule.questions[0];const results=await Promise.allSettled([0,1].map(answer=>assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer})));assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal((await repo.record(view.id)).revision,1);});
-test('expiry skips one question, gives the next its own timer and rejects a late answer',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');const raw=await repo.record(view.id),q=raw.modules[0].questions[0];raw.modules[0].expiresAt=Date.now()-10000;await repo.put('assessment',raw);await assert.rejects(answer(repo,a,view.id,q,q.format==='choice'?q.correct:String(q.numeric.expected)),e=>e.status===409);const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;assert.equal(resumed.status,'active');assert.equal(resumed.currentModule.questionIndex,1);assert.equal(resumed.currentModule.answers[q.id],null);assert.equal(resumed.currentModule.expiresAt-resumed.currentModule.questionStartedAt,20000);assert.equal((await repo.record(view.id)).modules[0].answers[q.id].timedOut,true);const deadline=resumed.currentModule.expiresAt;const again=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;assert.equal(again.currentModule.expiresAt,deadline);const finished=await complete(repo,a,view.id,false);assert.equal(finished.status,'finished');assert.equal(finished.results[0].score,0);});
+test('expiry skips one question, gives the next its own timer and rejects a late answer',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'python');const raw=await repo.record(view.id),q=raw.modules[0].questions[0];raw.modules[0].expiresAt=Date.now()-10000;await repo.put('assessment',raw);await assert.rejects(answer(repo,a,view.id,q,correctTestAnswer(q)),e=>e.status===409);const resumed=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;assert.equal(resumed.status,'active');assert.equal(resumed.currentModule.questionIndex,1);assert.equal(resumed.currentModule.answers[q.id],null);assert.equal(resumed.currentModule.expiresAt-resumed.currentModule.questionStartedAt,20000);assert.equal((await repo.record(view.id)).modules[0].answers[q.id].timedOut,true);const deadline=resumed.currentModule.expiresAt;const again=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;assert.equal(again.currentModule.expiresAt,deadline);const finished=await complete(repo,a,view.id,false);assert.equal(finished.status,'finished');assert.equal(finished.results[0].score,0);});
 
 test('role progresses after failure; required module thresholds cannot be compensated',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'devops-engineer');let r=await complete(repo,a,view.id,false);assert.equal(r.status,'active');for(let i=1;i<3;i++){const t=await repo.record(view.id);r=(await assessmentAction(repo,a,{action:'assessment-next-module',id:t.id,revision:t.revision})).assessment;r=await complete(repo,a,view.id,true);}assert.equal(r.status,'finished');assert.equal(r.roleResult.level,'Ниже Junior');assert.equal(r.results.length,3);assert.equal(r.roleResult.integration.score,100);assert.equal(a.profile.verified,false);});
 test('full role retains full module results and separate integration score',async()=>{const repo=memory(),a=candidate(),d=await day(repo),view=await start(repo,a,d,'backend-developer');let r;for(let i=0;i<4;i++){if(i){const t=await repo.record(view.id);await assessmentAction(repo,a,{action:'assessment-next-module',id:t.id,revision:t.revision});}r=await complete(repo,a,view.id);}assert.equal(r.roleResult.level,'Senior');assert.equal(r.results.length,4);assert.equal(a.profile.grade,'Senior');assert.ok(r.results.every(r=>r.total===6));const s=await assessmentState(repo,a);assert.equal(s.history[0].results.length,4);});
 test('abandoned roles are incomplete, keep finished skills and do not lower qualification',async()=>{const repo=memory(),a=candidate();a.profile={verified:true,grade:'Middle',spec:'Backend',score:80};const d=await day(repo),v=await start(repo,a,d,'backend-developer');await complete(repo,a,v.id);const t=await repo.record(v.id);const r=(await assessmentAction(repo,a,{action:'assessment-abandon',id:t.id,revision:t.revision})).assessment;assert.equal(r.status,'incomplete');assert.equal(r.roleResult.level,null);assert.equal(r.results.length,1);assert.equal(a.profile.grade,'Middle');});
 test('experimental items are additive, hidden, excluded and never become scored retroactively',async()=>{const repo=memory(),a=candidate();const q={...INITIAL_QUESTIONS.find(q=>q.moduleId==='python'),familyId:'python:experimental-additive',prompt:'Какой объект возвращает iter([1, 2])?',options:['Итератор','Число','Словарь','Строка']};const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',question:q});await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'experiment',reviewed:true,reason:'Проверена однозначность и ключ'});const d=await day(repo,{python:1}),v=await start(repo,a,d,'python');assert.equal(v.currentModule.questions.length,7);assert.equal(v.currentModule.seconds,140);assert.equal(v.currentModule.questionSeconds,20);const raw=await repo.record(v.id),experimental=raw.modules[0].questions.find(q=>!q.scored);assert.equal(experimental.id,question.id);for(const item of raw.modules[0].questions)await answer(repo,a,v.id,item,item.scored?(item.format==='choice'?item.correct:String(item.numeric.expected)):null);let r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.results[0].score,100);assert.equal(r.results[0].total,6);await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:question.id,decision:'admit',difficulty:2,reason:'Команда рассмотрела статистику и допустила задание'});r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.results[0].total,6);assert.equal((await repo.record(v.id)).modules[0].questions.find(q=>q.id===question.id).scored,false);assert.equal(d.pool.find(q=>q.id===question.id).scored,false);});
-test('editing creates a separate version and specification changes affect only future pools',async()=>{const repo=memory(),d=await day(repo);const old=INITIAL_QUESTIONS[0];const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',id:old.id,question:{...old,prompt:'Новое проверенное условие для следующей версии вопроса'}});assert.notEqual(question.id,old.id);assert.equal(question.version,2);assert.equal((await bank(repo)).find(q=>q.id===old.id).prompt,old.prompt);await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...DEFAULT_SPECS[0],questionSeconds:40}});const frozen=await repo.record(d.id);assert.equal(frozen.specs.find(s=>s.moduleId==='python').questionSeconds,20);});
-test('quality analytics records distractors, skips and score strata without automatic promotion',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'sql');const raw=await repo.record(v.id),q=raw.modules[0].questions[0];await assessmentAction(repo,a,{action:'assessment-view',id:v.id,revision:raw.revision,questionId:q.id});await answer(repo,a,v.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));await complete(repo,a,v.id,false);const adminState=await maintainerState(repo,admin),stat=adminState.analytics.find(x=>x.id===q.id);assert.equal(stat.shown,1);assert.equal(stat.correct,1);assert.equal(stat.groups.low.n,1);assert.equal((await bank(repo)).find(x=>x.id===q.id).status,'working');});
+test('editing creates a separate version and specification changes affect only future pools',async()=>{const repo=memory(),d=await day(repo);const old=INITIAL_QUESTIONS[0];const {question}=await assessmentAction(repo,admin,{action:'maintainer-question-save',id:old.id,question:{...old,prompt:'Новое проверенное условие для следующей версии вопроса'}});assert.notEqual(question.id,old.id);assert.equal(question.version,old.version+1);assert.equal((await bank(repo)).find(q=>q.id===old.id).prompt,old.prompt);await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...DEFAULT_SPECS[0],questionSeconds:40}});const frozen=await repo.record(d.id);assert.equal(frozen.specs.find(s=>s.moduleId==='python').questionSeconds,20);});
+test('quality analytics records distractors, skips and score strata without automatic promotion',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'sql');const raw=await repo.record(v.id),q=raw.modules[0].questions[0];await assessmentAction(repo,a,{action:'assessment-view',id:v.id,revision:raw.revision,questionId:q.id});await answer(repo,a,v.id,q,correctTestAnswer(q));await complete(repo,a,v.id,false);const adminState=await maintainerState(repo,admin),stat=adminState.analytics.find(x=>x.id===q.id);assert.equal(stat.shown,1);assert.equal(stat.correct,1);assert.equal(stat.groups.low.n,1);assert.equal((await bank(repo)).find(x=>x.id===q.id).status,'working');});
 
 test('concurrent starts atomically claim registration and allow only one active attempt',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const {registration}=await assessmentAction(repo,a,{action:'assessment-register',dayId:d.id,targetId:'python'});await Promise.allSettled([1,2].map(()=>assessmentAction(repo,a,{action:'assessment-start',registrationId:registration.id,rulesAccepted:true})));assert.equal((await repo.records('assessment')).length,1);assert.equal((await repo.record(registration.id)).status,'started');});
 test('numeric key cannot be silently converted from empty input to zero',()=>{const q=INITIAL_QUESTIONS.find(q=>q.format==='numeric');for(const expected of ['',null,undefined])assert.throws(()=>validateQuestion({...q,numeric:{...q.numeric,expected}}));assert.ok(validateQuestion({...q,numeric:{...q.numeric,expected:0}}));});
@@ -116,9 +123,9 @@ test('concurrent expiry reads persist only one skip and return the same next que
 test('automatic daily pool selects a blueprint and reserve instead of copying the entire bank',async()=>{const repo=memory(),d=await day(repo,{},['python']);assert.equal(d.pool.length,8);assert.equal(new Set(d.pool.map(q=>q.familyId)).size,8);assert.ok(d.pool.length<INITIAL_QUESTIONS.filter(q=>q.moduleId==='python').length);assert.ok(d.pool.every(q=>q.scored));assert.equal(assemble(d.pool,d.specs[0]).length,6);});
 
 test('per-question deadlines apply equally to standalone, role and integration modules',async()=>{const repo=memory(),a=candidate(),d=await day(repo);const single=await start(repo,a,d,'python');assert.equal(single.currentModule.questionSeconds,20);await complete(repo,a,single.id);const role=await start(repo,a,d,'backend-developer');for(let i=0;i<4;i++){let view=role;if(i){const raw=await repo.record(role.id);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:role.id,revision:raw.revision})).assessment;}assert.equal(view.currentModule.questionSeconds,single.currentModule.questionSeconds);assert.equal(view.currentModule.expiresAt-view.currentModule.questionStartedAt,20000);await complete(repo,a,role.id);}assert.equal((await repo.record(role.id)).modules[3].moduleId,'integration-backend');});
-test('last question timeout completes the module and preserves previously confirmed answers',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'python');let raw=await repo.record(v.id);for(const q of raw.modules[0].questions.slice(0,-1))await answer(repo,a,v.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));raw=await repo.record(v.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);const r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.status,'finished');assert.equal(r.results[0].correct,5);assert.equal(r.results[0].skipped,1);assert.equal(r.currentModule,null);});
+test('last question timeout completes the module and preserves previously confirmed answers',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'python');let raw=await repo.record(v.id);for(const q of raw.modules[0].questions.slice(0,-1))await answer(repo,a,v.id,q,correctTestAnswer(q));raw=await repo.record(v.id);raw.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',raw);const r=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(r.status,'finished');assert.equal(r.results[0].correct,5);assert.equal(r.results[0].skipped,1);assert.equal(r.currentModule,null);});
 test('old published pools receive per-question timing without rewriting the pool or finished history',async()=>{const repo=memory(),a=candidate(),d=await day(repo);for(const spec of d.specs){delete spec.questionSeconds;spec.seconds=600;spec.experimentalSeconds=90;}for(const config of Object.values(d.moduleConfigs)){delete config.questionSeconds;config.seconds=600;}await repo.put('test-day',d);const v=await start(repo,a,d,'python');assert.equal(v.currentModule.seconds,120);assert.equal(v.currentModule.questionSeconds,20);assert.equal((await repo.record(d.id)).moduleConfigs.python.seconds,600);const state=await assessmentState(repo,a);assert.equal(state.days[0].moduleConfigs.python.seconds,120);await complete(repo,a,v.id);const before=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-resume',id:v.id});assert.deepEqual(await repo.record(v.id),before);});
-test('a new timing specification affects future pools and freezes the per-question deadline',async()=>{const repo=memory(),a=candidate(),old=await day(repo,{},['python']);await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...DEFAULT_SPECS[0],questionSeconds:35}});const next=await day(repo,{},['python']);assert.equal(old.moduleConfigs.python.questionSeconds,20);assert.equal(next.moduleConfigs.python.questionSeconds,35);const v=await start(repo,a,next,'python');assert.equal(v.currentModule.expiresAt-v.currentModule.questionStartedAt,35000);assert.equal(v.currentModule.seconds,1120);});
+test('a new timing specification affects future pools and freezes the per-question deadline',async()=>{const repo=memory(),a=candidate(),old=await day(repo,{},['python']);await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...DEFAULT_SPECS[0],questionSeconds:35}});const next=await day(repo,{},['python']);assert.equal(old.moduleConfigs.python.questionSeconds,20);assert.equal(next.moduleConfigs.python.questionSeconds,35);const v=await start(repo,a,next,'python');assert.equal(v.currentModule.expiresAt-v.currentModule.questionStartedAt,35000);assert.equal(v.currentModule.seconds,2180);});
 
 test('unfinished attempts upgrade once from a module timer and retain their answers and assigned variant',async()=>{const repo=memory(),a=candidate(),d=await day(repo),v=await start(repo,a,d,'backend-developer');const raw=await repo.record(v.id);delete raw.timingRule;const m=raw.modules[0];delete m.questionSeconds;delete m.spec.questionSeconds;m.seconds=600;m.expiresAt=Date.now()+600000;m.answers[m.questions[0].id]={value:null,savedAt:Date.now()};const assigned=raw.modules.map(m=>m.questions.map(q=>q.id));await repo.put('assessment',raw);const first=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(first.currentModule.questionSeconds,20);assert.equal(first.currentModule.expiresAt-first.currentModule.questionStartedAt,20000);const updated=await repo.record(v.id);assert.equal(updated.timingRule,'per-question-v1');assert.deepEqual(updated.modules.map(m=>m.questions.map(q=>q.id)),assigned);assert.deepEqual(updated.modules[0].answers,m.answers);const again=(await assessmentAction(repo,a,{action:'assessment-resume',id:v.id})).assessment;assert.equal(again.currentModule.expiresAt,first.currentModule.expiresAt);assert.equal(again.revision,first.revision);});
 
@@ -137,12 +144,12 @@ test('standalone scores remain immediate and abandoned roles retain completed mo
 async function completeAdaptivePart(repo,a,id,correct=true,experimentalCorrect=correct){
  const t=await repo.record(id),m=t.modules[t.moduleIndex],startIndex=m.questions.findIndex(q=>q.id===m.activeQuestionId);
  const qs=m.questions.slice(startIndex);let view;
- for(const q of qs)view=await answer(repo,a,id,q,(q.scored?correct:experimentalCorrect)?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);
+ for(const q of qs)view=await answer(repo,a,id,q,(q.scored?correct:experimentalCorrect)?(correctTestAnswer(q)):null);
  return view;
 }
 test('all 18 adaptive blueprints assemble both 16-question routes without repeated families',()=>{
  for(const spec of ADAPTIVE_SPECS)for(let i=0;i<10;i++){
-  const pool=INITIAL_QUESTIONS.filter(q=>q.moduleId===spec.moduleId).map(q=>({...q,scored:true}));
+  const pool=[...INITIAL_QUESTIONS,...MIXED_CODING_QUESTIONS].filter(q=>q.moduleId===spec.moduleId).map(q=>({...q,scored:true}));
   const tree=assembleAdaptiveVariant(pool,spec);
   assert.equal(tree.first.length,16);
   for(const [route,qs] of Object.entries(tree.routes)){
@@ -156,14 +163,14 @@ test('all 18 adaptive blueprints assemble both 16-question routes without repeat
 });
 test('automatic adaptive pools include both possible routes and are validated before publishing',async()=>{
  const repo=memory(),d=await day(repo,{},MODULES.map(m=>m.id),true);
- for(const s of d.specs){assert.equal(s.scoredCount,32);assert.equal(d.moduleConfigs[s.moduleId].seconds,640);assert.equal(d.moduleConfigs[s.moduleId].partCount,2);const pool=d.pool.filter(q=>q.moduleId===s.moduleId);assert.ok(pool.length>=32&&pool.length<=100);for(let i=0;i<5;i++)assert.ok(assembleAdaptiveVariant(pool,s));}
+ for(const s of d.specs){assert.equal(s.scoredCount,32);assert.equal(d.moduleConfigs[s.moduleId].seconds,1760);assert.equal(d.moduleConfigs[s.moduleId].partCount,2);const pool=d.pool.filter(q=>q.moduleId===s.moduleId);assert.ok(pool.length>=32&&pool.length<=100);for(let i=0;i<5;i++)assert.ok(assembleAdaptiveVariant(pool,s));}
  const {dayId}=await assessmentAction(repo,admin,{action:'maintainer-day-save',name:'Неполное дерево',opensAt:Date.now()+10000,closesAt:Date.now()+86400000,moduleIds:['python'],questionIds:INITIAL_QUESTIONS.filter(q=>q.moduleId==='python'&&!q.seedOrigin).map(q=>q.id)});
  await assert.rejects(assessmentAction(repo,admin,{action:'maintainer-day-publish',id:dayId}),e=>e.status===409);
 });
 test('the diagnostic part opens the fixed advanced or foundation route only after its final answer',async()=>{
  for(const correct of [true,false]){
   const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
-  assert.equal(v.currentModule.partIndex,0);assert.equal(v.currentModule.partQuestionCount,16);assert.equal(v.currentModule.totalQuestionCount,32);assert.equal(v.currentModule.seconds,640);
+  assert.equal(v.currentModule.partIndex,0);assert.equal(v.currentModule.partQuestionCount,16);assert.equal(v.currentModule.totalQuestionCount,32);assert.equal(v.currentModule.seconds,1760);
   assert.equal(v.currentModule.questions.length,16);assert.deepEqual(v.results,[]);
   const before=await repo.record(v.id);assert.equal(before.modules[0].adaptive.selectedRoute,null);
   const second=await completeAdaptivePart(repo,a,v.id,correct),raw=await repo.record(v.id),m=raw.modules[0],route=correct?'advanced':'foundation';
@@ -173,7 +180,7 @@ test('the diagnostic part opens the fixed advanced or foundation route only afte
   assert.equal(second.currentModule.expiresAt-second.currentModule.questionStartedAt,20000);
   const serial=JSON.stringify(second);for(const key of ['correct','numeric','difficulty','routes','selectedRoute','decision'])assert.ok(!serial.includes('"'+key+'":'));
   const finished=await completeAdaptivePart(repo,a,v.id,true);assert.equal(finished.status,'finished');assert.equal(finished.results[0].total,32);
-  assert.equal(finished.results[0].score,correct?100:37);assert.equal(finished.results[0].level,correct?'Senior':'Ниже Junior');assert.equal(finished.results[0].maximumPoints,70);assert.equal(finished.results[0].secondPartRoute,route);
+  if(correct)assert.equal(finished.results[0].score,100);else assert.ok(finished.results[0].score<50);assert.equal(finished.results[0].level,correct?'Senior':'Ниже Junior');assert.equal(finished.results[0].scoreRule,SCORING_RULE);assert.equal(finished.results[0].secondPartRoute,route);
  }
 });
 test('route snapshots survive resume, bank edits and stale answer replay',async()=>{
@@ -189,9 +196,9 @@ test('route snapshots survive resume, bank edits and stale answer replay',async(
 });
 test('concurrent final diagnostic confirmations commit one route decision',async()=>{
  const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
- let raw=await repo.record(v.id);for(const q of raw.modules[0].questions.slice(0,15))await answer(repo,a,v.id,q,q.format==='choice'?q.correct:String(q.numeric.expected));
+ let raw=await repo.record(v.id);for(const q of raw.modules[0].questions.slice(0,15))await answer(repo,a,v.id,q,correctTestAnswer(q));
  raw=await repo.record(v.id);const q=raw.modules[0].questions[15];
- const body={action:'assessment-answer',id:v.id,revision:raw.revision,questionId:q.id,answer:q.format==='choice'?q.correct:String(q.numeric.expected)};
+ const body={action:'assessment-answer',id:v.id,revision:raw.revision,questionId:q.id,answer:correctTestAnswer(q)};
  const r=await Promise.allSettled([assessmentAction(repo,a,body),assessmentAction(repo,a,body)]);assert.equal(r.filter(x=>x.status==='fulfilled').length,1);
  const stored=await repo.record(v.id);assert.equal(stored.modules[0].questions.length,32);assert.equal(stored.modules[0].adaptive.selectedRoute,'advanced');assert.equal(stored.revision,16);
 });
@@ -206,7 +213,7 @@ test('timeout on the last diagnostic question selects once and starts a fresh pe
 test('experimental answers cannot alter the adaptive route or the 32-question scored result',async()=>{
  const repo=memory(),a=candidate();const source=INITIAL_QUESTIONS.find(q=>q.moduleId==='python');
  await repo.put('question',{...source,id:'experimental-routing',familyId:'python:experimental-routing',status:'experimental'});
- const d=await day(repo,{python:1},['python'],true),v=await start(repo,a,d,'python');assert.equal(v.currentModule.questions.length,17);assert.equal(v.currentModule.seconds,660);
+ const d=await day(repo,{python:1},['python'],true),v=await start(repo,a,d,'python');assert.equal(v.currentModule.questions.length,17);assert.equal(v.currentModule.seconds,1780);
  await completeAdaptivePart(repo,a,v.id,true,false);let raw=await repo.record(v.id);assert.equal(raw.modules[0].adaptive.selectedRoute,'advanced');assert.equal(raw.modules[0].questions.length,33);
  const finished=await completeAdaptivePart(repo,a,v.id,true);assert.equal(finished.results[0].total,32);assert.equal(finished.results[0].score,100);
  await assessmentAction(repo,admin,{action:'maintainer-question-decision',id:'experimental-routing',decision:'admit',difficulty:1,reason:'Содержательная проверка и собранные данные рассмотрены'});
@@ -216,26 +223,26 @@ test('a complete adaptive role uses two parts for every base and integration mod
  const repo=memory(),a=candidate(),d=await day(repo,{},undefined,true),v=await start(repo,a,d,'devops-engineer');let view=v;
  for(let i=0;i<3;i++){
   if(i){const raw=await repo.record(v.id);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:raw.revision})).assessment;}
-  assert.equal(view.currentModule.partIndex,0);assert.equal(view.currentModule.seconds,640);assert.deepEqual(view.results,[]);
+  assert.equal(view.currentModule.partIndex,0);assert.equal(view.currentModule.seconds,1760);assert.deepEqual(view.results,[]);
   view=await completeAdaptivePart(repo,a,v.id,true);assert.equal(view.currentModule.partIndex,1);assert.deepEqual(view.results,[]);
   view=await completeAdaptivePart(repo,a,v.id,true);if(i<2){assert.deepEqual(view.results,[]);assert.equal(view.resultsAvailable,false);}
  }
- assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);assert.equal(view.roleResult.targetGrade,'Middle');assert.equal(view.roleResult.status,'confirmed-plus-potential');assert.equal(view.roleResult.confirmedGrade,'Middle');assert.equal(view.roleResult.confirmedPlus,true);assert.equal(view.roleResult.outcomeRule,'target-grade-five-outcomes-midpoint-v2');assert.ok(view.roleResult.plusThresholds.every(r=>r.threshold===80));assert.equal(view.roleResult.potentialHigher,'Senior');
+ assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);assert.equal(view.roleResult.targetGrade,'Middle');assert.equal(view.roleResult.status,'confirmed-plus-potential');assert.equal(view.roleResult.confirmedGrade,'Middle');assert.equal(view.roleResult.confirmedPlus,true);assert.equal(view.roleResult.outcomeRule,ROLE_OUTCOME_RULE);assert.ok(view.roleResult.plusThresholds.every(r=>r.threshold===80));assert.equal(view.roleResult.potentialHigher,'Senior');
 });
 test('legacy saved specifications upgrade for future days without mutating old published snapshots',async()=>{
  const repo=memory(),old=await day(repo,{},['python']);
  await repo.put('module-spec',{...DEFAULT_SPECS[0],id:'old-custom',version:4,created:Date.now(),questionSeconds:35});
- const all=await specifications(repo),newest=all.filter(s=>s.moduleId==='python').sort((a,b)=>b.version-a.version)[0];assert.ok(newest.adaptive);assert.equal(newest.questionSeconds,35);assert.equal(newest.version,5);
- const next=await day(repo,{},['python'],true);assert.equal(next.specs[0].scoredCount,32);assert.equal(next.moduleConfigs.python.seconds,1120);assert.equal((await repo.record(old.id)).specs[0].scoredCount,6);
+ const all=await specifications(repo),newest=all.filter(s=>s.moduleId==='python').sort((a,b)=>b.version-a.version)[0];assert.ok(newest.adaptive);assert.equal(newest.questionSeconds,35);assert.equal(newest.version,7);
+ const next=await day(repo,{},['python'],true);assert.equal(next.specs[0].scoredCount,32);assert.equal(next.moduleConfigs.python.seconds,2180);assert.equal((await repo.record(old.id)).specs[0].scoredCount,6);
 });
-test('routing uses difficulty-weighted evidence, not just the number of correct answers',async()=>{
+test('the common Rasch scale gives equal routing scores for equal credits on the same first-part difficulty mix',async()=>{
  for(const hardEvidence of [false,true]){
   const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
   const first=(await repo.record(v.id)).modules[0].questions;
-  const selected=hardEvidence?[...first.filter(q=>q.difficulty===3),...first.filter(q=>q.difficulty===2).slice(0,3),...first.filter(q=>q.difficulty===1).slice(0,3)]:first.filter(q=>q.difficulty<3);
-  assert.equal(selected.length,11);const ids=new Set(selected.map(q=>q.id));
-  for(const q of first)await answer(repo,a,v.id,q,ids.has(q.id)?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);
-  const raw=await repo.record(v.id);assert.equal(raw.modules[0].adaptive.selectedRoute,hardEvidence?'advanced':'foundation');assert.equal(raw.modules[0].adaptive.decision.earned,hardEvidence?24:17);assert.equal(raw.modules[0].adaptive.decision.possible,32);
+  const selected=[...first].sort((a,b)=>hardEvidence?b.difficulty-a.difficulty:a.difficulty-b.difficulty).slice(0,9);
+  assert.equal(selected.length,9);const ids=new Set(selected.map(q=>q.id));
+  for(const q of first)await answer(repo,a,v.id,q,ids.has(q.id)?(correctTestAnswer(q)):null);
+  const raw=await repo.record(v.id);assert.equal(raw.modules[0].adaptive.selectedRoute,'foundation');assert.equal(raw.modules[0].adaptive.decision.earned,9);assert.equal(raw.modules[0].adaptive.decision.possible,16);
  }
 });
 
@@ -257,7 +264,7 @@ test('a completed role below an existing grade retains the saved qualification a
  let view;
  for(let moduleIndex=0;moduleIndex<4;moduleIndex++){
   const t=await repo.record(v.id),m=t.modules[t.moduleIndex];
-  for(const [index,q] of m.questions.entries())view=await answer(repo,a,v.id,q,index<4?(q.format==='choice'?q.correct:String(q.numeric.expected)):null);
+  for(const [index,q] of m.questions.entries())view=await answer(repo,a,v.id,q,index<4?(correctTestAnswer(q)):null);
   if(moduleIndex<3){const stored=await repo.record(v.id);await assessmentAction(repo,a,{action:'assessment-next-module',id:v.id,revision:stored.revision});}
  }
  assert.equal(view.roleResult.level,'Junior');assert.equal(view.roleResult.lower,true);assert.equal(view.roleResult.applied,false);
@@ -314,7 +321,7 @@ test('selected grade is validated at start, frozen with attempt and resolved aga
  assert.equal(r.registration.targetGrade,'Senior');
  await assert.rejects(assessmentAction(repo,a,{action:'assessment-start',registrationId:r.registration.id,rulesAccepted:true,targetGrade:'Lead'}));
  const started=await assessmentAction(repo,a,{action:'assessment-start',registrationId:r.registration.id,rulesAccepted:true,targetGrade:'Junior'});
- assert.equal(started.assessment.targetGrade,'Junior');assert.equal((await repo.record(started.assessment.id)).targetGrade,'Junior');assert.equal((await repo.record(started.assessment.id)).roleOutcomeRule,'target-grade-five-outcomes-midpoint-v2');
+ assert.equal(started.assessment.targetGrade,'Junior');assert.equal((await repo.record(started.assessment.id)).targetGrade,'Junior');assert.equal((await repo.record(started.assessment.id)).roleOutcomeRule,ROLE_OUTCOME_RULE);
 });
 
 test('active role answers expose saved source without hidden coding judgement',async()=>{
@@ -328,18 +335,23 @@ test('active role answers expose saved source without hidden coding judgement',a
  assert.ok(!JSON.stringify(candidateView.currentModule.answers).includes('passed'));
 });
 
-test('daily coding questions are frozen after two adaptive parts, hide private checks and get their own time limit',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
- const repo=memory(),a=candidate(),spec=ADAPTIVE_SPECS.find(s=>s.moduleId==='python');
- await assessmentAction(repo,admin,{action:'maintainer-spec-save',spec:{...spec,codingCount:1,codingSeconds:600}});
+test('mixed daily coding appears twice in each part, uses five minutes and keeps hidden checks private',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
+ const repo=memory(),a=candidate();
  let {assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});
- assert.equal((await repo.record(view.id)).dayId,dailyPoolWindow().id);
- for(let i=0;i<32;i++){const stored=await repo.record(view.id),m=stored.modules[0],q=m.questions.find(q=>q.id===m.activeQuestionId);const answer=q.format==='choice'?q.correct:String(q.numeric.expected);view=(await assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer})).assessment;}
- const q=view.currentModule.questions[view.currentModule.questionIndex];assert.equal(q.format,'coding');assert.equal(q.coding.tests.length,1);assert.equal(view.currentModule.questionSeconds,600);
- await assert.rejects(assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer:{correct:true,judged:true}}));
- view=(await assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer:'import json,sys\nprint(sum(x for x in json.load(sys.stdin) if x%2==0))'})).assessment;
- assert.equal(view.status,'finished');assert.equal(view.results[0].total,33);assert.equal(view.results[0].score,100);
+ assert.equal((await repo.record(view.id)).dayId,dailyPoolWindow().id+'-'+DAILY_POOL_REVISION);
+ const positions=[];
+ for(let i=0;i<32;i++){
+  const stored=await repo.record(view.id),m=stored.modules[0],q=m.questions.find(q=>q.id===m.activeQuestionId);
+  if(q.format==='coding'){
+   positions.push(i);assert.equal(view.currentModule.questionSeconds,300);assert.equal(view.currentModule.partQuestionCount,16);
+   const shown=view.currentModule.questions[view.currentModule.questionIndex];assert.equal(shown.coding.tests.length,1);
+   await assert.rejects(assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer:{correct:true,judged:true}}));
+   if(i===4){const source=MIXED_CODING_SOLUTIONS.get(q.id)||'import json,sys\nprint(sum(x for x in json.load(sys.stdin) if x%2==0))';view=(await assessmentAction(repo,a,{action:'assessment-submit-code',id:view.id,revision:view.revision,questionId:q.id,source,submissionId:crypto.randomUUID()})).assessment;view=await answer(repo,a,view.id,q,null);continue;}
+  }else assert.equal(view.currentModule.questionSeconds,20);
+  view=await answer(repo,a,view.id,q,correctTestAnswer(q));
+ }
+ assert.deepEqual(positions,[4,11,20,27]);assert.equal(view.status,'finished');assert.equal(view.results[0].total,32);assert.equal(view.results[0].score,100);assert.equal(view.results[0].theoryScore,100);assert.equal(view.results[0].codingScore,100);
 });
-
 
 test('daily pools span exactly 24 hours and rotate at Moscow midnight',()=>{
  const before=dailyPoolWindow(Date.parse('2026-12-31T20:59:59.999Z')),after=dailyPoolWindow(Date.parse('2026-12-31T21:00:00Z'));
@@ -391,4 +403,101 @@ test('a role begun just before midnight keeps the old pool and can open its next
   assert.equal(assessment.moduleIndex,1);assert.equal(assessment.currentModule.id,'sql');
   const continued=await repo.record(assessment.id);assert.equal(continued.dayId,started.dayId);assert.deepEqual(continued.modules[1].questions,started.modules[1].questions);
  }finally{Date.now=clock;}
+});
+
+test('mixed coding bank and all module parts have distinct families, fixed counts and exact difficulty quotas',async()=>{
+ const repo=memory(),day=await ensureDailyPool(repo);
+ assert.equal(MIXED_CODING_QUESTIONS.length,108);
+ for(const spec of day.specs){
+  const tasks=MIXED_CODING_QUESTIONS.filter(q=>q.moduleId===spec.moduleId);assert.equal(tasks.length,6);
+  for(const q of tasks){assert.equal(validateQuestion(q).format,'coding');assert.equal(q.questionSeconds,300);}
+  const tree=assembleAdaptiveVariant(day.pool.filter(q=>q.moduleId===spec.moduleId),spec);
+  assert.equal(spec.codingPerPart,2);assert.equal(spec.seconds,1760);
+  for(const [name,part] of [['first',tree.first],...Object.entries(tree.routes)]){
+   assert.equal(part.length,16);assert.equal(part.filter(q=>q.format==='coding').length,2);
+   assert.equal(part.filter(q=>q.format!=='coding').length,14);
+   const counts=name==='first'?spec.adaptive.firstDifficultyCounts:spec.adaptive.routes[name];
+   for(const d of [1,2,3])assert.equal(part.filter(q=>q.difficulty===d).length,counts[d]);
+   if(name!=='first')assert.equal(new Set([...tree.first,...part].map(q=>q.familyId)).size,32);
+  }
+ }
+});
+test('a correct coding response can change the second-part route without affecting the deadline rules',async()=>{
+ for(const codeCorrect of [false,true]){
+  const repo=memory(),a=candidate(),{assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});
+  const first=(await repo.record(view.id)).modules[0].questions;
+  const ordinary=new Set(first.filter(q=>q.format!=='coding').slice(0,10).map(q=>q.id));
+  let codeSeen=false;
+  for(const q of first){const right=q.format==='coding'?codeCorrect&&!codeSeen:ordinary.has(q.id);if(q.format==='coding')codeSeen=true;await answer(repo,a,view.id,q,right?correctTestAnswer(q):null);}
+  const m=(await repo.record(view.id)).modules[0];assert.equal(m.adaptive.decision.earned,codeCorrect?11:10);assert.equal(m.adaptive.selectedRoute,codeCorrect?'advanced':'foundation');
+ }
+});
+
+async function codingAttempt(){const repo=memory(),a=candidate();let {assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});for(let i=0;i<4;i++){const t=await repo.record(view.id),q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);view=await answer(repo,a,view.id,q,correctTestAnswer(q));}const t=await repo.record(view.id),q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);return {repo,a,view,q};}
+test('coding run uses editable stdin without grading; submission limit, idempotency and best result survive drafts and Next',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
+ const {repo,a,q,view:initial}=await codingAttempt();let view=initial;
+ const request=(action,extra={})=>assessmentAction(repo,a,{action,id:view.id,revision:view.revision,questionId:q.id,...extra});
+ assert.equal(view.currentModule.questions[4].coding.input,q.coding.tests[0].stdin);
+ const echo='import sys\nprint(sys.stdin.read(),end="")',stdin='custom input\n';
+ view=(await request('assessment-draft',{answer:echo,stdin})).assessment;
+ assert.equal(view.currentModule.questions[4].coding.input,stdin);
+ const run=await request('assessment-run-code',{source:echo,stdin});assert.equal(run.run.stdout,stdin);assert.ok(!('results' in run.run));assert.ok(!('correct' in run.run));
+ assert.deepEqual(view.currentModule.questions[4].coding.submission,{used:0,limit:3});assert.ok(!(await repo.record(view.id)).modules[0].answers[q.id]);
+ const partial='import sys\nprint('+JSON.stringify(q.coding.tests[0].expected)+' if sys.stdin.read()=='+JSON.stringify(q.coding.tests[0].stdin)+' else "wrong")';
+ view=(await request('assessment-submit-code',{source:partial,submissionId:'first-submit'})).assessment;
+ let feedback=view.currentModule.questions[4].coding.submission;
+ assert.equal(feedback.used,1);assert.equal(feedback.passed,1);assert.deepEqual(feedback.results,q.coding.tests.map((_,i)=>i===0));
+ view=(await request('assessment-submit-code',{source:partial,submissionId:'first-submit'})).assessment;assert.equal(view.currentModule.questions[4].coding.submission.used,1);
+ view=(await request('assessment-submit-code',{source:MIXED_CODING_SOLUTIONS.get(q.id),submissionId:'second-submit'})).assessment;
+ assert.equal(view.currentModule.questions[4].coding.submission.passed,q.coding.tests.length);
+ const concurrent=await Promise.allSettled(['third-submit','competing-submit'].map(submissionId=>request('assessment-submit-code',{source:'print("wrong")',submissionId})));assert.equal(concurrent.filter(r=>r.status==='fulfilled').length,1);assert.equal(concurrent.find(r=>r.status==='rejected').reason.status,409);view=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;
+ assert.equal(view.currentModule.questions[4].coding.submission.used,3);assert.equal(view.currentModule.questions[4].coding.submission.passed,0);
+ await assert.rejects(request('assessment-submit-code',{source:'print(1)',submissionId:'fourth-submit'}),/3 попытки/);
+ await assert.rejects(request('assessment-answer',{answer:MIXED_CODING_SOLUTIONS.get(q.id)}),/Отправить/);
+ view=(await request('assessment-draft',{answer:'print("draft")',stdin:'changed input'})).assessment;
+ view=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;
+ assert.equal(view.currentModule.questions[4].coding.submission.used,3);assert.equal(view.currentModule.answers[q.id],'print("draft")');assert.equal(view.currentModule.questions[4].coding.input,'changed input');
+ let stored=await repo.record(view.id);assert.equal(stored.modules[0].answers[q.id].value.correct,true);
+ view=(await request('assessment-answer',{answer:null})).assessment;
+ assert.equal(view.currentModule.questionIndex,5);stored=await repo.record(view.id);assert.equal(stored.modules[0].answers[q.id].value.correct,true);assert.equal(stored.modules[0].codingSubmissions[q.id].length,3);
+});
+test('coding timeout and Next do not grade an unsent draft or consume a submission',async()=>{
+ for(const expired of [false,true]){const {repo,a,view:initial,q}=await codingAttempt();const {assessment:view}=await assessmentAction(repo,a,{action:'assessment-draft',id:initial.id,revision:initial.revision,questionId:q.id,answer:'print(1)',stdin:'editable'});if(expired){const t=await repo.record(view.id);t.modules[0].expiresAt=Date.now()-1;await repo.put('assessment',t);}
+ const next=(await assessmentAction(repo,a,{action:expired?'assessment-resume':'assessment-answer',id:view.id,revision:view.revision,questionId:q.id,answer:null})).assessment;
+ assert.equal(next.currentModule.questionIndex,5);const t=await repo.record(view.id);assert.equal(t.modules[0].answers[q.id].value,null);assert.ok(!t.modules[0].codingSubmissions?.[q.id]);}
+});
+
+test('reviewed daily bank revision creates a new pool without rewriting previous pools or their question versions',async()=>{
+ const repo=memory(),at=Date.parse('2026-10-08T09:00:00Z'),oldId=dailyPoolWindow(at).id+'-mixed-v2';
+ const old={id:oldId,kind:'test-day',owner:'platform',created:at,status:'published',version:1,pool:[{...INITIAL_QUESTIONS[0],version:1,options:['old','a','b','c'],correct:0}]};
+ await repo.put('test-day',old);
+ const reviewed=await ensureDailyPool(repo,at);assert.notEqual(reviewed.id,old.id);assert.equal(reviewed.bankRevision,'2026-10-08');
+ assert.deepEqual(await repo.record(oldId),old);assert.ok(reviewed.pool.every(q=>q.status==='working'||q.status==='experimental'));
+ assert.ok(!reviewed.pool.some(q=>q.id==='coding-integration-backend-v1'));
+ assert.ok(reviewed.pool.filter(q=>q.format==='choice').every(q=>q.version===2));
+ assert.deepEqual(await ensureDailyPool(repo,at+1000),reviewed);
+});
+
+
+test('skipping all coding cannot confirm a role or verify the candidate despite perfect theory',async()=>{
+ const repo=memory(),a=candidate();let {assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'devops-engineer',targetGrade:'Middle',rulesAccepted:true});
+ for(let moduleIndex=0;moduleIndex<3;moduleIndex++){
+  if(moduleIndex){const raw=await repo.record(view.id);raw.nextModuleAt=Date.now()-1;await repo.put('assessment',raw);view=(await assessmentAction(repo,a,{action:'assessment-next-module',id:view.id,revision:raw.revision})).assessment;}
+  for(let part=0;part<2;part++){
+   const raw=await repo.record(view.id),m=raw.modules[raw.moduleIndex];
+   for(const q of m.questions.slice(part*16,(part+1)*16))view=await answer(repo,a,view.id,q,q.format==='coding'?null:correctTestAnswer(q));
+  }
+ }
+ assert.equal(view.status,'finished');assert.equal(view.roleResult.status,'unconfirmed');assert.equal(view.roleResult.level,'Ниже Junior');assert.equal(view.roleResult.potentialHigher,null);
+ assert.ok(view.results.every(r=>r.score===60&&r.theoryScore===100&&r.codingScore===0&&r.level==='Ниже Junior'));
+ assert.notEqual((await repo.account(a.id))?.profile?.verified,true);
+});
+
+test('a frozen legacy mixed attempt keeps its scoring after the new daily pool is created',async()=>{
+ const repo=memory(),a=candidate(),d=await day(repo,{},['python'],true),v=await start(repo,a,d,'python');
+ const raw=await repo.record(v.id),m=raw.modules[0];delete m.spec.scoring;m.spec.adaptive.rule='two-stage-16-mixed-coding-v2';raw.roleOutcomeRule='target-grade-five-outcomes-midpoint-v2';raw.scoreRule='difficulty-weighted-fixed-scale-v1';await repo.put('assessment',raw);
+ await ensureDailyPool(repo);
+ await completeAdaptivePart(repo,a,v.id,false);const finished=await completeAdaptivePart(repo,a,v.id,true);
+ assert.equal(finished.results[0].score,37);assert.equal(finished.results[0].maximumPoints,70);assert.equal(finished.results[0].scoreRule,'difficulty-weighted-fixed-scale-v1');
+ assert.equal((await repo.record(v.id)).roleOutcomeRule,'target-grade-five-outcomes-midpoint-v2');
 });
