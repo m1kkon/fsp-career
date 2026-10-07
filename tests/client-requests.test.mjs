@@ -12,7 +12,7 @@ const empty=source.slice(source.indexOf('const emptyState='),source.indexOf('let
 function client(fetch){
  const button={textContent:'Сохранить',disabled:false,setAttribute(){},removeAttribute(){}};
  const error={textContent:'',focus(){}};
- const context=vm.createContext({fetch,AbortController,setTimeout,clearTimeout,Date,JSON,Error,URLSearchParams,
+ const context=vm.createContext({standaloneTestAdmin:false,serverOffset:0,assessmentAttempt:null,assessmentAdmin:null,assessmentBooking:null,assessmentRenderKey:null,fetch,AbortController,setTimeout,clearTimeout,Date,JSON,Error,URLSearchParams,
   needContext:{},needSpec:'',needGrade:'',needStack:'',needConfirmed:false,compare:[],contextDraft:null,activeNeed:null,contextFields:()=>({}),
   role:'candidate',query:'',page:'profile',busy:false,pendingHomeSearch:false,homeMode:'candidate',
   state:{authenticated:true,user:{id:'a',email:'a@example.test'},roles:['candidate'],profile:{name:'Original'},privacy:{fspVisible:true},invites:[]},

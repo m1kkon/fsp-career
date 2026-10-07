@@ -31,7 +31,9 @@ test('need parser reads role words, synonyms, word boundaries and grade evidence
  assert.deepEqual(need.evidence.spec,['backend','Python','PostgreSQL']);assert.ok(need.adjacent.includes('Data Science'));assert.deepEqual(need.defaulted,{spec:false,grade:false});
  need=parseNeed('Сеньор бэкенд на питоне, постгрес, k8s');
  assert.equal(need.spec,'Backend');assert.equal(need.grade,'Senior');assert.deepEqual(need.stack,['Python','PostgreSQL','Kubernetes']);
- assert.equal(parseNeed('ML engineer: Python, PyTorch, рекомендации').spec,'Data Science');
+ assert.equal(parseNeed('ML engineer: Python, PyTorch, рекомендации').spec,'ML Engineering');
+ assert.equal(parseNeed('ML engineer или data scientist').spec,null);
+ assert.equal(parseNeed('Senior mlops Python Docker').spec,'ML Engineering');
  need=parseNeed('Нужен разработчик React, опыт от 5 лет');
  assert.equal(need.spec,'Frontend');assert.equal(need.grade,'Senior');assert.equal(need.evidence.grade,'5 лет');
  assert.deepEqual(parseNeed('JavaScript и Java').stack,['JavaScript','Java']);

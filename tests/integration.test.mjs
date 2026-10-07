@@ -18,9 +18,11 @@ async function employerWorkspace(){
 }
 function client(){
  const element={innerHTML:'',querySelector:()=>null};
- const context=vm.createContext({...history,document:{getElementById:()=>element,querySelector:()=>null,addEventListener:()=>{},body:{classList:{add:()=>{},remove:()=>{}}}},window:{addEventListener:()=>{},scrollTo:()=>{}},localStorage:{getItem:()=>null,setItem:()=>{}},location:{hash:''},setInterval:()=>{}});
+ const documentEvents={};
+ const context=vm.createContext({...history,documentEvents,document:{getElementById:()=>element,querySelector:()=>null,addEventListener:(type,handler)=>(documentEvents[type]??=[]).push(handler),body:{classList:{add:()=>{},remove:()=>{}}}},window:{addEventListener:()=>{},scrollTo:()=>{}},localStorage:{getItem:()=>null,setItem:()=>{}},location:{hash:''},setTimeout,clearTimeout,setInterval:()=>{}});
  const source=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8').replace(/^import .*;\n/,'').replace(/^boot\(\);$/m,'');
- vm.runInContext(source,context);
+ const assessment=readFileSync(new URL('../public/assessments.js',import.meta.url),'utf8');
+ vm.runInContext(assessment+'\n'+source,context);
  vm.runInContext('modal=()=>{};matchBreakdown=(match,heading)=>{globalThis.display={match,heading};return "";}',context);
  return context;
 }
@@ -176,4 +178,77 @@ test('landing preview contains only synthetic public summaries with no contacts 
  assert.equal(previews.length,3);
  assert.deepEqual(previews.map(c=>c.spec),['Backend','Frontend','DevOps']);
  for(const c of previews){assert.equal(c.synthetic,true);assert.equal(c.verified,true);assert.ok(!('email' in c));assert.ok(!('phone' in c));assert.ok(!('resume' in c));assert.ok(!('privacy' in c));}
+});
+
+
+test('mouse-selected assessment answers reach the draft through the installed change listener and submit the chosen option',async()=>{
+ const context=client();
+ context.exam={id:'click-test',status:'active',modules:['react'],moduleIndex:0,currentModule:{id:'react',name:'React',questions:[{id:'q1',format:'choice',prompt:'Как изменить состояние?',options:['Первый','Второй','Третий','Четвёртый']}],questionSeconds:20}};
+ vm.runInContext('assessmentAttempt=exam;assessmentQuestion=0;assessmentDraft=null;page="tests";render=()=>{};globalThis.submissions=[];assessmentRun=async(action,payload)=>submissions.push({action,...payload});',context);
+ assert.match(vm.runInContext('assessmentExamMarkup()',context),/class="exam-check" type="submit" disabled/);
+ for(const handler of context.documentEvents.change)handler({target:{name:'assessmentAnswer',value:'2',dataset:{}}});
+ assert.equal(vm.runInContext('assessmentDraft',context),2);
+ const markup=vm.runInContext('assessmentExamMarkup()',context);
+ assert.match(markup,/value="2" checked/);
+ assert.doesNotMatch(markup,/class="exam-check" type="submit" disabled/);
+ assert.equal((markup.match(/type="submit"/g)||[]).length,1);
+ assert.equal(context.submissions.length,0,'selection must not advance the question');
+ await vm.runInContext('assessmentConfirm()',context);
+ assert.deepEqual(JSON.parse(JSON.stringify(context.submissions)),[{action:'assessment-answer',questionId:'q1',answer:2}]);
+ // Option zero must also enable confirmation; saving must reject further changes.
+ for(const handler of context.documentEvents.change)handler({target:{name:'assessmentAnswer',value:'0',dataset:{}}});
+ assert.equal(vm.runInContext('assessmentDraft',context),0);
+ assert.doesNotMatch(vm.runInContext('assessmentExamMarkup()',context),/class="exam-check" type="submit" disabled/);
+ vm.runInContext('assessmentSaving=true',context);
+ for(const handler of context.documentEvents.change)handler({target:{name:'assessmentAnswer',value:'3',dataset:{}}});
+ assert.equal(vm.runInContext('assessmentDraft',context),0);
+});
+
+
+test('autosave serializes rapid choices and confirmation uses the saved revision without waiting for the timer',async()=>{
+ const context=client();
+ context.exam={id:'autosave-test',revision:0,status:'active',modules:['react'],moduleIndex:0,currentModule:{id:'react',name:'React',questionIndex:0,answers:{},questions:[{id:'q1',format:'choice',prompt:'Вопрос',options:['A','B','C','D']}],questionSeconds:20,expiresAt:Date.now()+20000}};
+ context.calls=[];let release;const delayed=new Promise(resolve=>{release=resolve;});
+ context.api=async body=>{
+  context.calls.push({...body});
+  if(context.calls.length===1)await delayed;
+  assert.equal(body.revision,context.exam.revision);
+  context.exam={...context.exam,revision:context.exam.revision+1,currentModule:{...context.exam.currentModule,answers:{q1:body.answer}}};
+  return {assessment:context.exam};
+ };
+ vm.runInContext('assessmentAccept(exam);page="tests";render=()=>{};',context);
+ for(const value of ['0','1','3'])for(const handler of context.documentEvents.change)handler({target:{name:'assessmentAnswer',value,dataset:{}}});
+ assert.equal(context.calls.length,1,'only one draft request may be in flight');
+ const confirm=vm.runInContext('assessmentConfirm()',context);
+ assert.equal(context.calls.length,1,'confirmation waits for queued selections');
+ release();await confirm;
+ assert.deepEqual(context.calls.map(c=>[c.action,c.answer,c.revision]),[['assessment-draft',0,0],['assessment-draft',3,1],['assessment-answer',3,2]]);
+});
+
+test('numeric autosave accepts zero, clears partial expressions and restores saved answers on reload',async()=>{
+ const context=client();
+ context.exam={id:'numeric-autosave',revision:0,status:'active',modules:['sql'],moduleIndex:0,currentModule:{id:'sql',name:'SQL',questionIndex:0,answers:{},questions:[{id:'n1',format:'numeric',prompt:'Число'}],questionSeconds:20}};
+ context.calls=[];
+ context.api=async body=>{context.calls.push({...body});context.exam={...context.exam,revision:context.exam.revision+1,currentModule:{...context.exam.currentModule,answers:{n1:body.answer}}};return {assessment:context.exam};};
+ vm.runInContext('assessmentAccept(exam);page="tests";render=()=>{};',context);
+ for(const value of ['0','12,5','1e','']){
+  for(const handler of context.documentEvents.input)handler({target:{name:'assessmentNumeric',value,dataset:{}}});
+  await vm.runInContext('assessmentFlushDraft()',context);
+ }
+ assert.deepEqual(context.calls.map(c=>c.answer),['0','12,5',null,null]);
+ context.exam.currentModule.answers.n1='0';
+ vm.runInContext('assessmentAttempt=null;assessmentAccept(exam)',context);
+ assert.equal(vm.runInContext('assessmentDraft',context),'0');
+});
+
+test('a timeout during autosave recovery clears the old draft and cannot submit it for the next question',async()=>{
+ const context=client();
+ context.exam={id:'expiry-during-save',revision:0,status:'active',modules:['react'],moduleIndex:0,currentModule:{id:'react',name:'React',questionIndex:0,answers:{},questions:[{id:'q1',format:'choice',prompt:'Первый',options:['A','B','C','D']},{id:'q2',format:'choice',prompt:'Второй',options:['A','B','C','D']}],questionSeconds:20}};
+ context.calls=[];
+ context.api=async body=>{context.calls.push({...body});if(body.action==='assessment-draft')throw new Error('Expired');context.exam={...context.exam,revision:1,currentModule:{...context.exam.currentModule,questionIndex:1,answers:{q1:0}}};return {assessment:context.exam};};
+ vm.runInContext('assessmentAccept(exam);page="tests";render=()=>{};',context);
+ vm.runInContext('assessmentSaveAnswer(0)',context);
+ await vm.runInContext('assessmentConfirm()',context);
+ assert.deepEqual(context.calls.map(c=>c.action),['assessment-draft','assessment-resume']);
+ assert.equal(vm.runInContext('assessmentQuestion',context),1);assert.equal(vm.runInContext('assessmentDraft',context),null);
 });

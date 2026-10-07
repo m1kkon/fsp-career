@@ -44,6 +44,7 @@ services:
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       EMAIL_FROM: ${EMAIL_FROM:-}
       MAIL_TOKEN_KEY: ${MAIL_TOKEN_KEY:-}
+      TEST_MAINTAINER_IDS: ${TEST_MAINTAINER_IDS:-}
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:
