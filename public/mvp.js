@@ -54,7 +54,7 @@ try{const saved=JSON.parse(localStorage.getItem('fsp-search-location')||'null');
 let role=localStorage.getItem('fsp-role')||'candidate',page=standaloneTestAdmin?'maintainer':routePage(location.hash.slice(1)||'home'),state=emptyState(),query='',needSpec='',needGrade='',needStack='',needConfirmed=false,compare=[],jobQuery='',jobPageIndex=1,filter={spec:'all',grade:'all',stack:'',format:'all',sort:'match',fsp:'all'},test=null,testIndex=0,answers=[],result=null,busy=false,toastTimer,previousFocus;
 const date=t=>new Date(t).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
 const age=t=>t?date(t):'Нет подтверждения';
-const button=(label,action,extra='',secondary=false)=>`<button class="button ${secondary?'secondary':''}" data-action="${action}" ${extra}>${label}</button>`;
+const button=(label,action,extra='',secondary=false)=>`<button type="button" class="button ${secondary?'secondary':''}" data-action="${action}" ${extra}>${label}</button>`;
 const badge=(label,type='')=>`<span class="badge ${type}">${esc(label)}</span>`;
 const tag=values=>`<div class="tags">${values.map(x=>`<span class="pill">${esc(x)}</span>`).join('')}</div>`;
 const options=(values,current,all)=>`${all?`<option value="all">${all}</option>`:''}${values.map(v=>`<option value="${esc(v)}" ${current===v?'selected':''}>${esc(v)}</option>`).join('')}`;
@@ -458,7 +458,7 @@ async function exportPDF(){
  }catch(error){toast(error.message||'Не удалось скачать PDF.');}
  finally{pdfExporting=false;buttons.forEach((b,i)=>{b.disabled=false;b.innerHTML=labels[i];b.removeAttribute('aria-busy');});}
 }
-document.addEventListener('click',async event=>{const faq=event.target.closest('.faq-item > summary');if(faq){event.preventDefault();toggleFAQ(faq.parentElement);return;}if(event.target.matches('[data-backdrop]')){close();return;}const el=event.target.closest('[data-action]');if(!el)return;if(el.tagName==='A'&&(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey))return;event.preventDefault();const {action,id}=el.dataset;if(await assessmentHandleAction(el))return;switch(action){
+document.addEventListener('click',async event=>{const faq=event.target.closest('.faq-item > summary');if(faq){event.preventDefault();toggleFAQ(faq.parentElement);return;}if(event.target.matches('[data-backdrop]')){close();return;}const el=event.target.closest('[data-action]');if(!el||el.tagName==='FORM')return;if(el.tagName==='A'&&(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey))return;event.preventDefault();const {action,id}=el.dataset;if(await assessmentHandleAction(el))return;switch(action){
 case 'nav':go(el.dataset.page);break;
 case 'api-key-new':newApiKeyDialog();break;
 case 'api-key-refresh':await loadApiAccess();break;
