@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import * as history from '../public/resume-history.mjs';
+import {citySuggestions,canonicalCity} from '../public/cities.mjs';
 import {selectedNeed,parseNeed,matching} from '../lib/matching.mjs';
 import {accountFor,action,getState} from '../lib/service.mjs';
 import {actionResponse} from '../lib/action-response.mjs';
@@ -19,10 +20,11 @@ async function employerWorkspace(){
 function client(){
  const element={innerHTML:'',querySelector:()=>null};
  const documentEvents={};
- const context=vm.createContext({...history,documentEvents,document:{getElementById:()=>element,querySelector:()=>null,addEventListener:(type,handler)=>(documentEvents[type]??=[]).push(handler),body:{classList:{add:()=>{},remove:()=>{}}}},window:{addEventListener:()=>{},scrollTo:()=>{}},localStorage:{getItem:()=>null,setItem:()=>{}},location:{hash:''},setTimeout,clearTimeout,setInterval:()=>{}});
- const source=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8').replace(/^import .*;\n/,'').replace(/^boot\(\);$/m,'');
+ const context=vm.createContext({...history,citySuggestions,canonicalCity,documentEvents,document:{getElementById:()=>element,querySelector:()=>null,addEventListener:(type,handler)=>(documentEvents[type]??=[]).push(handler),body:{classList:{add:()=>{},remove:()=>{}}}},window:{addEventListener:()=>{},scrollTo:()=>{}},localStorage:{getItem:()=>null,setItem:()=>{}},location:{hash:''},setTimeout,clearTimeout,setInterval:()=>{}});
+ const source=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace(/^boot\(\);$/m,'');
  const assessment=readFileSync(new URL('../public/assessments.js',import.meta.url),'utf8');
- vm.runInContext(assessment+'\n'+source,context);
+ const cities=readFileSync(new URL('../public/city-autocomplete.js',import.meta.url),'utf8');
+ vm.runInContext(assessment+'\n'+cities+'\n'+source,context);
  vm.runInContext('modal=()=>{};matchBreakdown=(match,heading)=>{globalThis.display={match,heading};return "";}',context);
  return context;
 }
