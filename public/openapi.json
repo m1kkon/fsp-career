@@ -655,6 +655,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -834,6 +835,16 @@
             "minLength": 3,
             "maxLength": 600
           },
+          "secondarySpecs": {
+            "type": "array",
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {"type": "string"}
+          },
+          "projectSummary": {
+            "type": "string",
+            "maxLength": 1800
+          },
           "achievement": {
             "type": "string",
             "minLength": 30,
@@ -874,6 +885,24 @@
               "Офис"
             ]
           },
+          "acceptedFormats": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "enum": ["Удалённо", "Гибрид", "Офис"]}
+          },
+          "employmentTypes": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"type": "string"}
+          },
+          "availableFrom": {"type": "string"},
+          "englishLevel": {
+            "type": "string",
+            "enum": ["A1", "A2", "B1", "B2", "C1", "C2"]
+          },
+          "city": {"type": "string", "maxLength": 80},
+          "salaryMin": {"type": ["integer", "string", "null"]},
           "teamSize": {
             "type": "string"
           },
@@ -1047,6 +1076,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -1065,6 +1095,21 @@
               "type": "string"
             }
           },
+          "requiredStack": {
+            "description": "Навыки, отсутствие которых исключает кандидата",
+            "type": ["array", "string"],
+            "items": {"type": "string"}
+          },
+          "preferredStack": {
+            "description": "Желательные навыки, влияющие только на порядок",
+            "type": ["array", "string"],
+            "items": {"type": "string"}
+          },
+          "englishLevel": {"type": "string", "enum": ["A1", "A2", "B1", "B2", "C1", "C2"]},
+          "minExperience": {"type": ["number", "string", "null"]},
+          "formatRequired": {"type": "boolean"},
+          "locationRequired": {"type": "boolean"},
+          "salaryRequired": {"type": "boolean"},
           "confirmed": {
             "type": "boolean",
             "const": true,

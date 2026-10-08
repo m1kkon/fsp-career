@@ -43,6 +43,7 @@ test('need parser reads role words, synonyms, word boundaries and grade evidence
  assert.equal(parseNeed('Backend, запуск проекта 2025 года').defaulted.grade,true);
  assert.equal(parseNeed('Senior разработчик',{team:'Пишем платёжный backend на Go'}).evidence.specSource,'team');
  assert.deepEqual(stackNames(['Postgres','k8s','JavaScript/TypeScript','RabbitMQ']),['PostgreSQL','Kubernetes','JavaScript','TypeScript','RabbitMQ']);
+ assert.deepEqual(stackNames(['HFT','high-frequency trading']),['HFT']);
 });
 
 test('budget and format come from money-like phrases or explicit context only',()=>{
@@ -121,7 +122,8 @@ test('category recommendations put the requested category first and explain neig
  assert.deepEqual(categories[0].salary,{min:150000,max:250000});
  assert.match(categories[1].reason,/выше бюджета/);assert.match(categories[3].reason,/Python/);
  const ranked=rankCandidates(seedRows(need),need,categories);
- assert.deepEqual(ranked.slice(0,4).map(r=>r.id),['demo-1','demo-10','demo-4','demo-9']);
+ assert.deepEqual(ranked.slice(0,4).map(r=>r.id),['demo-10','demo-4','demo-1','demo-9']);
+ assert.ok(ranked[0].match.semantic.score>=ranked[1].match.semantic.score);
  need=parseNeed('Senior QA, pytest');categories=recommendCategories(seedRows(need),need);
  assert.equal(categories[0].relation,'exact');assert.equal(categories[0].count,0);assert.match(categories[0].reason,/Пока нет/);
  assert.ok(categories.some(c=>c.spec==='QA'&&c.grade==='Middle'&&c.relation==='lower'));
@@ -168,7 +170,7 @@ test('saved need keeps team context and a snapshot of the shortlist; invalid bud
  await action(repo,employer,{action:'need',text:QUERY,confirmed:true,...TEAM,budgetMin:'180 000',city:'Москва'});
  const [saved]=await repo.scoped('need',employer.id);
  assert.deepEqual(saved.context,{team:TEAM.team,format:'Удалённо',city:'Москва',budgetMin:180000,budgetMax:250000});
- assert.equal(saved.spec,'Backend');assert.equal(saved.snapshot.total,5);assert.equal(saved.snapshot.items[0].id,'demo-1');
+ assert.equal(saved.spec,'Backend');assert.equal(saved.snapshot.total,5);assert.equal(saved.snapshot.items[0].id,'demo-10');
  assert.ok(saved.snapshot.items.some(i=>i.id===candidate.id));assert.ok(saved.snapshot.items.every(i=>Number.isInteger(i.score)));
  assert.ok(!JSON.stringify(saved).includes(candidate.email));
  for(const budget of [{budgetMin:300000,budgetMax:200000},{budgetMin:'abc'},{budgetMax:-5}])await assert.rejects(action(repo,employer,{action:'need',text:QUERY,...budget}));
