@@ -5,6 +5,7 @@ import {randomUUID,createHash} from 'node:crypto';
 import pg from 'pg';
 import {authMail,encryptMail,decryptMail,sendMail} from '../lib/mail.mjs';
 import {authenticate,currentUser} from '../lib/auth.mjs';
+import {createApiKey,authenticateApiKey} from '../lib/api-keys.mjs';
 import {requestAuthEmail,completeEmailAction,EMAIL_REQUEST_MESSAGE} from '../lib/email-auth.mjs';
 import {deliverQueuedMail} from '../lib/mail-worker.mjs';
 const mailEnv={RESEND_API_KEY:'test-only',EMAIL_FROM:'ФСП Карьера <test@example.test>',MAIL_TOKEN_KEY:'b'.repeat(64),APP_URL:'https://example.test'};
@@ -32,7 +33,7 @@ test('PostgreSQL email auth: ownership, expiry, single-use, recovery and mail re
   assert.ok(row);const text=decryptMail(row.payload).text,token=text.match(/token=([a-f0-9]{64})/)[1];assert.equal(createHash('sha256').update(token).digest('hex'),row.token_hash);assert.equal(row.payload.includes(token),false);return token;
  };
  try{
-  for(const name of ['001_initial.sql','002_email_auth.sql'])await pool.query(await readFile(new URL('../db/migrations/'+name,import.meta.url),'utf8'));
+  for(const name of ['001_initial.sql','002_email_auth.sql','004_api_keys.sql'])await pool.query(await readFile(new URL('../db/migrations/'+name,import.meta.url),'utf8'));
   let user,first,session;
   await t.test('registration queues email, exposes no token/session and unverified users cannot sign in',async()=>{
    const pending=await authenticate(body,request);user=pending.account;assert.equal(pending.pendingVerification,true);assert.equal(pending.token,null);first=await tokenFrom('verify');
@@ -57,11 +58,13 @@ test('PostgreSQL email auth: ownership, expiry, single-use, recovery and mail re
    session=(await authenticate({...body,action:'login'},request)).token;assert.equal((await currentUser('fsp_session='+session,pool)).userId,user.id);
   });
   await t.test('recovery is generic and valid reset revokes all sessions and sibling links',async()=>{
+   const apiKey=await createApiKey(user.id,{name:'Recovery integration'},pool);
    const known=await requestAuthEmail({action:'forgot-password',email:body.email},request,pool),unknown=await requestAuthEmail({action:'forgot-password',email:'unknown@example.test'},request,pool);assert.deepEqual(known,unknown);
    const reset=await tokenFrom('reset');await assert.rejects(completeEmailAction({action:'verify-email',token:reset},pool),e=>e.status===400);
    await assert.rejects(completeEmailAction({action:'reset-password',token:reset,password:'weak'},pool),e=>e.status===400);
    const password='a different sufficiently long password';await completeEmailAction({action:'reset-password',token:reset,password},pool);
    assert.equal(await currentUser('fsp_session='+session,pool),null);assert.equal((await pool.query('SELECT count(*) FROM auth_email_tokens WHERE user_id=$1',[user.id])).rows[0].count,'0');
+   await assert.rejects(authenticateApiKey(new Request('https://example.test/api/v1/me',{headers:{Authorization:'Bearer '+apiKey.token}}),pool),e=>e.status===401);
    await assert.rejects(completeEmailAction({action:'reset-password',token:reset,password},pool),e=>e.status===400);
    await assert.rejects(authenticate({...body,action:'login'},request),e=>e.status===401);assert.ok((await authenticate({...body,action:'login',password},request)).token);
   });

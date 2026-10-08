@@ -1,0 +1,6522 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ФСП Карьера — Personal API",
+    "version": "1.0.0",
+    "description": "Bearer API-ключ из личного кабинета, 30/90 дней. Сохраняет роли и приватность аккаунта. Чтение 120 запросов/мин на аккаунт, запись до 30/мин. При смене пароля ключи отзываются. POST автоматически не повторять: сначала проверить состояние. Для записи нужен scope write."
+  },
+  "externalDocs": {
+    "description": "Руководство и примеры",
+    "url": "https://fspcareer.space/api-docs"
+  },
+  "servers": [
+    {
+      "url": "https://fspcareer.space/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "ApiKey": []
+    }
+  ],
+  "paths": {
+    "/me": {
+      "get": {
+        "operationId": "getMe",
+        "summary": "Свои профили и роли",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/taxonomy": {
+      "get": {
+        "operationId": "getTaxonomy",
+        "summary": "Специализации, уровни, форматы, действия и лимиты",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidates": {
+      "get": {
+        "operationId": "searchCandidates",
+        "summary": "Поиск работодателя с приватностью и объяснением ранжирования",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "description": "Потребность; без подтверждения категории выдача пуста."
+          },
+          {
+            "name": "spec",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "ML Engineering",
+                "DevOps",
+                "QA"
+              ]
+            },
+            "description": "Точный фильтр специализации."
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Middle",
+                "Senior"
+              ]
+            },
+            "description": "Точный фильтр уровня."
+          },
+          {
+            "name": "stack",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 800
+            },
+            "description": "До 20 технологий через запятую, нужны все; известные алиасы нормализуются."
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "Подстрока города, регистр не важен."
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            },
+            "description": "Формат работы."
+          },
+          {
+            "name": "salaryMin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "description": "Нижняя граница пересечения зарплатных ожиданий."
+          },
+          {
+            "name": "salaryMax",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "description": "Верхняя граница; неизвестная зарплата исключается."
+          },
+          {
+            "name": "synthetic",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Только демонстрационные / только реальные записи."
+          },
+          {
+            "name": "team",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "description": "Контекст команды для ранжирования."
+          },
+          {
+            "name": "budgetMin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "description": "Бюджет потребности, влияет на балл, не жёсткий фильтр."
+          },
+          {
+            "name": "budgetMax",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "description": "Бюджет до."
+          },
+          {
+            "name": "confirmed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Подтвердить разобранную потребность. Оба spec/grade подтверждают её автоматически."
+          },
+          {
+            "name": "fsp",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "with",
+                "without"
+              ]
+            },
+            "description": "Видимые достижения ФСП."
+          },
+          {
+            "name": "favorites",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Фильтр вашего избранного."
+          },
+          {
+            "name": "minScore",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "default": 0
+            },
+            "description": "Минимальный результат теста; не match.score."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "match",
+                "strength",
+                "score",
+                "salary",
+                "name"
+              ],
+              "default": "match"
+            },
+            "description": "Как на сайте / по силе / по тесту / дешевле / по имени."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Candidate"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    },
+                    "need": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/components/schemas/Need"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CategoryRecommendation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/candidates/{id}": {
+      "get": {
+        "operationId": "getCandidate",
+        "summary": "Профиль видимого кандидата; контакт только после принятия приглашения или отклика",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Candidate"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "operationId": "searchJobs",
+        "summary": "Опубликованные вакансии, новые сначала",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "description": "Подстрока названия/описания/компании/стека."
+          },
+          {
+            "name": "spec",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "ML Engineering",
+                "DevOps",
+                "QA"
+              ]
+            },
+            "description": "Точный фильтр специализации."
+          },
+          {
+            "name": "grade",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Junior",
+                "Middle",
+                "Senior"
+              ]
+            },
+            "description": "Точный фильтр уровня."
+          },
+          {
+            "name": "stack",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 800
+            },
+            "description": "До 20 технологий через запятую, нужны все; известные алиасы нормализуются."
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "Подстрока города, регистр не важен."
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            },
+            "description": "Формат работы."
+          },
+          {
+            "name": "salaryMin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "description": "Нижняя граница пересечения зарплатных ожиданий."
+          },
+          {
+            "name": "salaryMax",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000000
+            },
+            "description": "Верхняя граница; неизвестная зарплата исключается."
+          },
+          {
+            "name": "synthetic",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "description": "Только демонстрационные / только реальные записи."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "operationId": "getJob",
+        "summary": "Опубликованная вакансия",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/state": {
+      "get": {
+        "operationId": "getCabinetState",
+        "summary": "Полное собственное представление; без пагинации",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/State"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/actions": {
+      "post": {
+        "operationId": "performAction",
+        "summary": "Операция кабинета; нужен write; тесты и администрирование исключены",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/onboard"
+                  },
+                  {
+                    "$ref": "#/components/schemas/profile"
+                  },
+                  {
+                    "$ref": "#/components/schemas/resume-details"
+                  },
+                  {
+                    "$ref": "#/components/schemas/survey"
+                  },
+                  {
+                    "$ref": "#/components/schemas/settings"
+                  },
+                  {
+                    "$ref": "#/components/schemas/company"
+                  },
+                  {
+                    "$ref": "#/components/schemas/fsp-link"
+                  },
+                  {
+                    "$ref": "#/components/schemas/fsp-unlink"
+                  },
+                  {
+                    "$ref": "#/components/schemas/favorite"
+                  },
+                  {
+                    "$ref": "#/components/schemas/need"
+                  },
+                  {
+                    "$ref": "#/components/schemas/delete-need"
+                  },
+                  {
+                    "$ref": "#/components/schemas/invite"
+                  },
+                  {
+                    "$ref": "#/components/schemas/invite-status"
+                  },
+                  {
+                    "$ref": "#/components/schemas/job"
+                  },
+                  {
+                    "$ref": "#/components/schemas/job-status"
+                  },
+                  {
+                    "$ref": "#/components/schemas/apply"
+                  },
+                  {
+                    "$ref": "#/components/schemas/application-status"
+                  },
+                  {
+                    "$ref": "#/components/schemas/task"
+                  },
+                  {
+                    "$ref": "#/components/schemas/task-answer"
+                  },
+                  {
+                    "$ref": "#/components/schemas/task-review"
+                  },
+                  {
+                    "$ref": "#/components/schemas/message"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/favorites/{candidateId}": {
+      "put": {
+        "operationId": "saveFavorite",
+        "summary": "Добавить в избранное (идемпотентно)",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "removeFavorite",
+        "summary": "Удалить из избранного (идемпотентно)",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/needs": {
+      "get": {
+        "operationId": "listNeeds",
+        "summary": "Список своего кабинета: needs",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/favorites": {
+      "get": {
+        "operationId": "listFavorites",
+        "summary": "Список своего кабинета: favorites",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/invites": {
+      "get": {
+        "operationId": "listInvites",
+        "summary": "Список своего кабинета: invites",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "sendInvite",
+        "summary": "Предложение видимому кандидату; дубликат открытого предложения — 409",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Пригласить подтверждённого кандидата",
+                "properties": {
+                  "candidateId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "contact": {
+                    "type": "string"
+                  },
+                  "min": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000000
+                  },
+                  "max": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000000
+                  }
+                },
+                "required": [
+                  "candidateId",
+                  "title",
+                  "description",
+                  "contact",
+                  "min",
+                  "max"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications": {
+      "get": {
+        "operationId": "listApplications",
+        "summary": "Список своего кабинета: applications",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages": {
+      "get": {
+        "operationId": "listMessages",
+        "summary": "Список своего кабинета: messages",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks": {
+      "get": {
+        "operationId": "listTasks",
+        "summary": "Список своего кабинета: tasks",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/submissions": {
+      "get": {
+        "operationId": "listSubmissions",
+        "summary": "Список своего кабинета: submissions",
+        "parameters": [
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "candidate",
+                "employer"
+              ]
+            },
+            "description": "По умолчанию employer, если у аккаунта есть эта роль, иначе candidate."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "description": "Размер страницы."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            },
+            "description": "Смещение. nextOffset=null завершает обход."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Фильтр поля status, если оно есть."
+          },
+          {
+            "name": "contextId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID диалога; фильтрует записи с этим полем."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успех. Cache-Control: no-store; X-Request-ID содержит ID запроса.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "pagination"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ключ недействителен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет роли или права записи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Метод/адрес/запись недоступны",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Конфликт состояния",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Слишком большой запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Ожидается JSON",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Лимит; повторить через Retry-After",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "60 секунд"
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "fsp_live_<64 hex>",
+        "description": "Создаётся/отзывается в ЛК → API-ключи. Использовать на сервере."
+      }
+    },
+    "schemas": {
+      "onboard": {
+        "type": "object",
+        "description": "Создать ролевой профиль",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "onboard"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "candidate",
+              "employer"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "consent": {
+            "const": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "role",
+          "name",
+          "consent"
+        ]
+      },
+      "profile": {
+        "type": "object",
+        "description": "Сохранить частично заполненное резюме кандидата. Пропущенные ключи сохраняются, пустые поля очищаются; пустое имя сохраняет имя аккаунта. Зарплата необязательна, при двух границах max >= min. Необязательное поле resume сохраняет структурированные блоки вместе с основными полями одной записью; ошибка любого блока отменяет весь запрос.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "profile"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "about": {
+            "type": "string"
+          },
+          "experience": {
+            "type": "string"
+          },
+          "stack": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "phone": {
+            "type": "string"
+          },
+          "education": {
+            "type": "string"
+          },
+          "work": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "min": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "description": "Одна граница ожиданий. null или пустая строка удаляют значение; отсутствие ключа сохраняет его."
+          },
+          "max": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000000
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ],
+            "description": "Одна граница ожиданий. null или пустая строка удаляют значение; отсутствие ключа сохраняет его."
+          },
+          "resume": {
+            "$ref": "#/components/schemas/ResumeDetails"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "survey": {
+        "type": "object",
+        "description": "Сохранить новую версию обязательной анкеты кандидата перед тестированием",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "survey"
+          },
+          "careerGoal": {
+            "type": "string"
+          },
+          "employmentStatus": {
+            "type": "string"
+          },
+          "experienceYears": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string",
+            "enum": [
+              "Финтех",
+              "Электронная коммерция",
+              "Образование",
+              "Медиа",
+              "Государственные сервисы",
+              "Другое"
+            ]
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "primaryRole": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "technicalSkills": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 600
+          },
+          "achievement": {
+            "type": "string",
+            "minLength": 30,
+            "maxLength": 1200
+          },
+          "softSkills": {
+            "type": "array",
+            "minItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "softSkillExample": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 1200
+          },
+          "uncertaintyResponse": {
+            "type": "string"
+          },
+          "feedbackPreference": {
+            "type": "string"
+          },
+          "workStyle": {
+            "type": "string",
+            "enum": [
+              "Команда",
+              "Самостоятельно",
+              "Смешанный формат"
+            ]
+          },
+          "preferredFormat": {
+            "type": "string",
+            "enum": [
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "teamSize": {
+            "type": "string"
+          },
+          "taskType": {
+            "type": "string"
+          },
+          "businessTrips": {
+            "type": "string"
+          },
+          "relocation": {
+            "type": "string"
+          },
+          "motivation": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 1200
+          },
+          "avoidTasks": {
+            "type": "string",
+            "maxLength": 800
+          }
+        },
+        "required": [
+          "action",
+          "careerGoal",
+          "employmentStatus",
+          "experienceYears",
+          "industry",
+          "spec",
+          "grade",
+          "primaryRole",
+          "roles",
+          "technicalSkills",
+          "achievement",
+          "softSkills",
+          "softSkillExample",
+          "uncertaintyResponse",
+          "feedbackPreference",
+          "motivation"
+        ]
+      },
+      "settings": {
+        "type": "object",
+        "description": "Видимость и согласие",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "settings"
+          },
+          "visible": {
+            "type": "boolean"
+          },
+          "consent": {
+            "type": "boolean"
+          },
+          "notifications": {
+            "type": "boolean"
+          },
+          "fspVisible": {
+            "type": "boolean",
+            "description": "Отдельная видимость спортивной истории, по умолчанию включена."
+          }
+        },
+        "required": [
+          "action",
+          "visible",
+          "consent",
+          "notifications"
+        ]
+      },
+      "company": {
+        "type": "object",
+        "description": "Редактировать свою компанию",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "company"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "size": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "name"
+        ]
+      },
+      "favorite": {
+        "type": "object",
+        "description": "Добавить или убрать избранное",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "favorite"
+          },
+          "candidateId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "candidateId"
+        ]
+      },
+      "need": {
+        "type": "object",
+        "description": "Сохранить потребность команды вместе с контекстом и снимком точной категории. 400 — неверный бюджет: не целое число, вне 1–10 000 000 или «до» меньше «от».",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "need"
+          },
+          "text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "team": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Целое число рублей; пробелы и точки-разделители допускаются"
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "description": "Целое число рублей; пробелы и точки-разделители допускаются"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "description": "Подтверждение выбранной специализации, уровня и стека перед сохранением."
+          }
+        },
+        "required": [
+          "action",
+          "text",
+          "spec",
+          "grade",
+          "confirmed"
+        ]
+      },
+      "delete-need": {
+        "type": "object",
+        "description": "Удалить свою подборку",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "delete-need"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "invite": {
+        "type": "object",
+        "description": "Пригласить подтверждённого кандидата",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "invite"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          },
+          "min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        },
+        "required": [
+          "action",
+          "candidateId",
+          "title",
+          "description",
+          "contact",
+          "min",
+          "max"
+        ]
+      },
+      "invite-status": {
+        "type": "object",
+        "description": "Решение кандидата по своему приглашению",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "invite-status"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "viewed",
+              "accepted",
+              "declined"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "status"
+        ]
+      },
+      "job": {
+        "type": "object",
+        "description": "Публикация или редактирование своей вакансии",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "job"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "stack": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "min": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        },
+        "required": [
+          "action",
+          "title",
+          "description",
+          "spec",
+          "grade",
+          "min",
+          "max"
+        ]
+      },
+      "job-status": {
+        "type": "object",
+        "description": "Архивировать или восстановить свою вакансию",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "job-status"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "archived"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "status"
+        ]
+      },
+      "apply": {
+        "type": "object",
+        "description": "Откликнуться и открыть контакт владельцу вакансии",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "apply"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "letter": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "jobId"
+        ]
+      },
+      "application-status": {
+        "type": "object",
+        "description": "Ответ работодателя на свой входящий отклик",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "application-status"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "viewed",
+              "shortlisted",
+              "rejected"
+            ]
+          },
+          "feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "status"
+        ]
+      },
+      "test-start": {
+        "type": "object",
+        "description": "Создать персонализированную попытку теста",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-start"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "spec",
+          "grade"
+        ]
+      },
+      "test-submit": {
+        "type": "object",
+        "description": "Проверить ответы, сохранить результат и назначить категорию",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-submit"
+          },
+          "id": {
+            "type": "string"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "minItems": 6,
+            "maxItems": 6
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "answers"
+        ]
+      },
+      "task": {
+        "type": "object",
+        "description": "Опубликовать короткое задание работодателя",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "title",
+          "description",
+          "spec"
+        ]
+      },
+      "task-answer": {
+        "type": "object",
+        "description": "Передать подход к задаче компании",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task-answer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "answer"
+        ]
+      },
+      "task-review": {
+        "type": "object",
+        "description": "Обратная связь работодателя по решению",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task-review"
+          },
+          "id": {
+            "type": "string"
+          },
+          "feedback": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "feedback"
+        ]
+      },
+      "message": {
+        "type": "object",
+        "description": "Сообщение в доступном диалоге",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "message"
+          },
+          "contextId": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "contextId",
+          "text"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "topic",
+          "prompt",
+          "options"
+        ]
+      },
+      "Test": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "version": {
+            "type": "string"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "expires": {
+            "type": "integer"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          },
+          "questionSeconds": {
+            "type": "integer"
+          },
+          "questionExpires": {
+            "type": "integer"
+          },
+          "questionIndex": {
+            "type": "integer"
+          },
+          "questionCount": {
+            "type": "integer"
+          },
+          "serverTime": {
+            "type": "integer"
+          }
+        }
+      },
+      "Result": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer"
+          },
+          "correct": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "applied": {
+            "type": "boolean"
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "feedback": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string"
+                },
+                "correct": {
+                  "type": "boolean"
+                },
+                "explanation": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "skipped": {
+            "type": "integer"
+          }
+        }
+      },
+      "Candidate": {
+        "type": "object",
+        "description": "Контакты отсутствуют до согласия конкретной компании. Другие кандидаты не получают этот объект.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior",
+              null
+            ]
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "softSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "competencies": {
+            "type": "array",
+            "description": "Паспорт компетенций из последнего принятого успешного теста",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "confirmed",
+                    "development"
+                  ]
+                },
+                "source": {
+                  "type": "string"
+                },
+                "verifiedAt": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "verifiedAt": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "synthetic": {
+            "type": "boolean"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "match": {
+            "$ref": "#/components/schemas/Match"
+          },
+          "min": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "max": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "fsp": {
+            "$ref": "#/components/schemas/FspProfile"
+          },
+          "confirmedResults": {
+            "type": "array",
+            "description": "Последние завершённые результаты, разрешённые работодателю. Скрытый свежий результат не заменяется старым. Нет ID попыток, ключей, ответов и флагов скрытия.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "skill",
+                    "role"
+                  ]
+                },
+                "score": {
+                  "type": "integer"
+                },
+                "level": {
+                  "type": "string"
+                },
+                "completedAt": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "State": {
+        "type": "object",
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "fsp": {
+                "$ref": "#/components/schemas/FspProfile"
+              }
+            }
+          },
+          "privacy": {
+            "type": "object"
+          },
+          "company": {
+            "type": "object"
+          },
+          "need": {
+            "$ref": "#/components/schemas/Need"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "С запросом — рекомендуемые категории, без запроса — все непустые категории банка.",
+            "items": {
+              "$ref": "#/components/schemas/CategoryRecommendation"
+            }
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "invites": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "applications": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "needs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavedNeed"
+            }
+          },
+          "tests": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "surveys": {
+            "type": "array",
+            "description": "Версии анкет текущего кандидата, от новых к старым",
+            "items": {
+              "type": "object"
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "submissions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "favorites": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serverTime": {
+            "type": "integer"
+          },
+          "assessmentNotice": {
+            "type": "string"
+          },
+          "assessment": {
+            "type": "object",
+            "description": "12 модулей навыков, 6 интеграций, 6 ролей, спецификации, доступные сессии, свои записи и история. Ключей закрытого банка нет.",
+            "properties": {
+              "maintainer": {
+                "type": "boolean"
+              },
+              "active": {
+                "$ref": "#/components/schemas/Assessment"
+              },
+              "history": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                },
+                "description": "Видимые попытки. Результаты активных комплексных тестов скрыты до завершения всей попытки, включая результаты навыков в резюме."
+              },
+              "days": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "registrations": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "hiddenHistory": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "hiddenAt": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "description": "Только собственные скрытые попытки: минимальные данные для восстановления. Не входят в результаты резюме."
+              }
+            }
+          }
+        }
+      },
+      "Match": {
+        "type": "object",
+        "description": "Объяснимый балл соответствия: сумма parts[].points равна score. Без запроса score = null и порядок задаёт strength. В отклике балл считается относительно вакансии.",
+        "properties": {
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "strength": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30,
+            "description": "Сила подтверждённого профиля: баллы теста и ФСП"
+          },
+          "relation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "exact",
+              "higher",
+              "lower",
+              "adjacent",
+              "other",
+              null
+            ]
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchPart"
+            }
+          },
+          "matched": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fsp": {
+            "$ref": "#/components/schemas/FspSignal"
+          }
+        },
+        "required": [
+          "score",
+          "strength",
+          "relation",
+          "parts",
+          "matched",
+          "reasons",
+          "fsp"
+        ]
+      },
+      "MatchPart": {
+        "type": "object",
+        "description": "Веса: spec 25, grade 15, stack 20, test 20, fsp 10, format 4, salary 4, domain 2. Незаданный работодателем признак получает полный балл у всех.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "spec",
+              "grade",
+              "stack",
+              "test",
+              "fsp",
+              "format",
+              "salary",
+              "domain"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "category",
+              "stack",
+              "test",
+              "fsp",
+              "context"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "test",
+              "resume",
+              "fsp"
+            ],
+            "description": "test — подтверждено тестом, resume — заявлено кандидатом, fsp — адаптер ФСП (сейчас тестовые данные)"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "max": {
+            "type": "integer"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "group",
+          "source",
+          "points",
+          "max",
+          "note"
+        ]
+      },
+      "FspSignal": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Вклад ФСП: лучший результат × профильность дисциплины × давность, каждый следующий результат +10%, не более 10 баллов. null — история не привязана или скрыта кандидатом; пустой items — привязка без достижений.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "const": "demo"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "discipline": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "winner",
+                    "prize",
+                    "final",
+                    "participant"
+                  ]
+                },
+                "year": {
+                  "type": "integer"
+                },
+                "relevance": {
+                  "type": "number"
+                },
+                "recency": {
+                  "type": "number"
+                },
+                "value": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NeedContext": {
+        "type": "object",
+        "properties": {
+          "team": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10000000
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10000000
+          }
+        }
+      },
+      "Need": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Разбор потребности правилами на ключевых словах. Специализацию и грейд задаёт текст запроса; контекст команды уточняет порядок внутри категории.",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "spec": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "grade": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "",
+              "Удалённо",
+              "Гибрид",
+              "Офис"
+            ]
+          },
+          "city": {
+            "type": "string"
+          },
+          "team": {
+            "type": "string"
+          },
+          "budgetMin": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "budgetMax": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "adjacent": {
+            "type": "array",
+            "description": "Смежные специализации по общим технологиям",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Backend",
+                "Frontend",
+                "Data Science",
+                "ML Engineering",
+                "DevOps",
+                "QA"
+              ]
+            }
+          },
+          "scores": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "description": "Слова и источники, на которые опирается разбор"
+          },
+          "defaulted": {
+            "type": "object",
+            "properties": {
+              "spec": {
+                "type": "boolean"
+              },
+              "grade": {
+                "type": "boolean"
+              }
+            }
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "missing": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "spec",
+                "grade"
+              ]
+            }
+          },
+          "signals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "quote": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "ambiguous": {
+            "type": "object",
+            "properties": {
+              "spec": {
+                "type": "boolean"
+              },
+              "grade": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "CategoryRecommendation": {
+        "type": "object",
+        "description": "С запросом точная категория идёт первой, даже пустая, за ней до трёх соседних: грейд выше или ниже, смежное направление. Без запроса relation = all.",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "Backend|Middle"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "higher",
+              "lower",
+              "adjacent",
+              "all"
+            ]
+          },
+          "count": {
+            "type": "integer"
+          },
+          "withFsp": {
+            "type": "integer"
+          },
+          "best": {
+            "type": "integer"
+          },
+          "averageTest": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "salary": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "min": {
+                "type": "integer"
+              },
+              "max": {
+                "type": "integer"
+              }
+            }
+          },
+          "inBudget": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "coverage": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SavedNeed": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "created": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string",
+            "enum": [
+              "Backend",
+              "Frontend",
+              "Data Science",
+              "ML Engineering",
+              "DevOps",
+              "QA"
+            ]
+          },
+          "grade": {
+            "type": "string",
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ]
+          },
+          "stack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/NeedContext"
+          },
+          "snapshot": {
+            "type": "object",
+            "description": "Точная категория на момент сохранения: до 50 кандидатов с баллами, без контактов",
+            "properties": {
+              "at": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "score": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "fsp-link": {
+        "type": "object",
+        "description": "Привязать тестовый ФСП ID к своему кандидату. Реестр не вызывается; принадлежность реального ID не подтверждается.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "fsp-link"
+          },
+          "fspId": {
+            "type": "string",
+            "pattern": "^DEMO-FSP-0(0[1-9]|1[0-4])$",
+            "example": "DEMO-FSP-001"
+          }
+        },
+        "required": [
+          "action",
+          "fspId"
+        ]
+      },
+      "fsp-unlink": {
+        "type": "object",
+        "description": "Отвязать тестовый ID, сохранив резюме и категорию.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "fsp-unlink"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "FspProfile": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "description": "Только синтетические fixture-данные; null при отсутствующей или скрытой истории. Не означает реальную проверку ФСП.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "const": "demo"
+          },
+          "status": {
+            "const": "demo"
+          },
+          "linkedAt": {
+            "type": "integer"
+          },
+          "achievements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "discipline": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "string"
+                },
+                "level": {
+                  "type": "string",
+                  "enum": [
+                    "winner",
+                    "prize",
+                    "final",
+                    "participant"
+                  ]
+                },
+                "format": {
+                  "type": "string"
+                },
+                "year": {
+                  "type": "integer"
+                },
+                "source": {
+                  "const": "demo"
+                }
+              },
+              "required": [
+                "id",
+                "event",
+                "discipline",
+                "year",
+                "result",
+                "format",
+                "source"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "status",
+          "achievements"
+        ]
+      },
+      "resume-details": {
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "const": "resume-details"
+          },
+          "headline": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "languages": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "achievements": {
+            "type": "string",
+            "maxLength": 1800
+          },
+          "skillGroups": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "projects": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1200
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "workEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "position": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 3000
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "educationEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "institution": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "program": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "level": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              }
+            }
+          }
+        }
+      },
+      "ResumeDetails": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "languages": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "achievements": {
+            "type": "string",
+            "maxLength": 1800
+          },
+          "skillGroups": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              }
+            }
+          },
+          "projects": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1200
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "url": {
+                  "type": "string",
+                  "maxLength": 300
+                }
+              }
+            }
+          },
+          "workEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "position": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 3000
+                },
+                "current": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "educationEntries": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "institution": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "program": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "level": {
+                  "type": "string",
+                  "maxLength": 160
+                },
+                "start": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "end": {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                "description": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              }
+            }
+          }
+        }
+      },
+      "test-answer": {
+        "type": "object",
+        "description": "Старый HTTP-формат отключён; возвращает 409. Используйте assessment-*.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-answer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "questionIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "answer": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 3
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "questionIndex",
+          "answer"
+        ],
+        "deprecated": true
+      },
+      "test-resume": {
+        "type": "object",
+        "description": "Старый HTTP-формат отключён; возвращает 409. Используйте assessment-*.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-resume"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ],
+        "deprecated": true
+      },
+      "test-abandon": {
+        "type": "object",
+        "description": "Закрыть активную попытку без изменения категории.",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "test-abandon"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "AssessmentQuestion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "format": {
+            "enum": [
+              "choice",
+              "numeric"
+            ]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        },
+        "description": "Условие и варианты доступны только для текущего вопроса. Для закрытых и будущих вопросов возвращается только id. Ключи, числовые правила, семейства и зачётность скрыты."
+      },
+      "ModuleResult": {
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "specVersion": {
+            "type": "integer"
+          },
+          "score": {
+            "type": "integer",
+            "description": "Для adaptive v3: заработанные взвешенные баллы / фиксированный максимум 70 × 100, округлённо. Прежние попытки сохраняют процент правильных ответов."
+          },
+          "correct": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "skipped": {
+            "type": "integer"
+          },
+          "level": {
+            "type": "string"
+          },
+          "completedAt": {
+            "type": "integer"
+          },
+          "thresholds": {
+            "type": "object",
+            "properties": {
+              "Junior": {
+                "type": "number"
+              },
+              "Middle": {
+                "type": "number"
+              },
+              "Senior": {
+                "type": "number"
+              }
+            }
+          },
+          "earnedPoints": {
+            "type": "integer"
+          },
+          "maximumPoints": {
+            "type": "integer"
+          },
+          "secondPartRoute": {
+            "type": "string",
+            "enum": [
+              "foundation",
+              "advanced"
+            ],
+            "description": "Выбранная ветка, доступна только в раскрытом результате."
+          },
+          "scoreRule": {
+            "type": "string"
+          },
+          "adaptiveRule": {
+            "type": "string"
+          }
+        }
+      },
+      "Assessment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "targetKind": {
+            "enum": [
+              "skill",
+              "role"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "finished",
+              "incomplete"
+            ]
+          },
+          "dayId": {
+            "type": "string"
+          },
+          "dayVersion": {
+            "type": "integer"
+          },
+          "sessionName": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "moduleIndex": {
+            "type": "integer"
+          },
+          "nextModuleAt": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "questionCount": {
+                  "type": "integer"
+                },
+                "seconds": {
+                  "type": "integer"
+                },
+                "integration": {
+                  "type": "boolean"
+                },
+                "result": {
+                  "$ref": "#/components/schemas/ModuleResult",
+                  "description": "Не передаётся для модулей активного комплексного теста."
+                },
+                "partCount": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleResult"
+            },
+            "description": "Во время активного комплексного теста пустой массив. Все баллы раскрываются после завершения попытки."
+          },
+          "roleResult": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "При активном комплексном тесте level=null, requirements=[], integration=null; баллы не раскрываются до завершения попытки."
+          },
+          "serverTime": {
+            "type": "integer"
+          },
+          "currentModule": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "expiresAt": {
+                "type": "integer",
+                "description": "Серверный дедлайн текущего вопроса; выбор варианта и перезагрузка его не меняют."
+              },
+              "startedAt": {
+                "type": "integer"
+              },
+              "seconds": {
+                "type": "integer",
+                "description": "Суммарный лимит модуля, включая экспериментальные вопросы."
+              },
+              "questions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AssessmentQuestion"
+                }
+              },
+              "answers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "questionIndex": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "questionSeconds": {
+                "type": "integer",
+                "description": "Лимит времени на один вопрос."
+              },
+              "questionStartedAt": {
+                "type": "integer"
+              },
+              "partIndex": {
+                "type": "integer"
+              },
+              "partCount": {
+                "type": "integer"
+              },
+              "partQuestionIndex": {
+                "type": "integer"
+              },
+              "partQuestionCount": {
+                "type": "integer"
+              },
+              "totalQuestionCount": {
+                "type": "integer"
+              }
+            },
+            "description": "Номер части и вопрос внутри части; ключи и обе закрытые ветки не передаются. После части 1 сервер атомарно выбирает сохранённую ветку части 2. Таймер каждого вопроса сохраняется при перезагрузке."
+          },
+          "resultsAvailable": {
+            "type": "boolean",
+            "description": "Для комплексной попытки false, пока она активна. До завершения все результаты модулей и пороги по ответам скрыты."
+          },
+          "employerHiddenResults": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "description": "Видимость результатов только в собственном состоянии кандидата; ключ skill:<moduleId> или role:<roleId>."
+          }
+        },
+        "description": "Вариант фиксируется заранее. У каждого вопроса отдельный таймер; подтверждение, пропуск или истечение времени закрывают его и открывают следующий. Ответы закрытых вопросов неизменны."
+      },
+      "BankQuestionInput": {
+        "type": "object",
+        "required": [
+          "moduleId",
+          "familyId",
+          "templateVersion",
+          "difficulty",
+          "competencies",
+          "format",
+          "prompt"
+        ],
+        "properties": {
+          "moduleId": {
+            "type": "string"
+          },
+          "familyId": {
+            "type": "string"
+          },
+          "templateVersion": {
+            "type": "integer"
+          },
+          "difficulty": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          },
+          "competencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "format": {
+            "enum": [
+              "choice",
+              "numeric"
+            ]
+          },
+          "prompt": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 12000
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "numeric": {
+            "type": "object",
+            "properties": {
+              "expected": {
+                "type": "number"
+              },
+              "tolerance": {
+                "type": "number",
+                "minimum": 0
+              },
+              "decimals": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 10
+              },
+              "equivalents": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "description": "Сохраняется только мейнтейнером. Новый экземпляр — черновик; редактирование создаёт отдельную версию."
+      },
+      "ModuleSpecification": {
+        "type": "object",
+        "required": [
+          "moduleId",
+          "scoredCount",
+          "difficultyCounts",
+          "numericMin",
+          "numericMax",
+          "thresholds",
+          "questionSeconds"
+        ],
+        "properties": {
+          "moduleId": {
+            "type": "string"
+          },
+          "scoredCount": {
+            "type": "integer",
+            "minimum": 3,
+            "maximum": 60,
+            "description": "Новые спецификации: 32 зачётных вопроса, две части по 16. Старые версии сохраняют прежнее число."
+          },
+          "difficultyCounts": {
+            "type": "object",
+            "properties": {
+              "1": {
+                "type": "integer"
+              },
+              "2": {
+                "type": "integer"
+              },
+              "3": {
+                "type": "integer"
+              }
+            }
+          },
+          "numericMin": {
+            "type": "integer",
+            "description": "Ограничение числовых вопросов для каждой части отдельно."
+          },
+          "numericMax": {
+            "type": "integer",
+            "description": "Ограничение числовых вопросов для каждой части отдельно."
+          },
+          "seconds": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "Суммарный лимит зачётных вопросов: scoredCount × questionSeconds."
+          },
+          "experimentalSeconds": {
+            "type": "integer",
+            "readOnly": true,
+            "description": "Совпадает с questionSeconds."
+          },
+          "thresholds": {
+            "type": "object",
+            "properties": {
+              "Junior": {
+                "type": "number"
+              },
+              "Middle": {
+                "type": "number"
+              },
+              "Senior": {
+                "type": "number"
+              }
+            }
+          },
+          "questionSeconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600,
+            "default": 20,
+            "description": "Одинаковый лимит каждого зачётного и экспериментального вопроса."
+          },
+          "adaptive": {
+            "type": "object",
+            "description": "Правило two-stage-16-v1. Первая часть: 5/6/5 по сложности; вторая: 8/6/2 либо 2/6/8. Порог ветвления 65% взвешенных баллов первой части; веса 1/2/3. Правила фиксируются в версии спецификации."
+          }
+        }
+      },
+      "assessment-register": {
+        "type": "object",
+        "description": "Запись на сессию: отдельный навык или роль.",
+        "properties": {
+          "action": {
+            "const": "assessment-register"
+          },
+          "dayId": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "dayId",
+          "targetId"
+        ]
+      },
+      "assessment-start": {
+        "type": "object",
+        "description": "Атомарный запуск; весь вариант и порядок модулей фиксируются заранее.",
+        "properties": {
+          "action": {
+            "const": "assessment-start"
+          },
+          "registrationId": {
+            "type": "string"
+          },
+          "rulesAccepted": {
+            "const": true
+          }
+        },
+        "required": [
+          "action",
+          "registrationId",
+          "rulesAccepted"
+        ]
+      },
+      "assessment-resume": {
+        "type": "object",
+        "description": "Восстановить тот же вариант, ответы и дедлайн; ключи не передаются.",
+        "properties": {
+          "action": {
+            "const": "assessment-resume"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "assessment-answer": {
+        "type": "object",
+        "description": "Подтвердить ответ на текущий вопрос до его дедлайна; сохранить и открыть следующий вопрос с новым таймером. Закрытые и будущие вопросы недоступны. Число допускает точку, запятую и экспоненту.",
+        "properties": {
+          "action": {
+            "const": "assessment-answer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "questionId": {
+            "type": "string"
+          },
+          "answer": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          },
+          "activeMs": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "revision",
+          "questionId",
+          "answer"
+        ]
+      },
+      "assessment-view": {
+        "type": "object",
+        "description": "Получить текущий вопрос без сброса таймера. Навигация к закрытым или будущим вопросам возвращает 409.",
+        "properties": {
+          "action": {
+            "const": "assessment-view"
+          },
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "questionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "revision",
+          "questionId"
+        ]
+      },
+      "assessment-submit-module": {
+        "type": "object",
+        "description": "Досрочная сдача отключена (409). Модуль закрывается автоматически после последнего вопроса.",
+        "properties": {
+          "action": {
+            "const": "assessment-submit-module"
+          },
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "revision"
+        ]
+      },
+      "assessment-next-module": {
+        "type": "object",
+        "description": "Начать следующий полный модуль после перерыва, независимо от предыдущего результата. Баллы предыдущих модулей скрыты до завершения всей попытки.",
+        "properties": {
+          "action": {
+            "const": "assessment-next-module"
+          },
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "revision"
+        ]
+      },
+      "assessment-abandon": {
+        "type": "object",
+        "description": "Сохранить незавершённую попытку; закрытые модули остаются в истории.",
+        "properties": {
+          "action": {
+            "const": "assessment-abandon"
+          },
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "revision"
+        ]
+      },
+      "maintainer-state": {
+        "type": "object",
+        "description": "Закрытая админская проекция банка, спецификаций, дней и аналитики качества.",
+        "properties": {
+          "action": {
+            "const": "maintainer-state"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "maintainer-question-save": {
+        "type": "object",
+        "description": "Создать черновик или отдельную новую версию вопроса.",
+        "properties": {
+          "action": {
+            "const": "maintainer-question-save"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "question": {
+            "$ref": "#/components/schemas/BankQuestionInput"
+          }
+        },
+        "required": [
+          "action",
+          "question"
+        ]
+      },
+      "maintainer-question-decision": {
+        "type": "object",
+        "description": "Явное решение с обоснованием. Для experiment требуется reviewed=true, для admit — сложность. Старые пулы и результаты не изменяются.",
+        "properties": {
+          "action": {
+            "const": "maintainer-question-decision"
+          },
+          "id": {
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "experiment",
+              "admit",
+              "collect",
+              "reject",
+              "retire"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10
+          },
+          "reviewed": {
+            "type": "boolean"
+          },
+          "difficulty": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "decision",
+          "reason"
+        ]
+      },
+      "maintainer-spec-save": {
+        "type": "object",
+        "description": "Создать новую версию общей спецификации модуля для будущих дней.",
+        "properties": {
+          "action": {
+            "const": "maintainer-spec-save"
+          },
+          "spec": {
+            "$ref": "#/components/schemas/ModuleSpecification"
+          }
+        },
+        "required": [
+          "action",
+          "spec"
+        ]
+      },
+      "maintainer-day-save": {
+        "type": "object",
+        "description": "Создать или редактировать черновик пула: снимки рабочих и экспериментальных заданий и спецификаций. Редактирование увеличивает версию; зафиксированные пулы неизменны.",
+        "properties": {
+          "action": {
+            "const": "maintainer-day-save"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "opensAt": {
+            "type": "integer"
+          },
+          "closesAt": {
+            "type": "integer"
+          },
+          "breakSeconds": {
+            "type": "integer"
+          },
+          "expectedCandidates": {
+            "type": "integer"
+          },
+          "tools": {
+            "type": "string"
+          },
+          "moduleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "questionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "experimentalCounts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          }
+        },
+        "required": [
+          "action",
+          "name",
+          "opensAt",
+          "closesAt"
+        ]
+      },
+      "maintainer-day-publish": {
+        "type": "object",
+        "description": "Проверить спецификации и зафиксировать пул до открытия сессии.",
+        "properties": {
+          "action": {
+            "const": "maintainer-day-publish"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "assessment-cancel-registration": {
+        "type": "object",
+        "description": "Отменить собственную запись до начала теста. Отменённую запись нельзя использовать для старта; можно записаться повторно. Чужая запись — 404, начатый тест или конкурентное изменение — 409.",
+        "properties": {
+          "action": {
+            "const": "assessment-cancel-registration"
+          },
+          "id": {
+            "type": "string",
+            "description": "Идентификатор записи на сессию."
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "assessment-history-hide": {
+        "type": "object",
+        "description": "Скрыть собственную завершённую или незавершённую попытку из истории и всех результатов в резюме. Запись, ответы и результаты остаются в БД и аналитике. Чужая попытка — 404, активная — 409.",
+        "properties": {
+          "action": {
+            "const": "assessment-history-hide"
+          },
+          "id": {
+            "type": "string",
+            "description": "Идентификатор попытки."
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "assessment-history-restore": {
+        "type": "object",
+        "description": "Вернуть скрытую собственную попытку в историю и резюме без пересчёта результатов.",
+        "properties": {
+          "action": {
+            "const": "assessment-history-restore"
+          },
+          "id": {
+            "type": "string",
+            "description": "Идентификатор попытки."
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "assessment-result-visibility": {
+        "type": "object",
+        "description": "Скрыть или показать работодателям конкретный результат навыка либо полностью завершённой роли в собственной закрытой попытке. Результат остаётся кандидату. Навыки и роль одной попытки скрываются независимо. Чужая попытка — 404, активная — 409.",
+        "properties": {
+          "action": {
+            "const": "assessment-result-visibility"
+          },
+          "id": {
+            "type": "string",
+            "description": "ID попытки"
+          },
+          "targetKind": {
+            "type": "string",
+            "enum": [
+              "skill",
+              "role"
+            ]
+          },
+          "targetId": {
+            "type": "string",
+            "description": "ID навыка или роли этой попытки"
+          },
+          "hidden": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "targetKind",
+          "targetId",
+          "hidden"
+        ]
+      },
+      "assessment-draft": {
+        "type": "object",
+        "description": "Сохранить или очистить выбор на текущем вопросе до дедлайна, без перехода и без сброса таймера. При истечении времени засчитывается последний сохранённый ответ. Используется актуальная ревизия попытки; закрытые и будущие вопросы недоступны.",
+        "properties": {
+          "action": {
+            "const": "assessment-draft"
+          },
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "questionId": {
+            "type": "string"
+          },
+          "answer": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "revision",
+          "questionId",
+          "answer"
+        ]
+      },
+      "PublicResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "nextOffset"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "nextOffset": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      },
+      "PublicError": {
+        "type": "object",
+        "required": [
+          "error",
+          "requestId"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      }
+    }
+  }
+}

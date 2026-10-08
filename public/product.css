@@ -767,3 +767,27 @@
 /* Technical symbols in prose use the same quiet syntax palette as code blocks. */
 .product-ui .assessment-exam .exam-inline-code { display: inline; padding: .06em .25em; border: 1px solid #e7e4ef; border-radius: 5px; background: #f5f3f9; color: #46506a; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: .88em; font-weight: 500; line-height: inherit; letter-spacing: 0; overflow-wrap: anywhere; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .product-ui .assessment-exam .code-type { color: #24707a; }
+
+/* Personal API access and documentation share the existing cabinet palette. */
+.api-access-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(240px,1fr);gap:24px;align-items:start}
+.api-access-main,.api-access-aside{padding:28px}
+.api-access-heading{display:flex;justify-content:space-between;align-items:start;gap:20px;margin-bottom:24px}
+.api-access-heading h2,.api-access-aside h2{margin-top:0}
+.api-access-heading p,.api-access-aside p{color:var(--muted,#686575);line-height:1.6}
+.api-key-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;border-top:1px solid #e6e3ed}
+.api-key-row>div{display:grid;gap:7px;min-width:0}
+.api-key-row code,.api-key-row small{color:#686575}.api-key-row code{overflow-wrap:anywhere}
+.api-key-empty{padding:32px 0}.api-key-empty p{color:#686575}
+.api-secret{padding:18px;border:1px solid #d9d2e8;border-radius:12px;background:#f5f2fb;white-space:pre-wrap;word-break:break-all;user-select:all}
+.api-key-dialog-actions{display:flex;flex-wrap:wrap;gap:12px}
+.api-docs{max-width:1040px;margin:0 auto;padding:32px 28px 60px;color:#272331;font-size:16px;line-height:1.7}
+.api-docs header,.api-docs footer{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.api-docs a{color:#6b3ec4}.api-docs .button{color:#fff;margin:8px 12px 8px 0}.api-docs .button.secondary{color:#6b3ec4}
+.api-docs-intro{padding:72px 0 36px}.api-docs-intro h1{font-size:clamp(36px,6vw,64px);line-height:1.08;letter-spacing:-.035em;margin:16px 0 24px}
+.api-docs-eyebrow{color:#6b3ec4}.api-docs-intro>p:not(.api-docs-eyebrow){max-width:640px;font-size:20px;color:#686575}
+.api-docs nav{display:flex;flex-wrap:wrap;gap:24px;border-block:1px solid #e6e3ed;padding:18px 0}
+.api-docs section{padding-top:36px;scroll-margin-top:24px}.api-docs h2{font-size:28px;line-height:1.25;margin:24px 0 16px}
+.api-docs code{font-size:.9em;overflow-wrap:anywhere}.api-docs pre{background:#f3eff8;border:1px solid #e6e3ed;border-radius:12px;padding:20px;overflow:auto;line-height:1.6;font-size:14px}
+.api-docs-table{overflow-x:auto}.api-docs table{width:100%;border-collapse:collapse}.api-docs th{text-align:left;background:#f3eff8}.api-docs td,.api-docs th{padding:12px;border-bottom:1px solid #e6e3ed;vertical-align:top}
+.api-docs footer{margin-top:56px;border-top:1px solid #e6e3ed;padding-top:24px}
+@media(max-width:760px){.api-access-layout{grid-template-columns:1fr}.api-access-main,.api-access-aside{padding:20px}.api-access-heading{flex-direction:column}.api-key-row{align-items:start;gap:12px}.api-docs{padding-inline:20px}.api-docs-intro{padding-top:44px}.api-docs pre{font-size:12px}.api-docs h2{font-size:24px}}

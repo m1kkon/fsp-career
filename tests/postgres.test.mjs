@@ -20,6 +20,7 @@ test('PostgreSQL integration: persistence, rollback, concurrent writes, roles an
  try {
   await pool.query(await readFile(new URL('../db/migrations/001_initial.sql',import.meta.url),'utf8'));
   await pool.query(await readFile(new URL('../db/migrations/002_email_auth.sql',import.meta.url),'utf8'));
+  await pool.query(await readFile(new URL('../db/migrations/004_api_keys.sql',import.meta.url),'utf8'));
   const repo=repository(pool);
   await t.test('account and JSONB records round-trip through new queries and failed transactions roll back',async()=>{
    const a=await accountFor(repo,{id:'candidate',email:'candidate@example.test',name:'Кандидат'});
