@@ -791,3 +791,13 @@
 .api-docs-table{overflow-x:auto}.api-docs table{width:100%;border-collapse:collapse}.api-docs th{text-align:left;background:#f3eff8}.api-docs td,.api-docs th{padding:12px;border-bottom:1px solid #e6e3ed;vertical-align:top}
 .api-docs footer{margin-top:56px;border-top:1px solid #e6e3ed;padding-top:24px}
 @media(max-width:760px){.api-access-layout{grid-template-columns:1fr}.api-access-main,.api-access-aside{padding:20px}.api-access-heading{flex-direction:column}.api-key-row{align-items:start;gap:12px}.api-docs{padding-inline:20px}.api-docs-intro{padding-top:44px}.api-docs pre{font-size:12px}.api-docs h2{font-size:24px}}
+.city-field{position:relative}
+.city-options{position:absolute;z-index:12;left:0;right:0;top:100%;margin-top:5px;max-height:260px;overflow:auto;background:#fff;border:1px solid #dedde5;border-radius:12px;box-shadow:0 8px 24px #21163b16;padding:5px}
+.city-options[hidden]{display:none}
+.city-options button{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:0;background:transparent;padding:12px;border-radius:8px;color:#25242b;cursor:pointer}
+.city-options button strong{font-size:14px;font-weight:600}
+.city-options button span{font-size:12px;color:#777184;text-align:right}
+.city-options button:hover,.city-options button[aria-selected="true"]{background:#f2eefb}
+.city-no-results{padding:10px;font-size:13px;color:#777184;margin:0}
+.city-attribution{margin-top:12px;font-size:12px}
+@media(max-width:600px){.city-options{max-height:210px}.city-options button{padding:12px 9px}.city-options button span{max-width:45%}}
