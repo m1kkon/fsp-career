@@ -1,8 +1,23 @@
 Справочник городов
 
+Российский справочник (city-data.mjs)
+
 Источник: HFLabs / DaData, https://github.com/hflabs/city
 Данные: https://github.com/hflabs/city/blob/ae661bffe572880472249097c9b29c42b09650ea/city.csv
 Лицензия исходных и адаптированных данных: Creative Commons Attribution-ShareAlike 4.0 International
 https://creativecommons.org/licenses/by-sa/4.0/
 
 Изменения ФСП Карьера: оставлены название, регион и численность населения; названия дополнены из полей населённого пункта, региона и адреса там, где поле города пустое; записи отсортированы по населению. Остальные поля исключены. Снимок справочника содержит 1117 записей. Это подсказки, а не ограничение ввода: другой город можно указать вручную.
+
+Международный справочник и варианты названий (world-city-data.mjs)
+
+Источник: GeoNames, https://www.geonames.org/
+Данные: https://download.geonames.org/export/dump/cities15000.zip
+Варианты названий: https://download.geonames.org/export/dump/alternateNamesV2.zip
+Регионы: https://download.geonames.org/export/dump/admin1CodesASCII.txt
+Языки стран: https://download.geonames.org/export/dump/countryInfo.txt
+Описание формата: https://download.geonames.org/export/dump/readme.txt
+Лицензия исходных и адаптированных данных GeoNames: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+
+Снимок от 2026-10-08. SHA-256 исходных файлов записаны в world-city-data.mjs. Изменения ФСП Карьера: отобраны города и административные центры из cities15000; исключены районы городов и исторические/заброшенные поселения. Для международных городов оставлены русское название (если доступно), страна, регион, население и современные русские, английские и местные варианты названия. Для российских городов сохранены дополнительные варианты названий без замены исходного справочника. Данные отсортированы по населению. Координаты и остальные поля исключены. Скрипт воспроизведения: scripts/import-world-cities.py. Справочник содержит преимущественно города с населением более 15 тысяч и столицы; отсутствующий город можно ввести вручную.
