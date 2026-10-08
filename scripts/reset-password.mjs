@@ -15,7 +15,8 @@ try {
   const row = (await db.query('UPDATE auth_users SET password_hash=$1 WHERE email=$2 RETURNING id', [hash, email])).rows[0];
   if (!row) throw new Error('Account not found');
   await db.query('DELETE FROM auth_sessions WHERE user_id=$1', [row.id]);
+  await db.query('UPDATE api_keys SET revoked_at=$2 WHERE user_id=$1 AND revoked_at IS NULL', [row.id,Date.now()]);
   await db.query('DELETE FROM auth_email_tokens WHERE user_id=$1', [row.id]);
  });
- console.log('Password changed; all sessions revoked.');
+ console.log('Password changed; all sessions and API keys revoked.');
 } finally { await getPool().end(); }
