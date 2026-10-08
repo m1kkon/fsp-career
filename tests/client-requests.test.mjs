@@ -55,6 +55,43 @@ test('reset password confirmation mismatch keeps the link and makes no API reque
  await vm.runInContext("submitEmailForm(form,{password:'a'.repeat(12),passwordConfirmation:'b'.repeat(12)})",context);
  assert.equal(calls,0);assert.match(error.textContent,/Пароли не совпадают/);assert.equal(vm.runInContext('emailLinkToken.length',context),64);assert.equal(button.disabled,false);
 });
+test('email form clicks retain native submit and confirmation uses the session endpoint',async()=>{
+ const calls=[];
+ const {context,button,error}=client(async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return Response.json({message:'Email подтверждён.'});});
+ const handlers={};let prevented=false;
+ context.document={addEventListener:(type,handler)=>{handlers[type]=handler;}};
+ context.assessmentHandleAction=async()=>false;context.assessmentHandleSubmit=async()=>false;
+ context.FormData=class { *[Symbol.iterator](){} };
+ context.authModal=()=>{context.loginOpened=true;};
+ vm.runInContext(source.slice(source.indexOf("document.addEventListener('click'"),source.indexOf('// Keep digit positions')),context);
+ vm.runInContext(source.slice(source.indexOf("document.addEventListener('submit'"),source.indexOf("window.addEventListener('hashchange'")),context);
+ vm.runInContext("emailLinkToken='a'.repeat(64)",context);
+ const form={id:'email-link-form',tagName:'FORM',dataset:{action:'verify-email'},querySelector:s=>s==='[data-error]'?error:button};
+ await handlers.click({target:{closest:s=>s==='[data-action]'?form:null,matches:()=>false},preventDefault(){prevented=true;}});
+ assert.equal(prevented,false,'click delegation must allow the native form submission');
+ await handlers.submit({target:form,preventDefault(){prevented=true;}});
+ assert.equal(prevented,true);assert.equal(calls.length,1);assert.equal(calls[0].url,'/api/session');assert.equal(calls[0].body.action,'verify-email');assert.equal(calls[0].body.token,'a'.repeat(64));
+ assert.equal(context.loginOpened,true);assert.equal(context.page,'home');assert.equal(vm.runInContext('emailLinkToken',context),'');assert.equal(button.disabled,false);
+});
+test('a rejected email confirmation displays the error and retains the token for retry',async()=>{
+ const {context,button,error}=client(async()=>Response.json({error:'Ссылка истекла.'},{status:400}));
+ context.form={id:'email-link-form',dataset:{action:'verify-email'},querySelector:s=>s==='[data-error]'?error:button};
+ vm.runInContext("emailLinkToken='b'.repeat(64)",context);
+ await vm.runInContext('submitEmailForm(form,{})',context);
+ assert.equal(error.textContent,'Ссылка истекла.');assert.equal(vm.runInContext('emailLinkToken.length',context),64);assert.equal(button.disabled,false);assert.equal(context.closed,undefined);
+});
+test('Enter in auth and email dialogs targets their primary submit, while Cancel stays an action',()=>{
+ let html;
+ const context=vm.createContext({role:'candidate',state:{},field:()=>'',esc:String,modal:(_title,_description,body)=>{html=body;}});
+ vm.runInContext(source.slice(source.indexOf('const button='),source.indexOf('const badge=')),context);
+ vm.runInContext(source.slice(source.indexOf('const formEnd='),source.indexOf('async function completeLogin(')),context);
+ vm.runInContext(source.slice(source.indexOf('function authModal('),source.indexOf('async function submitEmailForm(')),context);
+ for(const [dialog,label] of [['authModal()','Войти'],['authModal("candidate","dashboard",true)','Зарегистрироваться'],['forgotPasswordModal()','Получить ссылку'],['verificationModal("qa@example.invalid",false)','Отправить письмо ещё раз']]){
+  vm.runInContext(dialog,context);
+  const buttons=[...html.matchAll(/<button\b([^>]*)>(.*?)<\/button>/gs)].map(([,attrs,text])=>({type:attrs.match(/\btype="([^"]*)"/)?.[1]||'submit',text}));
+  assert.equal(buttons.find(b=>b.type==='submit')?.text,label,dialog+' implicit Enter target');assert.equal(buttons.find(b=>b.text==='Отмена')?.type,'button');
+ }
+});
 test('a confirmed profile save updates the UI with one request and keeps workspace lists',async()=>{
  const calls=[];
  const {context,button}=client(async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return Response.json({message:'Saved',state:{profile:{name:'Updated'}}});});
