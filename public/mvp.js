@@ -1,5 +1,5 @@
 import {historyDefaults,resumeHistory,historyHeading,historyPeriod} from './resume-history.mjs';
-import {citySuggestions,canonicalCity} from './cities.mjs';
+import {citySuggestions,canonicalCity,loadWorldCities,worldCitiesReady} from './cities.mjs';
 const iconPaths = {
 eyeOff: '<path d="m3 3 18 18M10.5 5.1C16 4 22 12 22 12a17 17 0 0 1-4 4M6 6C3.5 8 2 12 2 12s3 7 10 7a13 13 0 0 0 5-1M10 10a3 3 0 0 0 4 4"/>',
 eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',

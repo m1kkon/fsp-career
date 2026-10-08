@@ -8,12 +8,24 @@ function closeCityOptions(input){
  const list=input.parentElement.querySelector('.city-options');if(list)list.hidden=true;
  input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');
 }
+const citySuggestionRequests=new WeakMap();
+function renderCityOptions(input,error=false,preserveSelection=false){
+ const list=input.parentElement.querySelector('.city-options');if(!list)return;
+ const highlighted=preserveSelection?list.querySelector('[aria-selected="true"]')?.dataset.cityValue:null;
+ const rows=citySuggestions(input.value);
+ const note=error?'Не удалось загрузить города мира. Можно ввести город вручную.':!worldCitiesReady()?'Загружаем города мира…':!rows.length?'Город не найден. Можно ввести его название вручную.':'';
+ list.innerHTML=rows.map((city,i)=>`<button type="button" id="${input.id}-option-${i}" role="option" aria-selected="false" tabindex="-1" data-city-option data-city-value="${esc(city.value||city.name)}"><strong>${esc(city.name)}</strong><span>${esc(city.region)}</span></button>`).join('')+(note?`<p class="city-no-results" role="status">${note}</p>`:'');
+ list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
+ if(highlighted){const option=[...list.querySelectorAll('[data-city-option]')].find(row=>row.dataset.cityValue===highlighted);if(option){option.setAttribute('aria-selected','true');input.setAttribute('aria-activedescendant',option.id);}}
+}
 function showCityOptions(input){
  for(const other of document.querySelectorAll('[data-city-input]'))if(other!==input)closeCityOptions(other);
- const list=input.parentElement.querySelector('.city-options');if(!list)return;
- const rows=citySuggestions(input.value);
- list.innerHTML=rows.length?rows.map((city,i)=>`<button type="button" id="${input.id}-option-${i}" role="option" aria-selected="false" tabindex="-1" data-city-option data-city-value="${esc(city.name)}"><strong>${esc(city.name)}</strong><span>${esc(city.region)}</span></button>`).join(''):'<p class="city-no-results">Город не найден. Можно ввести его название вручную.</p>';
- list.hidden=false;input.setAttribute('aria-expanded','true');input.removeAttribute('aria-activedescendant');
+ renderCityOptions(input);
+ const request={};citySuggestionRequests.set(input,request);
+ if(!worldCitiesReady()){
+  const update=error=>{if(input.isConnected&&input.getAttribute('aria-expanded')==='true'&&citySuggestionRequests.get(input)===request)renderCityOptions(input,error,true);};
+  loadWorldCities().then(()=>update(false)).catch(()=>update(true));
+ }
 }
 function chooseCityOption(option){
  const input=option.closest('.city-field').querySelector('[data-city-input]');
@@ -67,9 +79,9 @@ async function applyLocation(city,format){
  const wanted=role,owner=state.user?.id,member=state.authenticated&&owner&&state.roles.includes(wanted);
  const identity=member?owner+':'+wanted:'guest';
  const next={city:canonicalCity(city),format:['Удалённо','Гибрид','Офис'].includes(format)?format:''};
- const profileCity=canonicalCity((wanted==='employer'?state.company:state.profile)?.city||'');
+ const rawProfileCity=(wanted==='employer'?state.company:state.profile)?.city||'',profileCity=canonicalCity(rawProfileCity);
  // Clearing the search filter must not erase a person's or company's city.
- if(member&&next.city&&next.city!==profileCity){
+ if(member&&next.city&&next.city!==rawProfileCity){
   const saved=await mutate({action:wanted==='employer'?'company':'profile',city:next.city});
   if(!saved)return;
  }
