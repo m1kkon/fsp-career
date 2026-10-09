@@ -36,15 +36,16 @@ mail_key = values.get('MAIL_TOKEN_KEY') or secrets.token_hex(32)
 if not re.fullmatch(r'[a-f0-9]{64}', mail_key):
     raise SystemExit('Invalid mail encryption key')
 mail_values = {'MAIL_TOKEN_KEY': mail_key, 'RESEND_API_KEY': values.get('RESEND_API_KEY', ''), 'EMAIL_FROM': values.get('EMAIL_FROM') or f'ФСП Карьера <no-reply@{args.domain}>'}
-if any('\n' in value or '\r' in value for value in mail_values.values()):
-    raise SystemExit('Invalid mail setting')
+runtime_values = {key: values.get(key, '') for key in ('TEST_MAINTAINER_IDS', 'CODE_SANDBOX_URL', 'CODE_SANDBOX_TOKEN')}
+if any('\n' in value or '\r' in value for value in (mail_values | runtime_values).values()):
+    raise SystemExit('Invalid service setting')
 target.parent.mkdir(parents=True, exist_ok=True)
 temporary = target.with_suffix('.tmp')
 fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
 with os.fdopen(fd, 'w') as stream:
     stream.write(f'RELEASE_SHA={args.revision}\n')
     stream.write(f'POSTGRES_PASSWORD={password}\nSITE_DOMAIN={args.domain}\nAPP_VERSION={args.version}\nSITE_REDIRECT_DOMAINS={redirect_domains}\n')
-    for key, value in mail_values.items():
+    for key, value in (mail_values | runtime_values).items():
         stream.write(f'{key}={value}\n')
 os.chmod(temporary, 0o600)
 os.replace(temporary, target)

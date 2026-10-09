@@ -249,6 +249,9 @@
                     "$ref": "#/components/schemas/assessment-answer"
                   },
                   {
+                    "$ref": "#/components/schemas/assessment-run-code"
+                  },
+                  {
                     "$ref": "#/components/schemas/assessment-view"
                   },
                   {
@@ -289,6 +292,12 @@
                   },
                   {
                     "$ref": "#/components/schemas/assessment-result-visibility"
+                  },
+                  {
+                    "$ref": "#/components/schemas/assessment-prepare"
+                  },
+                  {
+                    "$ref": "#/components/schemas/invite-cancel"
                   }
                 ]
               }
@@ -624,6 +633,53 @@
           }
         }
       }
+    },
+    "/api/code-sandbox": {
+      "get": {
+        "summary": "Открытые примеры заданий на кодинг",
+        "responses": {
+          "200": {
+            "description": "Задания с открытыми проверками"
+          }
+        }
+      },
+      "post": {
+        "summary": "Изолированный запуск примера",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "questionId": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "type": "string",
+                    "maxLength": 20000
+                  }
+                },
+                "required": [
+                  "questionId",
+                  "source"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Вывод и результаты открытых проверок"
+          },
+          "429": {
+            "description": "Песочница занята"
+          },
+          "503": {
+            "description": "Песочница недоступна"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -655,6 +711,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -834,6 +891,18 @@
             "minLength": 3,
             "maxLength": 600
           },
+          "secondarySpecs": {
+            "type": "array",
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "projectSummary": {
+            "type": "string",
+            "maxLength": 1800
+          },
           "achievement": {
             "type": "string",
             "minLength": 30,
@@ -872,6 +941,51 @@
               "Удалённо",
               "Гибрид",
               "Офис"
+            ]
+          },
+          "acceptedFormats": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "Удалённо",
+                "Гибрид",
+                "Офис"
+              ]
+            }
+          },
+          "employmentTypes": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "availableFrom": {
+            "type": "string"
+          },
+          "englishLevel": {
+            "type": "string",
+            "enum": [
+              "A1",
+              "A2",
+              "B1",
+              "B2",
+              "C1",
+              "C2"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "salaryMin": {
+            "type": [
+              "integer",
+              "string",
+              "null"
             ]
           },
           "teamSize": {
@@ -1047,6 +1161,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -1064,6 +1179,53 @@
             "items": {
               "type": "string"
             }
+          },
+          "requiredStack": {
+            "description": "Навыки, отсутствие которых исключает кандидата",
+            "type": [
+              "array",
+              "string"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "preferredStack": {
+            "description": "Желательные навыки, влияющие только на порядок",
+            "type": [
+              "array",
+              "string"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "englishLevel": {
+            "type": "string",
+            "enum": [
+              "A1",
+              "A2",
+              "B1",
+              "B2",
+              "C1",
+              "C2"
+            ]
+          },
+          "minExperience": {
+            "type": [
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "formatRequired": {
+            "type": "boolean"
+          },
+          "locationRequired": {
+            "type": "boolean"
+          },
+          "salaryRequired": {
+            "type": "boolean"
           },
           "confirmed": {
             "type": "boolean",
@@ -2923,7 +3085,8 @@
           "format": {
             "enum": [
               "choice",
-              "numeric"
+              "numeric",
+              "coding"
             ]
           },
           "options": {
@@ -2933,6 +3096,10 @@
             },
             "minItems": 4,
             "maxItems": 4
+          },
+          "coding": {
+            "type": "object",
+            "description": "Язык, начальный код, открытые проверки. Скрытые проверки доступны только мейнтейнеру и серверной оценке."
           }
         },
         "description": "Условие и варианты доступны только для текущего вопроса. Для закрытых и будущих вопросов возвращается только id. Ключи, числовые правила, семейства и зачётность скрыты."
@@ -3095,7 +3262,69 @@
               "object",
               "null"
             ],
-            "description": "При активном комплексном тесте level=null, requirements=[], integration=null; баллы не раскрываются до завершения попытки."
+            "description": "При активном комплексном тесте level=null, requirements=[], integration=null; баллы не раскрываются до завершения попытки. Для новых попыток пять исходов: confirmed-plus-potential, confirmed-plus, confirmed, unconfirmed-lower, unconfirmed. «+» достигается во всех модулях на середине между порогами текущего и следующего грейда (для Senior — между его порогом и 100). Потенциал требует фактического достижения следующего грейда.",
+            "properties": {
+              "targetGrade": {
+                "enum": [
+                  "Junior",
+                  "Middle",
+                  "Senior"
+                ]
+              },
+              "confirmedGrade": {
+                "enum": [
+                  "Junior",
+                  "Middle",
+                  "Senior",
+                  null
+                ]
+              },
+              "confirmedPlus": {
+                "type": "boolean"
+              },
+              "potentialHigher": {
+                "enum": [
+                  "Middle",
+                  "Senior",
+                  null
+                ]
+              },
+              "status": {
+                "enum": [
+                  "confirmed-plus-potential",
+                  "confirmed-plus",
+                  "confirmed",
+                  "unconfirmed-lower",
+                  "unconfirmed",
+                  "confirmed-potential"
+                ],
+                "description": "confirmed-potential — сохранённый исход прежних попыток."
+              },
+              "outcomeRule": {
+                "type": "string"
+              },
+              "plusThresholds": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "moduleId": {
+                      "type": "string"
+                    },
+                    "grade": {
+                      "enum": [
+                        "Junior",
+                        "Middle",
+                        "Senior"
+                      ]
+                    },
+                    "threshold": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
           },
           "serverTime": {
             "type": "integer"
@@ -3178,6 +3407,14 @@
               "type": "boolean"
             },
             "description": "Видимость результатов только в собственном состоянии кандидата; ключ skill:<moduleId> или role:<roleId>."
+          },
+          "targetGrade": {
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ],
+            "description": "Целевой грейд роли. Фиксируется при старте; у теста навыка отсутствует."
           }
         },
         "description": "Вариант фиксируется заранее. У каждого вопроса отдельный таймер; подтверждение, пропуск или истечение времени закрывают его и открывают следующий. Ответы закрытых вопросов неизменны."
@@ -3226,7 +3463,8 @@
           "format": {
             "enum": [
               "choice",
-              "numeric"
+              "numeric",
+              "coding"
             ]
           },
           "prompt": {
@@ -3272,6 +3510,9 @@
                 }
               }
             }
+          },
+          "coding": {
+            "type": "object"
           }
         },
         "description": "Сохраняется только мейнтейнером. Новый экземпляр — черновик; редактирование создаёт отдельную версию."
@@ -3368,17 +3609,26 @@
           },
           "targetId": {
             "type": "string"
+          },
+          "targetGrade": {
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ],
+            "description": "Целевой грейд роли. Фиксируется при старте; у теста навыка отсутствует."
           }
         },
         "required": [
           "action",
           "dayId",
           "targetId"
-        ]
+        ],
+        "deprecated": true
       },
       "assessment-start": {
         "type": "object",
-        "description": "Атомарный запуск; весь вариант и порядок модулей фиксируются заранее.",
+        "description": "Немедленный запуск из суточного пула по targetId; весь вариант и порядок модулей фиксируются заранее. registrationId поддерживается для прежних записей.",
         "properties": {
           "action": {
             "const": "assessment-start"
@@ -3388,12 +3638,35 @@
           },
           "rulesAccepted": {
             "const": true
+          },
+          "targetGrade": {
+            "enum": [
+              "Junior",
+              "Middle",
+              "Senior"
+            ],
+            "description": "Целевой грейд роли. Фиксируется при старте; у теста навыка отсутствует."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "Навык или роль. Текущий суточный пул выбирает сервер."
           }
         },
         "required": [
           "action",
-          "registrationId",
           "rulesAccepted"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "targetId"
+            ]
+          },
+          {
+            "required": [
+              "registrationId"
+            ]
+          }
         ]
       },
       "assessment-resume": {
@@ -3811,6 +4084,67 @@
           "revision",
           "questionId",
           "answer"
+        ]
+      },
+      "assessment-run-code": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "const": "assessment-run-code"
+          },
+          "id": {
+            "type": "string"
+          },
+          "questionId": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "action",
+          "id",
+          "questionId",
+          "revision",
+          "source"
+        ]
+      },
+      "assessment-prepare": {
+        "type": "object",
+        "description": "Подготовить экран начала теста. Возвращает правила и состав модулей суточного пула без вопросов и ключей.",
+        "properties": {
+          "action": {
+            "const": "assessment-prepare"
+          },
+          "targetId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "targetId"
+        ]
+      },
+      "invite-cancel": {
+        "type": "object",
+        "description": "Отмена своего открытого приглашения работодателем",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "invite-cancel"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
         ]
       }
     },

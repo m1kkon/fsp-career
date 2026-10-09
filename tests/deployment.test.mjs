@@ -14,6 +14,8 @@ for(const failure of ['', 'container', 'timer', 'backup'])test(`release ${failur
   fs.symlinkSync(previous,path.join(root,'current'));
   const initial=`POSTGRES_PASSWORD=${'1'.repeat(64)}\nSITE_DOMAIN=fspcareer.space\nAPP_VERSION=previous\nSITE_REDIRECT_DOMAINS=www.fspcareer.space\nRESEND_API_KEY=re_test_not_real\nMAIL_TOKEN_KEY=${'2'.repeat(64)}\nEMAIL_FROM=Test <no-reply@fspcareer.space>\nRELEASE_SHA=${'b'.repeat(40)}\n`;
   fs.writeFileSync(path.join(root,'.env'),initial,{mode:0o600});
+  const workerSettings=`TEST_MAINTAINER_IDS=qa-maintainer\nCODE_SANDBOX_URL=http://private-worker:4180\nCODE_SANDBOX_TOKEN=${'3'.repeat(64)}\n`;
+  fs.appendFileSync(path.join(root,'.env'),workerSettings);
   for(const dir of [previous,release]){
    fs.mkdirSync(path.join(dir,'deploy'));
    fs.writeFileSync(path.join(dir,'deploy/backup.sh'),`#!/bin/bash\necho backup >> "$FSP_DEPLOY_ROOT/calls"\nif [ "$PWD" = "$FSP_DEPLOY_ROOT/next" ] && [ "$FSP_TEST_FAIL" = backup ]; then exit 1; fi\n`);
@@ -35,7 +37,8 @@ for(const failure of ['', 'container', 'timer', 'backup'])test(`release ${failur
   assert.equal(run.status,failure?1:0,run.stderr);
   assert.equal(fs.realpathSync(path.join(root,'current')),failure?previous:release);
   const after=fs.readFileSync(path.join(root,'.env'),'utf8');
-  if(failure){assert.equal(after,initial);assert.match(fs.readFileSync(path.join(root,'calls'),'utf8'),/previous compose up/);}
+  if(failure){assert.equal(after,initial+workerSettings);assert.match(fs.readFileSync(path.join(root,'calls'),'utf8'),/previous compose up/);}
   else{assert.ok(after.includes('POSTGRES_PASSWORD='+'1'.repeat(64)));assert.ok(after.includes('MAIL_TOKEN_KEY='+'2'.repeat(64)));assert.ok(after.includes('RESEND_API_KEY=re_test_not_real'));assert.ok(after.includes('RELEASE_SHA='+'a'.repeat(40)));assert.equal(fs.statSync(path.join(root,'.env')).mode&0o777,0o600);assert.equal(fs.readFileSync(path.join(root,'previous-release'),'utf8').trim(),previous);}
+  assert.ok(after.includes(workerSettings),'releases preserve assessment administrator IDs and private worker credentials');
  }finally{fs.rmSync(root,{recursive:true,force:true});}
 });

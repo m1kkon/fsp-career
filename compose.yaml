@@ -45,6 +45,8 @@ services:
       EMAIL_FROM: ${EMAIL_FROM:-}
       MAIL_TOKEN_KEY: ${MAIL_TOKEN_KEY:-}
       TEST_MAINTAINER_IDS: ${TEST_MAINTAINER_IDS:-}
+      CODE_SANDBOX_URL: ${CODE_SANDBOX_URL:-}
+      CODE_SANDBOX_TOKEN: ${CODE_SANDBOX_TOKEN:-}
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:

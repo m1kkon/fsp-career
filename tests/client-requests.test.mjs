@@ -66,7 +66,7 @@ test('email form clicks retain native submit and confirmation uses the session e
  vm.runInContext(source.slice(source.indexOf("document.addEventListener('click'"),source.indexOf('// Keep digit positions')),context);
  vm.runInContext(source.slice(source.indexOf("document.addEventListener('submit'"),source.indexOf("window.addEventListener('hashchange'")),context);
  vm.runInContext("emailLinkToken='a'.repeat(64)",context);
- const form={id:'email-link-form',tagName:'FORM',dataset:{action:'verify-email'},querySelector:s=>s==='[data-error]'?error:button};
+ const form={id:'email-link-form',tagName:'FORM',dataset:{action:'verify-email'},querySelector:s=>s==='[data-error]'?error:button,querySelectorAll:()=>[]};
  await handlers.click({target:{closest:s=>s==='[data-action]'?form:null,matches:()=>false},preventDefault(){prevented=true;}});
  assert.equal(prevented,false,'click delegation must allow the native form submission');
  await handlers.submit({target:form,preventDefault(){prevented=true;}});
@@ -168,4 +168,19 @@ test('adding history cards preserves unsaved history, project and contact fields
  vm.runInContext(draft+update+"resumeDraft={workEntries:[{...historyDefaults.workEntries}],educationEntries:[],skillGroups:[],projects:[{name:'',description:'',url:''}],links:[]};updateResumeEditor('workEntries')",context);
  assert.equal(vm.runInContext('resumeDraft.workEntries[0].company',context),'Vector');assert.equal(vm.runInContext('resumeDraft.workEntries[0].current',context),true);assert.equal(vm.runInContext('resumeDraft.workEntries.length',context),2);assert.equal(vm.runInContext('resumeDraft.projects[0].name',context),'Unsaved project');assert.equal(form.values.phone,'Draft contact');assert.equal(panel.scrollTop,500);
  vm.runInContext("updateResumeEditor('workEntries',1)",context);assert.equal(vm.runInContext('resumeDraft.workEntries.length',context),1);
+});
+
+
+test('salary bounds travel through search refresh and mutation state, even without a query',async()=>{
+ const calls=[];
+ const {context}=client(async(url,options)=>{calls.push({url,body:options?.body?JSON.parse(options.body):null});return Response.json({});});
+ context.role='employer';context.query='Middle Backend Python';context.needContext={budgetMin:'100000',budgetMax:'200000'};context.needRules={salaryRequired:true};context.needConfirmed=true;
+ await vm.runInContext('refresh()',context);
+ let params=new URL(calls[0].url,'http://localhost').searchParams;
+ assert.equal(params.get('budgetMin'),'100000');assert.equal(params.get('budgetMax'),'200000');assert.equal(params.get('salaryRequired'),'1');
+ await vm.runInContext('api({action:"favorite",candidateId:"candidate"},true)',context);
+ assert.equal(calls[1].body.stateSelection.budgetMin,'100000');assert.equal(calls[1].body.stateSelection.budgetMax,'200000');assert.equal(calls[1].body.stateSelection.salaryRequired,true);
+ context.query='';await vm.runInContext('refresh()',context);
+ params=new URL(calls[2].url,'http://localhost').searchParams;
+ assert.equal(params.get('query'),'');assert.equal(params.get('budgetMin'),'100000');assert.equal(params.get('budgetMax'),'200000');
 });

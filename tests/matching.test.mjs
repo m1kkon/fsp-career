@@ -43,6 +43,7 @@ test('need parser reads role words, synonyms, word boundaries and grade evidence
  assert.equal(parseNeed('Backend, запуск проекта 2025 года').defaulted.grade,true);
  assert.equal(parseNeed('Senior разработчик',{team:'Пишем платёжный backend на Go'}).evidence.specSource,'team');
  assert.deepEqual(stackNames(['Postgres','k8s','JavaScript/TypeScript','RabbitMQ']),['PostgreSQL','Kubernetes','JavaScript','TypeScript','RabbitMQ']);
+ assert.deepEqual(stackNames(['HFT','high-frequency trading']),['HFT']);
 });
 
 test('budget and format come from money-like phrases or explicit context only',()=>{
@@ -73,6 +74,17 @@ test('FSP history lifts a candidate inside the category without excluding anyone
  assert.equal(fspSignal(null,'Backend',NOW),null);
 });
 
+test('displayed score outranks lexical overlap and category position, but mandatory conditions come first',()=>{
+ const need=parseNeed(QUERY);
+ const row=(id,score,semantic,status='pass',grade='Middle')=>({id,spec:'Backend',grade,score:90,match:{score,strength:16,semantic:{score:semantic},eligibility:{status}}});
+ const rows=[row('keyword-stuffed',76,99),row('stronger-senior',97,1,'pass','Senior'),row('fsp-winner',94,5),row('unknown',99,100,'unknown'),row('failed',100,100,'fail')];
+ const categories=[{key:'Backend|Middle'},{key:'Backend|Senior'}];
+ assert.deepEqual(rankCandidates(rows,need,categories).map(candidate=>candidate.id),['stronger-senior','fsp-winner','keyword-stuffed','unknown','failed']);
+ // Text wording cannot break an otherwise equal candidate score and strength.
+ const tied=[row('z',90,99),row('a',90,0)];
+ assert.deepEqual(rankCandidates(tied,need,categories).map(candidate=>candidate.id),['a','z']);
+});
+
 test('one test question outweighs FSP participation or a final, a win outweighs it',()=>{
  const need=parseNeed(QUERY);
  const rows=scored([person('test-100',{score:100}),person('participant',{score:83,fsp:mockFspProfile('DEMO-FSP-010')}),person('finalist',{score:83,fsp:mockFspProfile('DEMO-FSP-001')}),person('winner',{score:83,fsp:mockFspProfile('DEMO-FSP-012')})],need);
@@ -100,7 +112,7 @@ test('team context refines the order inside a category and explains each signal'
   person('fit',{min:150000,format:'Офис',about:'Пишу биллинг и интеграции с банками для малого бизнеса'}),
   person('remote',{min:150000,format:'Удалённо'}),
   person('hybrid-elsewhere',{min:150000,format:'Гибрид',city:'Казань'}),
-  person('expensive',{min:240000,format:'Офис'}),
+  person('expensive',{min:240000,max:300000,format:'Офис'}),
   person('senior',{grade:'Senior',min:150000,format:'Офис',about:'Финтех, платежи, высокая нагрузка, интеграции, B2B',score:100,fsp:mockFspProfile('DEMO-FSP-006')}),
  ],need);
  const by=Object.fromEntries(rows.map(r=>[r.id,r.match]));
@@ -109,20 +121,24 @@ test('team context refines the order inside a category and explains each signal'
  assert.equal(part(by.fit,'salary').points,4);assert.equal(part(by.expensive,'salary').points,1);assert.match(part(by.expensive,'salary').note,/выше бюджета на 20%/);
  assert.equal(part(by.fit,'domain').points,2);assert.equal(part(by.remote,'domain').points,0);assert.match(part(by.fit,'domain').note,/финтех/);
  assert.ok(by.expensive.reasons.some(r=>/выше бюджета/.test(r)));
- // A strong neighbour stays in its own category behind every exact match.
+ // A stronger eligible neighbour can outrank an exact category by overall score.
  const ranked=rankCandidates(rows,need,recommendCategories(rows,need));
- assert.ok(by.senior.score>by.remote.score);assert.equal(ranked.at(-1).id,'senior');assert.equal(ranked[0].id,'fit');
+ assert.ok(by.senior.score>by.remote.score);assert.ok(ranked.indexOf(rows.find(row=>row.id==='senior'))<ranked.indexOf(rows.find(row=>row.id==='remote')));assert.equal(ranked[0].id,'senior');
 });
 
 test('category recommendations put the requested category first and explain neighbours',()=>{
- let need=parseNeed(QUERY,TEAM),categories=recommendCategories(seedRows(need),need);
- assert.deepEqual(categories.map(c=>`${c.spec}|${c.grade}|${c.relation}`),['Backend|Middle|exact','Backend|Senior|higher','Backend|Junior|lower','Data Science|Middle|adjacent']);
+ // Keep this focused fixture independent of additions to the full demo bank.
+ const originalRows=need=>scored(seed.candidates.filter(account=>account.id.startsWith('demo-')),need);
+ let need=parseNeed(QUERY,TEAM),categories=recommendCategories(originalRows(need),need);
+ assert.deepEqual(categories.map(c=>`${c.spec}|${c.grade}|${c.relation}`),['Backend|Middle|exact','Backend|Senior|higher','Data Science|Middle|adjacent','Backend|Junior|lower']);
  assert.equal(categories[0].count,4);assert.equal(categories[0].withFsp,3);assert.equal(categories[0].inBudget,4);
  assert.deepEqual(categories[0].salary,{min:150000,max:250000});
- assert.match(categories[1].reason,/выше бюджета/);assert.match(categories[3].reason,/Python/);
- const ranked=rankCandidates(seedRows(need),need,categories);
- assert.deepEqual(ranked.slice(0,4).map(r=>r.id),['demo-1','demo-10','demo-4','demo-9']);
- need=parseNeed('Senior QA, pytest');categories=recommendCategories(seedRows(need),need);
+ assert.match(categories[1].reason,/выше бюджета/);assert.match(categories.find(c=>c.spec==='Data Science').reason,/Python/);
+ const ranked=rankCandidates(originalRows(need),need,categories);
+ const eligible=ranked.filter(row=>row.match.eligibility.status==='pass');
+ assert.deepEqual(ranked.slice(0,eligible.length),eligible);
+ for(let i=1;i<eligible.length;i++)assert.ok(eligible[i-1].match.score>=eligible[i].match.score);
+ need=parseNeed('Senior QA, pytest');categories=recommendCategories(originalRows(need),need);
  assert.equal(categories[0].relation,'exact');assert.equal(categories[0].count,0);assert.match(categories[0].reason,/Пока нет/);
  assert.ok(categories.some(c=>c.spec==='QA'&&c.grade==='Middle'&&c.relation==='lower'));
  const overview=recommendCategories(seedRows(null),null);
@@ -134,7 +150,7 @@ test('a vacancy acts as a structured need for its applicants',()=>{
  assert.deepEqual([need.spec,need.grade,need.format,need.city,need.budgetMin,need.budgetMax],['Data Science','Middle','Гибрид','Москва',220000,300000]);
  assert.deepEqual(need.stack,['Python','SQL','PyTorch']);
  const ds=matching(view(seed.candidates.find(c=>c.id==='demo-6')),need,NOW);
- assert.equal(ds.relation,'exact');assert.equal(part(ds,'stack').points,20);
+ assert.equal(ds.relation,'exact');assert.equal(part(ds,'stack').points,12);
  const unverified=matching(view(person('draft',{verified:false,score:0})),need,NOW);
  assert.equal(unverified.relation,'other');assert.equal(part(unverified,'spec').points+part(unverified,'grade').points+part(unverified,'test').points,0);
 });
@@ -144,7 +160,7 @@ async function workspace(){
  const repo=memory();
  const candidate=await accountFor(repo,{id:'candidate-a',email:'a@example.test',name:'Candidate'});
  await action(repo,candidate,{action:'onboard',role:'candidate',name:'Candidate',city:'Москва',spec:'Backend',grade:'Middle',consent:true});
- candidate.profile={...candidate.profile,verified:true,spec:'Backend',grade:'Middle',score:90,stack:['Python','PostgreSQL'],verifiedAt:Date.now(),gradeChangedAt:Date.now()};await repo.saveAccount(candidate);
+ candidate.profile={...candidate.profile,min:180000,max:220000,verified:true,spec:'Backend',grade:'Middle',score:90,stack:['Python','PostgreSQL'],verifiedAt:Date.now(),gradeChangedAt:Date.now()};await repo.saveAccount(candidate);
  const employer=await accountFor(repo,{id:'employer-a',email:'hr@example.test',name:'HR'});
  await action(repo,employer,{action:'onboard',role:'employer',name:'Company',description:'Product engineering team',contact:'hr@example.test',consent:true});
  return {repo,candidate,employer};
@@ -154,7 +170,7 @@ test('employer state carries the parsed need, team context and category recommen
  const {repo,candidate,employer}=await workspace();
  const state=await getState(repo,employer,'employer',QUERY,{team:TEAM.team,format:'Удалённо',budgetMin:'180000',budgetMax:'250000',role:'employer',confirmed:true});
  assert.deepEqual([state.need.format,state.need.budgetMin,state.need.budgetMax],['Удалённо',180000,250000]);
- assert.equal(state.categories[0].key,'Backend|Middle');assert.equal(state.categories[0].count,5);
+ assert.equal(state.categories[0].key,'Backend|Middle');assert.equal(state.categories[0].count,seed.candidates.filter(account=>account.profile.spec==='Backend'&&account.profile.grade==='Middle'&&account.profile.min<=250000&&account.profile.max>=180000).length+1);
  const own=state.candidates.find(c=>c.id===candidate.id);
  assert.equal(own.match.relation,'exact');assert.equal(own.email,undefined);assert.ok(own.match.parts.some(p=>p.key==='salary'));
  const browse=await getState(repo,employer,'employer');
@@ -168,7 +184,9 @@ test('saved need keeps team context and a snapshot of the shortlist; invalid bud
  await action(repo,employer,{action:'need',text:QUERY,confirmed:true,...TEAM,budgetMin:'180 000',city:'Москва'});
  const [saved]=await repo.scoped('need',employer.id);
  assert.deepEqual(saved.context,{team:TEAM.team,format:'Удалённо',city:'Москва',budgetMin:180000,budgetMax:250000});
- assert.equal(saved.spec,'Backend');assert.equal(saved.snapshot.total,5);assert.equal(saved.snapshot.items[0].id,'demo-1');
+ assert.equal(saved.spec,'Backend');assert.equal(saved.snapshot.total,seed.candidates.filter(account=>account.profile.spec==='Backend'&&account.profile.grade==='Middle'&&account.profile.min<=250000&&account.profile.max>=180000).length+1);
+ const current=await getState(repo,employer,'employer',QUERY,{...saved.context,confirmed:true});
+ assert.deepEqual(saved.snapshot.items,current.candidates.filter(row=>row.match.relation==='exact').map(row=>({id:row.id,score:row.match.score})));
  assert.ok(saved.snapshot.items.some(i=>i.id===candidate.id));assert.ok(saved.snapshot.items.every(i=>Number.isInteger(i.score)));
  assert.ok(!JSON.stringify(saved).includes(candidate.email));
  for(const budget of [{budgetMin:300000,budgetMax:200000},{budgetMin:'abc'},{budgetMax:-5}])await assert.rejects(action(repo,employer,{action:'need',text:QUERY,...budget}));

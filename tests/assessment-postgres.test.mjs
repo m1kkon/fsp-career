@@ -2,11 +2,23 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {postgresFixture,needsPostgres} from './helpers/postgres.mjs';
 import {accountFor,action,getState} from '../lib/service.mjs';
-import {assessmentAction} from '../lib/assessments.mjs';
+import {assessmentAction,ensureDailyPool} from '../lib/assessments.mjs';
 import {ROLES} from '../lib/question-bank.mjs';
 import {assessmentAccount,isTestMaintainer,requireTestMaintainer} from '../lib/test-maintainer.mjs';
 
 const admin={id:'test-admin',maintainer:true};
+test('PostgreSQL daily pools are insert-only and concurrent immediate starts reuse one attempt',needsPostgres,async t=>{
+ const {repo,write}=await postgresFixture(t);
+ const candidate=await accountFor(repo,{id:'daily-candidate',email:'daily@example.test',name:'Daily Candidate'});
+ candidate.roles=['candidate'];candidate.profile.surveyCompletedAt=Date.now();await repo.saveAccount(candidate);
+ const [first,second]=await Promise.all([ensureDailyPool(repo),ensureDailyPool(repo)]);
+ assert.deepEqual(first,second);assert.equal((await repo.records('test-day')).length,1);
+ const unchanged=await repo.putIfAbsent('test-day',{...first,name:'Must not replace published pool',pool:[]});assert.deepEqual(unchanged,first);
+ const run=()=>write(async current=>action(current,await current.account(candidate.id),{action:'assessment-start',targetId:'backend-developer',targetGrade:'Middle',rulesAccepted:true}));
+ const [a,b]=await Promise.all([run(),run()]);assert.equal(a.assessment.id,b.assessment.id);
+ assert.equal((await repo.scoped('assessment',candidate.id)).length,1);assert.equal((await repo.records('assessment-registration')).length,0);
+ assert.equal((await repo.record(a.assessment.id)).dayId,first.id);
+});
 test('test administration grants privileges only from the server allowlist',()=>{
  assert.equal(isTestMaintainer('local_seedy',{}),false);
  assert.equal(isTestMaintainer('candidate',{TEST_MAINTAINER_IDS:' admin,other '}),false);
@@ -63,7 +75,12 @@ test('PostgreSQL qualification flow keeps attempts, profile proof, permissions a
    const m=raw.modules[raw.moduleIndex];
    if(m.status==='completed'){await run({action:'assessment-next-module',id:attemptId,revision:raw.revision});continue;}
    const q=m.questions.find(q=>q.id===m.activeQuestionId);
-   const result=await run({action:'assessment-answer',id:attemptId,revision:raw.revision,questionId:q.id,answer:q.format==='choice'?q.correct:String(q.numeric.expected)});
+   let result;
+   if(q.format==='coding'){
+    // Exercise persistence and progression using a trusted judge fixture; Docker is checked separately.
+    m.answers[q.id]={value:{source:'judge fixture',judged:true,correct:true,passed:q.coding.tests.length,total:q.coding.tests.length},savedAt:Date.now()};m.expiresAt=Date.now()-1;await repo.put('assessment',raw);
+    result=await run({action:'assessment-resume',id:attemptId});
+   }else result=await run({action:'assessment-answer',id:attemptId,revision:raw.revision,questionId:q.id,answer:q.format==='choice'?q.correct:String(q.numeric.expected)});
    assert.ok(!JSON.stringify(result).includes('"correct":')||!result.assessment.currentModule);
    assert.ok(!JSON.stringify(result.assessment.currentModule||{}).includes('"numeric":'));
   }

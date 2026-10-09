@@ -25,7 +25,7 @@ test('personal API keys enforce authentication, scopes, consent, ownership, expi
  const employer=await user('employer',['employer']),other=await user('other',['employer']),candidate=await user('person',['candidate']),hidden=await user('hidden',['candidate']);hidden.privacy.consent=false;await repo.saveAccount(hidden);
  const key=await write((_repo,db)=>createApiKey(employer.id,{name:'HR sync',scopes:['read','write']},db));
  const read=await write((_repo,db)=>createApiKey(employer.id,{name:'Read only'},db));
- const otherKey=await write((_repo,db)=>createApiKey(other.id,{name:'Other'},db));
+ const otherKey=await write((_repo,db)=>createApiKey(other.id,{name:'Other',scopes:['read','write']},db));
  const candidateKey=await write((_repo,db)=>createApiKey(candidate.id,{name:'Candidate',scopes:['read','write']},db));
  const request=(path,token=key.token,method='GET',body)=>new Request('https://example.test/api/v1/'+path,{method,headers:{...(token?{Authorization:'Bearer '+token}:{}),...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
  const call=async(path,token=key.token,method='GET',body)=>{const response=await handlePublicApi(request(path,token,method,body),pool);return {status:response.status,headers:response.headers,body:await response.json()};};
@@ -74,6 +74,15 @@ test('personal API keys enforce authentication, scopes, consent, ownership, expi
   assert.equal((await call('jobs?limit=2')).body.data.length,2);
   const oversized=new Request('https://example.test/api/v1/actions',{method:'POST',headers:{Authorization:'Bearer '+key.token,'Content-Type':'application/json'},body:JSON.stringify({action:'profile',about:'x'.repeat(60001)})});assert.equal((await handlePublicApi(oversized,pool)).status,413);
   const wrongType=new Request('https://example.test/api/v1/actions',{method:'POST',headers:{Authorization:'Bearer '+key.token,'Content-Type':'text/plain'},body:'{}'});assert.equal((await handlePublicApi(wrongType,pool)).status,415);
+ });
+ await t.test('employers can cancel only their own open invitations through the personal API',async()=>{
+  await repo.put('invite',{id:'cancel-invite',owner:employer.id,recipient:candidate.id,status:'sent',created:Date.now()});
+  const body={action:'invite-cancel',id:'cancel-invite'};
+  assert.equal((await call('actions',otherKey.token,'POST',body)).status,404);
+  assert.equal((await call('actions',candidateKey.token,'POST',body)).status,403);
+  assert.equal((await call('actions',key.token,'POST',body)).status,200);
+  assert.equal((await repo.record(body.id)).status,'cancelled');
+  assert.equal((await call('actions',key.token,'POST',body)).status,409);
  });
  await t.test('failed requests count toward limits and revocation is owner scoped',async()=>{
   await assert.rejects(write((_repo,db)=>revokeApiKey(other.id,key.key.id,db)),e=>e.status===404);

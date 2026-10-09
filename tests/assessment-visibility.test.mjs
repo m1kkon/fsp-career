@@ -4,6 +4,7 @@ import {postgresFixture,needsPostgres} from './helpers/postgres.mjs';
 import {getState} from '../lib/service.mjs';
 import {assessmentAction,assessmentState,employerAssessmentProjection} from '../lib/assessments.mjs';
 import {MODULES,ROLES} from '../lib/question-bank.mjs';
+import {roleGradeOutcome} from '../lib/role-grade.mjs';
 
 async function fixture(t){
  const {repo}=await postgresFixture(t),at=Date.now()-10000,role=ROLES.find(r=>r.id==='backend-developer');
@@ -15,6 +16,17 @@ async function fixture(t){
  return {repo,candidate,employer,attempt};
 }
 const visibility=(id,targetKind,targetId,hidden)=>({action:'assessment-result-visibility',id,targetKind,targetId,hidden});
+
+test('role plus outcomes reach the public result only while that role remains visible',needsPostgres,async t=>{
+ const {repo,candidate,attempt}=await fixture(t);
+ attempt.finalRoleResult={...attempt.finalRoleResult,...roleGradeOutcome(attempt.modules.map(m=>m.result),'Middle')};
+ await repo.put('assessment',attempt);
+ const own=await assessmentState(repo,candidate);assert.equal(own.history[0].roleResult.confirmedPlus,true);
+ let publicResult=(await employerAssessmentProjection(repo,candidate)).confirmedResults.find(r=>r.kind==='role');
+ assert.equal(publicResult.status,'confirmed-plus');assert.equal(publicResult.confirmedGrade,'Middle');assert.equal(publicResult.confirmedPlus,true);assert.equal(publicResult.potentialHigher,null);
+ await assessmentAction(repo,candidate,visibility(attempt.id,'role','backend-developer',true));
+ publicResult=(await employerAssessmentProjection(repo,candidate)).confirmedResults.find(r=>r.kind==='role');assert.equal(publicResult,undefined);
+});
 
 test('visibility is saved per result, independently of history and other results, and can be restored',needsPostgres,async t=>{
  const {repo,candidate,attempt}=await fixture(t),before=await repo.record(attempt.id);

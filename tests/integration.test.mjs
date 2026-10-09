@@ -28,7 +28,7 @@ function client(){
  vm.runInContext('modal=()=>{};matchBreakdown=(match,heading)=>{globalThis.display={match,heading};return "";}',context);
  return context;
 }
-const profile={id:'candidate',name:'Candidate',city:'Москва',experience:'3 года',spec:'Backend',grade:'Middle',stack:['Python'],score:90,min:180000,max:220000,format:'Удалённо',verified:true};
+const profile={id:'candidate',name:'Candidate',work:'Разрабатываю сервисы на Python.',city:'Москва',experience:'3 года',spec:'Backend',grade:'Middle',stack:['Python'],score:90,min:180000,max:220000,format:'Удалённо',verified:true};
 
 test('opening an application selects its vacancy score even when the candidate is in the catalogue or has several applications',()=>{
  const context=client();
@@ -39,6 +39,40 @@ test('opening an application selects its vacancy score even when the candidate i
  vm.runInContext('candidateDetail("candidate")',context);
  assert.equal(context.display.match.score,null);
  assert.match(context.display.heading,/16\/30/);
+});
+
+test('optional card explanation opens the current catalogue score and also handles browsing without a need',()=>{
+ const context=client();
+ context.payload={favorites:[],candidates:[{...profile,match:matching(profile,parseNeed('Middle Backend Python'))}]};
+ const html=vm.runInContext('state=payload;candidateCard(state.candidates[0])',context);
+ assert.match(html,/data-action="candidate-score" data-id="candidate"/);
+ assert.match(html,/aria-label="Как рассчитана оценка Candidate"/);
+ assert.match(html,/Соответствие: 86\/100/);
+ assert.doesNotMatch(html,/по запросу|сила профиля/i);
+ const display=vm.runInContext('candidateScore("candidate");display',context);
+ assert.equal(display.match.score,context.payload.candidates[0].match.score);
+ assert.equal(display.heading,'Соответствие профиля: 86/100');
+ context.payload.candidates[0].match=matching(profile,null);
+ vm.runInContext('candidateScore("candidate")',context);
+ assert.equal(context.display.match.score,null);assert.equal(context.display.heading,'Тесты и ФСП: 16/30');
+ assert.match(vm.runInContext('candidateCard(state.candidates[0])',context),/Тесты и ФСП: 16\/30/);
+});
+
+test('a saved strength sort cannot override profile fit ordering after confirming a request',()=>{
+ const context=client(),need={...parseNeed('Middle Backend Python'),confirmed:true};
+ const fit=matching(profile,need);
+ context.payload={need,favorites:[],candidates:[
+  {...profile,id:'better-fit',match:{...fit,score:97,strength:15}},
+  {...profile,id:'stronger-tests',match:{...fit,score:76,strength:30}}
+ ]};
+ const ids=vm.runInContext('state={...emptyState(),...payload};filter.sort="strength";filteredCandidates().map(c=>c.id)',context);
+ assert.deepEqual(Array.from(ids),['better-fit','stronger-tests']);
+ const html=vm.runInContext('catalogPage()',context);
+ assert.match(html,/По соответствию профиля/);
+ assert.doesNotMatch(html,/value="strength"|по силе профиля/i);
+ vm.runInContext('state.need=null',context);
+ assert.deepEqual(Array.from(vm.runInContext('filteredCandidates().map(c=>c.id)',context)),['stronger-tests','better-fit']);
+ assert.match(vm.runInContext('catalogPage()',context),/По тестам и ФСП/);
 });
 
 test('saved searches retain every candidate ID above 50 and reopening an unchanged snapshot does not invent new candidates',async()=>{
@@ -187,7 +221,7 @@ test('mouse-selected assessment answers reach the draft through the installed ch
  const context=client();
  context.exam={id:'click-test',status:'active',modules:['react'],moduleIndex:0,currentModule:{id:'react',name:'React',questions:[{id:'q1',format:'choice',prompt:'Как изменить состояние?',options:['Первый','Второй','Третий','Четвёртый']}],questionSeconds:20}};
  vm.runInContext('assessmentAttempt=exam;assessmentQuestion=0;assessmentDraft=null;page="tests";render=()=>{};globalThis.submissions=[];assessmentRun=async(action,payload)=>submissions.push({action,...payload});',context);
- assert.match(vm.runInContext('assessmentExamMarkup()',context),/class="exam-check" type="submit" disabled/);
+ assert.doesNotMatch(vm.runInContext('assessmentExamMarkup()',context),/type="submit"/);
  for(const handler of context.documentEvents.change)handler({target:{name:'assessmentAnswer',value:'2',dataset:{}}});
  assert.equal(vm.runInContext('assessmentDraft',context),2);
  const markup=vm.runInContext('assessmentExamMarkup()',context);
@@ -253,4 +287,23 @@ test('a timeout during autosave recovery clears the old draft and cannot submit 
  await vm.runInContext('assessmentConfirm()',context);
  assert.deepEqual(context.calls.map(c=>c.action),['assessment-draft','assessment-resume']);
  assert.equal(vm.runInContext('assessmentQuestion',context),1);assert.equal(vm.runInContext('assessmentDraft',context),null);
+});
+
+test('coding task formats and examples render above the editor and escape authored HTML',()=>{
+ const context=client();
+ context.codingQuestion={id:'code-docs',format:'coding',coding:{language:'python',starter:'print(0)',inputFormat:'Массив из stdin',outputFormat:'Число в stdout',examples:[{input:'[1, 2]',output:'2',explanation:'Два положительных числа.'},{input:'<script>bad()</script>',output:'0'}]}};
+ vm.runInContext('assessmentDraftKey=()=>"code-docs";',context);
+ const markup=vm.runInContext('assessmentCodingMarkup(codingQuestion,null)',context);
+ for(const label of ['Формат ввода','Формат вывода','Примеры','Пример 1','Пример 2','Два положительных числа.'])assert.ok(markup.includes(label));
+ assert.ok(markup.indexOf('Формат ввода')<markup.indexOf('coding-editor'));
+ assert.ok(markup.includes('&lt;script&gt;'));assert.ok(!markup.includes('<script>'));
+});
+
+test('coding editor has editable example input, separate output and bounded submission controls with segmented feedback',()=>{
+ const context=client();context.q={id:'code-ui',format:'coding',coding:{language:'python',starter:'print(0)',input:'[1,2]',inputFormat:'JSON',outputFormat:'JSON',examples:[],submission:{used:2,limit:3,passed:2,total:4,results:[true,true,false,false]}}};
+ vm.runInContext('assessmentDraftKey=()=>"code-ui";',context);
+ const editor=vm.runInContext('assessmentCodingMarkup(q,null)',context),actions=vm.runInContext('assessmentCodingActions(q,true)',context);
+ assert.match(editor,/name="assessmentStdin"/);assert.match(editor,/>\[1,2\]<\/textarea>/);assert.ok(editor.indexOf('coding-io')<editor.indexOf('coding-editor-wrap'));
+ assert.match(actions,/Отправить/);assert.match(actions,/Далее/);assert.match(actions,/1 из 3/);assert.equal((actions.match(/<circle /g)||[]).length,4);assert.equal((actions.match(/stroke="#60c84c"/g)||[]).length,2);assert.match(actions,/Пройдено тестов: 2 из 4/);
+ vm.runInContext('q.coding.submission.used=3;',context);assert.match(vm.runInContext('assessmentCodingActions(q,true)',context),/data-action="assessment-code-submit" disabled/);
 });

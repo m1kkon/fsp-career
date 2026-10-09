@@ -7,7 +7,7 @@ const source=readFileSync(new URL('../public/assessments.js',import.meta.url),'u
 const base={modules:[{id:'python',name:'Python'},{id:'sql',name:'SQL'},{id:'integration-backend',name:'Интеграция',integration:true}],roles:[{id:'backend',name:'Backend Developer',modules:['python','sql'],integration:'integration-backend'}],history:[],hiddenHistory:[],registrations:[],specifications:[],days:[]};
 const result=(moduleId,score,completedAt)=>({moduleId,score,completedAt});
 const skill=(id,created,score,completedAt)=>({id,created,status:'finished',targetKind:'skill',targetId:'python',results:[result('python',score,completedAt)]});
-function render(config){const context={state:{assessment:config},page:'tests',setInterval:()=>{},document:{addEventListener:()=>{}},esc:String,button:()=>'',date:String,icon:()=>'<svg></svg>'};runInNewContext(source,context);return {latest:context.assessmentLatestResults(config),html:context.assessmentTestsPage(),context};}
+function render(config){const context={location:{hash:''},state:{assessment:config},page:'tests',setInterval:()=>{},document:{addEventListener:()=>{}},esc:String,button:()=>'',date:String,icon:()=>'<svg></svg>'};runInNewContext(source,context);return {latest:context.assessmentLatestResults(config),html:context.assessmentTestsPage(),context};}
 
 test('confirmed skills show the latest completed score even when lower, independent of history order',()=>{
  const config={...base,history:[skill('new',200,40,300),skill('old',100,95,150)]};
@@ -39,39 +39,39 @@ test('the eye keeps a hidden latest result visible to its owner and toggles the 
  el.dataset.hidden='true';await context.assessmentHandleAction(el);assert.equal(calls[1].hidden,true);
 });
 
-const bookingTime=Date.parse('2026-10-06T10:00:00Z');
-function session(id,ids,date='2026-10-06T16:00:00Z'){
- const opensAt=Date.parse(date);return {id,name:id,opensAt,closesAt:opensAt+7200000,breakSeconds:60,moduleConfigs:Object.fromEntries(ids.map(id=>[id,{seconds:640,adaptive:true}]))};
-}
-function bookingContext(config){const {context}=render(config);context.Date=class extends Date{constructor(...args){super(...(args.length?args:[bookingTime]));}static now(){return bookingTime;}};return context;}
-
-test('calendar shows fourteen Monday-aligned Moscow dates across month and year boundaries',()=>{
- const context=bookingContext(base);assert.equal(context.assessmentCalendarStart(Date.parse('2026-10-06T22:00:00Z')),'2026-10-05');assert.equal(context.assessmentDateKey(Date.parse('2026-10-06T22:00:00Z')),'2026-10-07');
- const dates=context.assessmentCalendarDates('2026-12-28');assert.equal(dates.length,14);assert.equal(dates[0],'2026-12-28');assert.equal(dates[13],'2027-01-10');assert.equal(new Set(dates).size,14);
+test('qualification picker contains skills and roles without calendar or booking confirmation',()=>{
+ const {context}=render(base);
+ const skills=context.assessmentBookingMarkup(base,{kind:'skill'});
+ assert.ok(skills.includes('Python'));assert.ok(!skills.includes('Интеграция'));assert.ok(!skills.includes('Дата тестирования'));assert.ok(!skills.includes('qualification-calendar'));assert.ok(!skills.includes('type="submit"'));
+ const roles=context.assessmentBookingMarkup(base,{kind:'role'});assert.ok(roles.includes('Backend Developer'));assert.ok(!roles.includes('Python'));
 });
 
-test('role dates require the full adaptive module composition, enough remaining time and a future or current date',()=>{
- const full=session('full',['python','sql','integration-backend']),partial=session('partial',['python','sql']);
- const legacy=session('legacy',['python','sql','integration-backend']);legacy.moduleConfigs.sql.adaptive=false;
- const short=session('short',['python','sql','integration-backend']);short.closesAt=short.opensAt+1800000;
- const yesterday=session('yesterday',['python','sql','integration-backend'],'2026-10-05T16:00:00Z');yesterday.closesAt=bookingTime+86400000;
- const config={...base,days:[full,partial,legacy,short,yesterday]},context=bookingContext(config);
- const model=context.assessmentBookingModel(config,{kind:'role',targetId:'backend',start:'2026-10-05',date:'2026-10-06',dayId:'full'},bookingTime);
- assert.equal(model.days.length,14);assert.equal(model.days[0].past,true);assert.equal(model.days[0].sessions.length,0);assert.deepEqual(JSON.parse(JSON.stringify(model.days[1].sessions.map(s=>s.id))),['full']);assert.equal(model.selected.id,'full');
- assert.equal(context.assessmentBookingModel(config,{kind:'role',targetId:'backend',start:'2026-10-05',date:'2026-10-06',dayId:'partial'},bookingTime).selected,null);
- assert.equal(context.assessmentBookingModel(config,{kind:'skill',targetId:'integration-backend',start:'2026-10-05'},bookingTime).sessions.length,0);
+test('choosing a qualification navigates directly to its start page without registering a session',async()=>{
+ const {context}=render(base),calls=[];context.go=route=>calls.push(route);context.assessmentPreparation={targetId:'old'};
+ await context.assessmentHandleAction({dataset:{action:'assessment-book-target',id:'backend'}});
+ assert.deepEqual(calls,['tests/start/backend']);
 });
 
-test('booking submit uses the selected real session and updates or clears it after role and calendar changes',async()=>{
- const config={...base,days:[session('python-slot',['python']),session('role-slot',['python','sql','integration-backend'],'2026-10-06T17:00:00Z')]},context=bookingContext(config),calls=[];
- context.overlay={querySelector:()=>({classList:{add:()=>{}},scrollTop:0})};context.modal=()=>{};context.assessmentBookingRender=()=>{};context.mutate=async body=>calls.push(body);
- const error={textContent:''},form={id:'assessment-book-form',querySelector:()=>error};
- context.assessmentBook();await context.assessmentHandleSubmit(form,{});assert.equal(calls.length,0);assert.ok(error.textContent.includes('Выберите доступную дату'));
- await context.assessmentHandleAction({dataset:{action:'assessment-book-date',date:'2026-10-06'}});await context.assessmentHandleSubmit(form,{});
- assert.deepEqual(JSON.parse(JSON.stringify(calls[0])),{action:'assessment-register',targetId:'python',dayId:'python-slot'});
- await context.assessmentHandleAction({dataset:{action:'assessment-book-kind',kind:'role'}});await context.assessmentHandleSubmit(form,{});
- assert.deepEqual(JSON.parse(JSON.stringify(calls[1])),{action:'assessment-register',targetId:'backend',dayId:'role-slot'});
- await context.assessmentHandleAction({dataset:{action:'assessment-book-weeks',shift:'14'}});await context.assessmentHandleSubmit(form,{});assert.equal(calls.length,2);
+test('preparing the daily pool preserves grade and consent selected while loading',async()=>{
+ const {context}=render(base);let resolve;
+ context.api=()=>new Promise(done=>{resolve=done;});context.render=()=>{};
+ const load=context.assessmentLoadPreparation({id:'backend'});
+ context.assessmentHandleChange({target:{name:'targetGrade',value:'Senior',form:{id:'assessment-start-form'}}});
+ context.assessmentHandleChange({target:{name:'accepted',checked:true,form:{id:'assessment-start-form'}}});
+ resolve({preparation:{targetId:'backend'}});await load;
+ context.location.hash='#tests/start/backend';context.title=(h,p)=>h+p;
+ const html=context.assessmentTestsPage();assert.ok(html.includes('value="Senior" checked'));assert.ok(html.includes('name="accepted" required checked'));
+});
+
+test('role start page offers a grade and submits the target directly, with no day booking',async()=>{
+ const {context}=render(base);context.location.hash='#tests/start/backend';context.title=(h,p)=>h+p;
+ const prep={targetId:'backend',name:'Backend Developer',day:{id:'daily-pool-today',breakSeconds:60,moduleConfigs:{python:{seconds:640},sql:{seconds:640},'integration-backend':{seconds:640}}}};
+ context.api=async()=>({preparation:prep});context.render=()=>{};
+ await context.assessmentLoadPreparation({id:'backend'});
+ const html=context.assessmentTestsPage();assert.ok(html.includes('Целевой грейд'));assert.ok(html.includes('Начать тест'));assert.ok(!html.includes('календар'));assert.ok(!html.includes('Ваши записи'));
+ const calls=[];context.api=async body=>{calls.push(body);return {assessment:{id:'attempt',status:'active',modules:[]}};};context.close=()=>{};
+ await context.assessmentHandleSubmit({id:'assessment-start-form',dataset:{targetId:'backend'},elements:{accepted:{checked:true},targetGrade:{value:'Senior'}},querySelector:()=>({})},{});
+ assert.deepEqual(JSON.parse(JSON.stringify(calls[0])),{action:'assessment-start',targetId:'backend',rulesAccepted:true,targetGrade:'Senior'});
 });
 
  test('question form renders competencies and integration skills from the selected module',()=>{
@@ -119,4 +119,21 @@ test('inline code covers technical names and expressions across prose without ch
  assert.equal(plain,text);
  const literal='Что выведет print("<img src=x onerror=alert(1)>") и `typeof value`?';
  const escaped=context.assessmentInlineCode(literal,'python');assert.ok(!escaped.includes('<img'));assert.ok(escaped.includes('&lt;img'));assert.ok(escaped.includes('`typeof value`'));
+});
+
+
+test('role result labels distinguish all five outcomes and preserve legacy reports',()=>{
+ const {context}=render(base);
+ const cases=[
+  [{targetGrade:'Middle',confirmedGrade:'Middle',confirmedPlus:true,potentialHigher:'Senior',status:'confirmed-plus-potential'},'Middle+ подтверждён · потенциал Senior'],
+  [{targetGrade:'Middle',confirmedGrade:'Middle',confirmedPlus:true,status:'confirmed-plus'},'Middle+ подтверждён'],
+  [{targetGrade:'Middle',confirmedGrade:'Middle',confirmedPlus:false,status:'confirmed'},'Middle подтверждён'],
+  [{targetGrade:'Middle',confirmedGrade:'Junior',confirmedPlus:true,status:'unconfirmed-lower'},'Middle не подтверждён · подтверждён Junior+'],
+  [{targetGrade:'Middle',confirmedGrade:'Junior',confirmedPlus:false,status:'unconfirmed-lower'},'Middle не подтверждён · подтверждён Junior'],
+  [{targetGrade:'Middle',confirmedGrade:null,status:'unconfirmed'},'Middle не подтверждён'],
+  [{level:'Senior'},'Senior'],
+ ];
+ for(const [result,label] of cases)assert.equal(context.assessmentRoleOutcome(result),label);
+ const report={id:'plus-role',created:100,status:'finished',targetKind:'role',targetId:'backend',roleResult:{...cases[0][0],completed:true},results:[result('python',90,110),result('sql',95,120),result('integration-backend',90,130)]};
+ assert.ok(render({...base,history:[report]}).html.includes('Middle+ подтверждён · потенциал Senior'));
 });
