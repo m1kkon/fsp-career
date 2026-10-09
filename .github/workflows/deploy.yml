@@ -20,7 +20,9 @@ jobs:
     timeout-minutes: 20
     services:
       postgres:
-        image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+        # Google's Docker Hub cache avoids anonymous Docker Hub pull limits.
+        # Keep the verified upstream digest so the database image is unchanged.
+        image: mirror.gcr.io/library/postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
         env:
           POSTGRES_USER: fsp
           POSTGRES_PASSWORD: ci-test-password
