@@ -1,12 +1,14 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {DEFAULT_SCORING,SCORING_RULE,answerCredit,difficultyAdjustedScore,evidenceScore,meetsModuleGrade} from '../lib/assessment-scoring.mjs';
+import {DEFAULT_SCORING,DEFAULT_THRESHOLDS,SCORING_RULE,LINEAR_CODING_SCORING_RULE,LEGACY_EVIDENCE_SCORING_RULE,answerCredit,difficultyAdjustedScore,evidenceScore,meetsModuleGrade} from '../lib/assessment-scoring.mjs';
 import {mixedCodingSpec,adaptiveScore,LEGACY_MIXED_CODING_RULE,routingDecision} from '../lib/adaptive-testing.mjs';
 import {roleGradeOutcome,LEGACY_PLUS_RULE} from '../lib/role-grade.mjs';
 const thresholds={Junior:50,Middle:70,Senior:90};
 const correct=(q,v)=>q.format==='coding'?v?.judged===true&&v.correct===true:v===1;
-function moduleFixture({theory=28,passes=[5,5,5,5],route='advanced'}={}){
+// Keep the original linear-scoring regression cases pinned to their v2 snapshot.
+function moduleFixture({theory=28,passes=[5,5,5,5],route='advanced',linear=true}={}){
  const spec=mixedCodingSpec({thresholds:structuredClone(thresholds)});
+ if(linear)spec.scoring.rule=LINEAR_CODING_SCORING_RULE;
  const questions=[...Array.from({length:28},(_,i)=>({id:'t'+i,format:'choice',scored:true,difficulty:2})),...[2,2,route==='advanced'?3:1,route==='advanced'?3:1].map((difficulty,i)=>({id:'c'+i,format:'coding',scored:true,difficulty,coding:{tests:Array(5).fill({})}}))];
  const answers=Object.fromEntries(questions.map((q,i)=>[q.id,{value:q.format==='coding'?{judged:true,source:'server snapshot',passed:passes[i-28],total:5,correct:passes[i-28]===5}:i<theory?1:null}]));
  return {spec,questions,answers,adaptive:{selectedRoute:route}};
@@ -57,12 +59,14 @@ test('rounding for display cannot push an insufficient score over a grade bounda
  m.spec.thresholds.Middle=raw+.01;m.spec.thresholds.Senior=100;
  const r=result(m);assert.equal(r.score,Math.round(raw*10)/10);assert.equal(meetsModuleGrade(r,'Middle'),false);
 });
-test('partial coding evidence participates in first-part routing',()=>{
+test('advanced routing requires both a sufficient score and a fully solved first-part coding task',()=>{
  const m=moduleFixture();m.questions=m.questions.slice(0,14).concat(m.questions.slice(28,30));
  for(let i=0;i<14;i++)m.answers['t'+i].value=i<10?1:0;
  m.answers.c0.value={judged:true,passed:0,total:5,correct:false};m.answers.c1.value={judged:true,passed:0,total:5,correct:false};
  assert.equal(routingDecision(m,correct).route,'foundation');
  m.answers.c0.value={judged:true,passed:4,total:5,correct:false};
+ assert.equal(routingDecision(m,correct).route,'foundation');
+ m.answers.c0.value={judged:true,passed:5,total:5,correct:true};
  assert.equal(routingDecision(m,correct).route,'advanced');
 });
 test('legacy mixed scoring and plus outcomes keep their frozen weighted rules',()=>{
@@ -72,5 +76,55 @@ test('legacy mixed scoring and plus outcomes keep their frozen weighted rules',(
  assert.equal(adaptiveScore(m,correct).maximumPoints,70);assert.equal(adaptiveScore(m,correct).score,83);
  const old={score:86,thresholds};assert.equal(roleGradeOutcome([old],'Middle',LEGACY_PLUS_RULE).status,'confirmed-plus');
  assert.equal(roleGradeOutcome([old],'Middle',LEGACY_PLUS_RULE).outcomeRule,LEGACY_PLUS_RULE);
- assert.equal(SCORING_RULE,'rasch-theory-practice-v1');
+ assert.equal(SCORING_RULE,'rasch-theory-practice-v3');
+});
+
+test('legacy evidence snapshots retain their score, routing, coding requirements and outcome',()=>{
+ const m=moduleFixture({theory:20,passes:[4,4,4,4]});
+ m.spec.scoring={...structuredClone(DEFAULT_SCORING),rule:LEGACY_EVIDENCE_SCORING_RULE,calibration:'provisional',routingCodingSolvedMin:0,
+  grades:{Junior:{codingMin:40,plusCodingMin:60,difficultyMin:1,solvedMin:1,plusSolvedMin:1},Middle:{codingMin:60,plusCodingMin:80,difficultyMin:2,solvedMin:1,plusSolvedMin:1},Senior:{codingMin:80,plusCodingMin:90,difficultyMin:3,solvedMin:1,plusSolvedMin:1}}};
+ assert.equal(routingDecision(m,correct).route,'advanced');
+ const r=result(m);assert.equal(r.scoreRule,LEGACY_EVIDENCE_SCORING_RULE);
+ assert.equal(r.gradeRequirements.Middle.codingMin,60);assert.equal(r.gradeRequirements.Middle.theoryMin,0);
+ assert.equal(meetsModuleGrade(r,'Junior'),false);
+});
+
+test('new lower cutoffs never qualify theory-only, coding-only or all-partial answers',()=>{
+ for(const linear of [true,false])for(const m of [moduleFixture({linear,passes:[0,0,0,0]}),moduleFixture({linear,theory:0}),moduleFixture({linear,passes:[4,4,4,4]})]){
+  m.spec.thresholds=structuredClone(DEFAULT_THRESHOLDS);
+  for(const grade of ['Junior','Middle','Senior'])assert.equal(meetsModuleGrade(result(m),grade),false);
+ }
+ const m=moduleFixture({theory:19,passes:[5,5,3,3]});m.spec.thresholds=structuredClone(DEFAULT_THRESHOLDS);
+ assert.equal(meetsModuleGrade(result(m),'Middle'),true);assert.equal(meetsModuleGrade(result(m),'Senior'),false);
+});
+
+test('coding difficulty adjustment uses the actual tasks, exposes raw completion, and leaves foundation scoring unchanged',()=>{
+ const hard=moduleFixture({linear:false,passes:[5,5,0,0]}),easy=moduleFixture({linear:false,passes:[5,5,0,0],route:'foundation'});
+ const high=result(hard),low=result(easy);
+ assert.equal(high.codingCompletion,50);assert.equal(low.codingCompletion,50);
+ assert.equal(low.codingScore,50);assert.ok(high.codingScore>low.codingScore);
+ assert.equal(high.codingScoreModel,'difficulty-adjusted-v1');
+ hard.adaptive.selectedRoute='foundation';assert.equal(result(hard).scoreExact,high.scoreExact);
+ hard.questions.push({id:'experimental',format:'coding',scored:false,difficulty:3,coding:{tests:Array(5).fill({})}});
+ hard.answers.experimental={value:{judged:true,passed:5,total:5,correct:true}};assert.equal(result(hard).scoreExact,high.scoreExact);
+});
+
+test('an intermediate practical result is not failed solely because harder challenges were missed',()=>{
+ const old=moduleFixture({theory:22,passes:[5,2,0,0]}),current=moduleFixture({linear:false,theory:22,passes:[5,2,0,0]});
+ for(const m of [old,current])m.spec.thresholds=structuredClone(DEFAULT_THRESHOLDS);
+ assert.equal(meetsModuleGrade(result(old),'Middle'),false);
+ assert.equal(meetsModuleGrade(result(current),'Middle'),true);
+ assert.equal(meetsModuleGrade(result(current),'Senior'),false);
+ assert.equal(result(old).codingScore,35);assert.equal(result(old).codingCompletion,undefined);
+});
+
+test('current coding adjustment remains monotone and cannot award Senior without a fully solved hard task',()=>{
+ let previous=-1;
+ for(let credit=0;credit<=5;credit++){
+  const r=result(moduleFixture({linear:false,passes:[credit,credit,credit,credit]}));
+  assert.ok(r.scoreExact>previous);previous=r.scoreExact;
+  if(credit<5)for(const grade of ['Junior','Middle','Senior'])assert.equal(meetsModuleGrade(r,grade),false);
+ }
+ const r=result(moduleFixture({linear:false,passes:[5,5,4,4]}));
+ assert.ok(r.score>=90);assert.equal(meetsModuleGrade(r,'Senior'),false);
 });

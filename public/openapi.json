@@ -3,7 +3,7 @@
   "info": {
     "title": "ФСП Карьера MVP API",
     "version": "2.1.0",
-    "description": "Node.js/PostgreSQL API. Собственная регистрация по email и паролю (12–128 символов), scrypt, серверная сессия 30 дней в HttpOnly/Secure/SameSite=Lax cookie. Вход только после подтверждения email через Resend; ссылки одноразовые, подтверждение 24 часа, восстановление 30 минут. role выбирает представление, права выдаются только при создании профиля. Запись требует Origin, совпадающий с APP_URL. Заголовки идентичности Sites не принимаются."
+    "description": "Node.js/PostgreSQL API. Собственная регистрация по email и паролю (12–128 символов), scrypt, серверная сессия 30 дней в HttpOnly/Secure/SameSite=Lax cookie. Вход только после подтверждения email через Resend; ссылки одноразовые, подтверждение 24 часа, восстановление 30 минут. role выбирает представление, права выдаются только при создании профиля. Запись требует Origin, совпадающий с APP_URL. Заголовки идентичности Sites не принимаются. Описание актуализировано по локальному коду 2026-10-10; публикация текущего артефакта проверяется отдельно."
   },
   "servers": [
     {
@@ -29,7 +29,7 @@
           {
             "name": "query",
             "in": "query",
-            "description": "Потребность работодателя свободным текстом. Без неё need = null, а кандидаты упорядочены по силе подтверждённого профиля.",
+            "description": "Потребность работодателя свободным текстом. До confirmed=1 возвращается разбор без выдачи. Без query need=null, порядок задают только тесты и видимые достижения ФСП (strength, до 18 баллов).",
             "schema": {
               "type": "string"
             }
@@ -68,7 +68,7 @@
           {
             "name": "budgetMin",
             "in": "query",
-            "description": "Бюджет от, ₽.",
+            "description": "Бюджет от, ₽; ожидания кандидата должны пересекаться с бюджетом, границы включены. Без query также фильтрует браузерный каталог.",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -78,7 +78,7 @@
           {
             "name": "budgetMax",
             "in": "query",
-            "description": "Бюджет до, ₽. Неверные значения поиска (не целые, вне диапазона, до < от) игнорируются без ошибки.",
+            "description": "Бюджет до, ₽. Неверные значения (не целые, вне 1–10000000, до < от) возвращают 400. В подтверждённой потребности salaryRequired=0 отключает обязательную фильтрацию по бюджету.",
             "schema": {
               "type": "integer",
               "minimum": 1,
@@ -94,6 +94,7 @@
                 "Backend",
                 "Frontend",
                 "Data Science",
+                "ML Engineering",
                 "DevOps",
                 "QA"
               ]
@@ -109,7 +110,8 @@
                 "Middle",
                 "Senior"
               ]
-            }
+            },
+            "description": "Минимальный подтверждённый грейд потребности; более высокий грейд не штрафуется. Не является точным фильтром как grade в публичном /api/v1/candidates."
           },
           {
             "name": "stack",
@@ -306,7 +308,7 @@
         },
         "responses": {
           "200": {
-            "description": "Операция выполнена. test-start возвращает test без ключа ответов; test-submit возвращает result.",
+            "description": "Операция выполнена. assessment-* возвращают актуальную ревизию/результат; test-start отключён (409), test-submit завершает только существующие прежние попытки.",
             "content": {
               "application/json": {
                 "schema": {
@@ -863,6 +865,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -1348,6 +1351,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -1466,7 +1470,7 @@
       },
       "test-start": {
         "type": "object",
-        "description": "Создать персонализированную попытку теста",
+        "description": "Устаревшее действие: новые попытки не создаёт, возвращает 409. Используйте опубликованную сессию и assessment-*.",
         "properties": {
           "action": {
             "type": "string",
@@ -1499,7 +1503,7 @@
       },
       "test-submit": {
         "type": "object",
-        "description": "Проверить ответы, сохранить результат и назначить категорию",
+        "description": "Завершает только существующую прежнюю попытку; не используется для нового модульного тестирования.",
         "properties": {
           "action": {
             "type": "string",
@@ -1543,6 +1547,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -1667,6 +1672,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -1773,12 +1779,16 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
           },
           "grade": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "enum": [
               "Junior",
               "Middle",
@@ -1787,7 +1797,10 @@
             ]
           },
           "score": {
-            "type": "integer"
+            "type": [
+              "number",
+              "null"
+            ]
           },
           "stack": {
             "type": "array",
@@ -1836,7 +1849,10 @@
             "type": "boolean"
           },
           "verifiedAt": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "synthetic": {
             "type": "boolean"
@@ -2084,7 +2100,7 @@
       },
       "Match": {
         "type": "object",
-        "description": "Объяснимый балл соответствия: сумма parts[].points равна score. Без запроса score = null и порядок задаёт strength. В отклике балл считается относительно вакансии.",
+        "description": "Общий балл соответствия кандидата: сумма parts[].points равна score. Обязательные условия pass/unknown/fail сортируются перед баллом. Без потребности score=null, используется strength (тесты и ФСП, до 18). В отклике потребность формируется из вакансии. Диагностическое текстовое semantic.score отдельно не сортирует кандидатов.",
         "properties": {
           "score": {
             "type": [
@@ -2097,8 +2113,8 @@
           "strength": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 30,
-            "description": "Сила подтверждённого профиля: баллы теста и ФСП"
+            "maximum": 18,
+            "description": "Баллы подтверждённого теста (до 12) и видимых ФСП-достижений (до 6); без потребности это отдельный показатель тестов и ФСП."
           },
           "relation": {
             "type": [
@@ -2134,6 +2150,24 @@
           },
           "fsp": {
             "$ref": "#/components/schemas/FspSignal"
+          },
+          "eligibility": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Результат обязательных условий; pass выше unknown, unknown выше fail. Обязательный бюджет дополнительно исключает кандидатов без пересечения ожиданий."
+          },
+          "resumeEvidence": {
+            "type": "object",
+            "description": "Свидетельства задач и применения технологий в заявленных опыте и проектах; правила учитывают отрицания и будущие планы. Не внешняя проверка опыта."
+          },
+          "semantic": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Диагностическое TF-IDF-сходство текста и совпавшие термины; отдельно не влияет на порядок выдачи."
           }
         },
         "required": [
@@ -2148,7 +2182,7 @@
       },
       "MatchPart": {
         "type": "object",
-        "description": "Веса: spec 25, grade 15, stack 20, test 20, fsp 10, format 4, salary 4, domain 2. Незаданный работодателем признак получает полный балл у всех.",
+        "description": "Максимумы: spec 25, grade 15, stack 12, resume 20, test 12, fsp 6, format 4, salary 4, domain 2; сумма 100. Минимальный грейд: более высокий получает полный вклад. Незаданный контекстный признак получает полный балл, подтверждённый тест и ФСП считаются по реальным видимым сигналам.",
         "properties": {
           "key": {
             "type": "string",
@@ -2156,6 +2190,7 @@
               "spec",
               "grade",
               "stack",
+              "resume",
               "test",
               "fsp",
               "format",
@@ -2211,7 +2246,7 @@
           "object",
           "null"
         ],
-        "description": "Вклад ФСП: лучший результат × профильность дисциплины × давность, каждый следующий результат +10%, не более 10 баллов. null — история не привязана или скрыта кандидатом; пустой items — привязка без достижений.",
+        "description": "Вклад ФСП: лучший результат × профильность дисциплины × давность, каждый следующий результат +10%, не более 6 баллов. null — история не привязана или скрыта; пустой items — привязка без достижений. Источник пока демонстрационный.",
         "properties": {
           "id": {
             "type": "string"
@@ -2222,7 +2257,7 @@
           "points": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 10
+            "maximum": 6
           },
           "items": {
             "type": "array",
@@ -2310,7 +2345,7 @@
           "object",
           "null"
         ],
-        "description": "Разбор потребности правилами на ключевых словах. Специализацию и грейд задаёт текст запроса; контекст команды уточняет порядок внутри категории.",
+        "description": "Разбор потребности по правилам и явным решениям работодателя. Категория подтверждается до поиска. Грейд — минимальный; обязательные условия и бюджет имеют приоритет, опыт и проекты участвуют в общем балле. Это не обученная модель общего понимания текста.",
         "properties": {
           "text": {
             "type": "string"
@@ -2383,6 +2418,7 @@
                 "Backend",
                 "Frontend",
                 "Data Science",
+                "ML Engineering",
                 "DevOps",
                 "QA"
               ]
@@ -2410,7 +2446,8 @@
             }
           },
           "confirmed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Категория и минимальный грейд подтверждены работодателем."
           },
           "missing": {
             "type": "array",
@@ -2449,6 +2486,44 @@
                 "type": "boolean"
               }
             }
+          },
+          "requiredStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Обязательные технологии; отличаются от желательных preferredStack."
+          },
+          "preferredStack": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Желательные технологии, допускающие неполное совпадение."
+          },
+          "englishLevel": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Минимальный уровень английского по заявлению кандидата; неизвестный результат отмечается отдельно."
+          },
+          "minExperience": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Минимальный коммерческий опыт в годах по данным анкеты."
+          },
+          "formatRequired": {
+            "type": "boolean"
+          },
+          "locationRequired": {
+            "type": "boolean"
+          },
+          "salaryRequired": {
+            "type": "boolean",
+            "description": "По умолчанию true при заполненном бюджете; false оставляет бюджет фактором балла."
           }
         }
       },
@@ -2466,6 +2541,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -2558,6 +2634,7 @@
               "Backend",
               "Frontend",
               "Data Science",
+              "ML Engineering",
               "DevOps",
               "QA"
             ]
@@ -3117,8 +3194,10 @@
             "type": "integer"
           },
           "score": {
-            "type": "integer",
-            "description": "Для adaptive v3: заработанные взвешенные баллы / фиксированный максимум 70 × 100, округлённо. Прежние попытки сохраняют процент правильных ответов."
+            "type": "number",
+            "description": "Итог v3: 0.6 × theoryScore + 0.4 × codingScore, отображение до одного знака после запятой; грейд проверяется по точному результату и дополнительным требованиям практики. Старые правила сохраняют прежнюю формулу.",
+            "minimum": 0,
+            "maximum": 100
           },
           "correct": {
             "type": "integer"
@@ -3164,12 +3243,64 @@
             "description": "Выбранная ветка, доступна только в раскрытом результате."
           },
           "scoreRule": {
-            "type": "string"
+            "type": "string",
+            "description": "Правило сохранённой попытки: текущее стандартное rasch-theory-practice-v3, прежние версии сохраняются."
           },
           "adaptiveRule": {
-            "type": "string"
+            "type": "string",
+            "description": "Правило выбора маршрута; для стандартного смешанного теста two-stage-16-mixed-coding-v3. Версия адаптации отличается от scoreRule."
+          },
+          "scoreExact": {
+            "type": "number",
+            "description": "Неокруглённый итог для проверки порогов грейда."
+          },
+          "theoryScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Нормализованный Rasch/1PL результат теории с якорями сложности -1/0/1; предварительная модель."
+          },
+          "codingScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Нормализованный результат практики; в v3 при difficulty-adjusted-v1 учитывает сложность 0/0/2. В прежних v1/v2 линейная доля проверок по задачам."
+          },
+          "codingCompletion": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "В v3: сырая средняя доля пройденных проверок по каждой задаче × 100; отличается от codingScore."
+          },
+          "codingScoreModel": {
+            "type": "string",
+            "description": "Для новых v3: difficulty-adjusted-v1. Отсутствует в прежних результатах с линейной практикой."
+          },
+          "calibration": {
+            "type": "string",
+            "description": "Текущий маркер synthetic-v2-provisional; не означает калибровку на людях."
+          },
+          "codingEvidence": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "fullySolved": {
+                "type": "integer"
+              },
+              "solvedByDifficulty": {
+                "type": "object",
+                "description": "Количество полностью решённых задач со сложностью не ниже 1, 2, 3."
+              }
+            }
+          },
+          "gradeRequirements": {
+            "type": "object",
+            "description": "Проверки итогового/теоретического/практического минимума и полностью решённых задач для каждого грейда и «+»."
           }
-        }
+        },
+        "description": "Результат завершённого модуля. Новые попытки используют rasch-theory-practice-v3; прежний scoreRule и сохранённая спецификация не пересчитываются. Во время комплексного теста результат скрыт до завершения."
       },
       "Assessment": {
         "type": "object",

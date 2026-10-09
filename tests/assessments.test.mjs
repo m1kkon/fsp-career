@@ -180,7 +180,7 @@ test('the diagnostic part opens the fixed advanced or foundation route only afte
   assert.equal(second.currentModule.expiresAt-second.currentModule.questionStartedAt,20000);
   const serial=JSON.stringify(second);for(const key of ['correct','numeric','difficulty','routes','selectedRoute','decision'])assert.ok(!serial.includes('"'+key+'":'));
   const finished=await completeAdaptivePart(repo,a,v.id,true);assert.equal(finished.status,'finished');assert.equal(finished.results[0].total,32);
-  if(correct)assert.equal(finished.results[0].score,100);else assert.ok(finished.results[0].score<50);assert.equal(finished.results[0].level,correct?'Senior':'Ниже Junior');assert.equal(finished.results[0].scoreRule,SCORING_RULE);assert.equal(finished.results[0].secondPartRoute,route);
+  if(correct)assert.equal(finished.results[0].score,100);else assert.ok(finished.results[0].score<50);assert.equal(finished.results[0].level,correct?'Senior':'Junior');assert.equal(finished.results[0].scoreRule,SCORING_RULE);assert.equal(finished.results[0].secondPartRoute,route);
  }
 });
 test('route snapshots survive resume, bank edits and stale answer replay',async()=>{
@@ -227,12 +227,12 @@ test('a complete adaptive role uses two parts for every base and integration mod
   view=await completeAdaptivePart(repo,a,v.id,true);assert.equal(view.currentModule.partIndex,1);assert.deepEqual(view.results,[]);
   view=await completeAdaptivePart(repo,a,v.id,true);if(i<2){assert.deepEqual(view.results,[]);assert.equal(view.resultsAvailable,false);}
  }
- assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);assert.equal(view.roleResult.targetGrade,'Middle');assert.equal(view.roleResult.status,'confirmed-plus-potential');assert.equal(view.roleResult.confirmedGrade,'Middle');assert.equal(view.roleResult.confirmedPlus,true);assert.equal(view.roleResult.outcomeRule,ROLE_OUTCOME_RULE);assert.ok(view.roleResult.plusThresholds.every(r=>r.threshold===80));assert.equal(view.roleResult.potentialHigher,'Senior');
+ assert.equal(view.status,'finished');assert.equal(view.roleResult.level,'Senior');assert.equal(view.results.length,3);assert.ok(view.results.every(r=>r.total===32&&r.score===100));assert.equal(view.roleResult.integration.total,32);assert.equal(view.roleResult.targetGrade,'Middle');assert.equal(view.roleResult.status,'confirmed-plus-potential');assert.equal(view.roleResult.confirmedGrade,'Middle');assert.equal(view.roleResult.confirmedPlus,true);assert.equal(view.roleResult.outcomeRule,ROLE_OUTCOME_RULE);assert.ok(view.roleResult.plusThresholds.every(r=>r.threshold===72.5));assert.equal(view.roleResult.potentialHigher,'Senior');
 });
 test('legacy saved specifications upgrade for future days without mutating old published snapshots',async()=>{
  const repo=memory(),old=await day(repo,{},['python']);
  await repo.put('module-spec',{...DEFAULT_SPECS[0],id:'old-custom',version:4,created:Date.now(),questionSeconds:35});
- const all=await specifications(repo),newest=all.filter(s=>s.moduleId==='python').sort((a,b)=>b.version-a.version)[0];assert.ok(newest.adaptive);assert.equal(newest.questionSeconds,35);assert.equal(newest.version,7);
+ const all=await specifications(repo),newest=all.filter(s=>s.moduleId==='python').sort((a,b)=>b.version-a.version)[0];assert.ok(newest.adaptive);assert.equal(newest.questionSeconds,35);assert.equal(newest.version,9);
  const next=await day(repo,{},['python'],true);assert.equal(next.specs[0].scoredCount,32);assert.equal(next.moduleConfigs.python.seconds,2180);assert.equal((await repo.record(old.id)).specs[0].scoredCount,6);
 });
 test('the common Rasch scale gives equal routing scores for equal credits on the same first-part difficulty mix',async()=>{

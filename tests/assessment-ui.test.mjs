@@ -6,6 +6,13 @@ import {runInNewContext} from 'node:vm';
 const source=readFileSync(new URL('../public/assessments.js',import.meta.url),'utf8');
 const base={modules:[{id:'python',name:'Python'},{id:'sql',name:'SQL'},{id:'integration-backend',name:'Интеграция',integration:true}],roles:[{id:'backend',name:'Backend Developer',modules:['python','sql'],integration:'integration-backend'}],history:[],hiddenHistory:[],registrations:[],specifications:[],days:[]};
 const result=(moduleId,score,completedAt)=>({moduleId,score,completedAt});
+
+test('result cards distinguish difficulty-adjusted coding points from raw completion and preserve old percentage reports',()=>{
+ const {context}=render(base),row={name:'Python',score:80,theoryScore:80,codingScore:80,codingCompletion:50,codingScoreModel:'difficulty-adjusted-v1',correct:20,total:32,specVersion:8,gradeRequirements:{Junior:{met:true},Middle:{met:true},Senior:{met:true}}};
+ const current=context.assessmentResultRows([row]);assert.ok(current.includes('Кодинг 80/100'));assert.ok(current.includes('Средний зачёт задач: 50%'));assert.ok(!current.includes('Кодинг 80%'));
+ const old={...row,codingScore:50};delete old.codingCompletion;delete old.codingScoreModel;
+ const legacy=context.assessmentResultRows([old]);assert.ok(legacy.includes('Кодинг 50%'));assert.ok(!legacy.includes('Средний зачёт задач'));
+});
 const skill=(id,created,score,completedAt)=>({id,created,status:'finished',targetKind:'skill',targetId:'python',results:[result('python',score,completedAt)]});
 function render(config){const context={location:{hash:''},state:{assessment:config},page:'tests',setInterval:()=>{},document:{addEventListener:()=>{}},esc:String,button:()=>'',date:String,icon:()=>'<svg></svg>'};runInNewContext(source,context);return {latest:context.assessmentLatestResults(config),html:context.assessmentTestsPage(),context};}
 

@@ -73,9 +73,9 @@ test('same-score Python profiles isolate the FSP bonus without changing other sc
  const need=backendNeed(),rows=rowsFor(need);
  const plain=rows.find(row=>row.id==='search-demo-3'),winner=rows.find(row=>row.id==='search-demo-4');
  assert.equal(plain.score,winner.score);assert.equal(plain.match.eligibility.status,'pass');assert.equal(winner.match.eligibility.status,'pass');
- assert.equal(part(plain,'fsp').points,0);assert.equal(part(winner,'fsp').points,10);
+ assert.equal(part(plain,'fsp').points,0);assert.equal(part(winner,'fsp').points,6);
  assert.deepEqual(plain.match.parts.filter(item=>item.key!=='fsp'),winner.match.parts.filter(item=>item.key!=='fsp'));
- assert.equal(winner.match.score,plain.match.score+10);
+ assert.equal(winner.match.score,plain.match.score+6);
 });
 
 test('text similarity diagnostics cannot override the displayed candidate score',()=>{
@@ -88,9 +88,10 @@ test('text similarity diagnostics cannot override the displayed candidate score'
   return rankCandidates(rows,need,recommendCategories(rows,need));
  };
  assert.equal(compare(payment)[0].id,'search-demo-3');
- assert.equal(compare(education)[0].id,'search-demo-3');
+ assert.equal(compare(education)[0].id,'search-demo-8');
  const educationRows=compare(education);
- assert.ok(educationRows[1].match.semantic.score>educationRows[0].match.semantic.score);
+ const inverted=educationRows.map((row,i)=>({...row,match:{...row.match,semantic:{score:i===0?0:100}}}));
+ assert.deepEqual(rankCandidates(inverted,education).map(row=>row.id),educationRows.map(row=>row.id));
  assert.ok(educationRows[0].match.score>educationRows[1].match.score);
 });
 

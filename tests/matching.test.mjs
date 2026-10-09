@@ -65,7 +65,7 @@ test('FSP history lifts a candidate inside the category without excluding anyone
  assert.deepEqual(ranked.map(r=>r.id),['with-fsp','empty-history','no-history']);
  assert.equal(categories[0].count,3);assert.equal(categories[0].withFsp,1);
  const [withFsp,...others]=ranked;
- assert.equal(part(withFsp.match,'fsp').points,6);
+ assert.equal(part(withFsp.match,'fsp').points,4);
  for(const other of others){
   assert.equal(part(other.match,'fsp').points,0);assert.equal(other.match.relation,'exact');
   assert.deepEqual(other.match.parts.filter(p=>p.key!=='fsp'),withFsp.match.parts.filter(p=>p.key!=='fsp'));
@@ -85,22 +85,22 @@ test('displayed score outranks lexical overlap and category position, but mandat
  assert.deepEqual(rankCandidates(tied,need,categories).map(candidate=>candidate.id),['a','z']);
 });
 
-test('one test question outweighs FSP participation or a final, a win outweighs it',()=>{
+test('FSP is a bounded bonus alongside test strength inside the same category',()=>{
  const need=parseNeed(QUERY);
  const rows=scored([person('test-100',{score:100}),person('participant',{score:83,fsp:mockFspProfile('DEMO-FSP-010')}),person('finalist',{score:83,fsp:mockFspProfile('DEMO-FSP-001')}),person('winner',{score:83,fsp:mockFspProfile('DEMO-FSP-012')})],need);
- assert.deepEqual(rankCandidates(rows,need,recommendCategories(rows,need)).map(r=>r.id),['winner','test-100','finalist','participant']);
- assert.deepEqual(rows.map(r=>part(r.match,'test').points),[20,13,13,13]);
- assert.deepEqual(rows.map(r=>part(r.match,'fsp').points),[0,4,6,10]);
+ assert.deepEqual(rankCandidates(rows,need,recommendCategories(rows,need)).map(r=>r.id),['winner','finalist','test-100','participant']);
+ assert.deepEqual(rows.map(r=>part(r.match,'test').points),[12,9,9,9]);
+ assert.deepEqual(rows.map(r=>part(r.match,'fsp').points),[0,2,4,6]);
 });
 
 test('FSP points use canonical adapter data, discipline fit, recency and the hidden-history setting',()=>{
  const forged={...mockFspProfile('DEMO-FSP-004'),achievements:[{event:'Forged',discipline:'Программирование ИИ',result:'1 место',level:'winner',year:2026}]};
  assert.equal(fspSignal(forged,'Backend',NOW).points,0);
  assert.equal(fspSignal({...mockFspProfile('DEMO-FSP-001'),source:'registry',status:'verified'},'Backend',NOW),null);
- assert.equal(fspSignal(mockFspProfile('DEMO-FSP-006'),'Data Science',NOW).points,10);
- assert.equal(fspSignal(mockFspProfile('DEMO-FSP-006'),'Backend',NOW).points,8);
+ assert.equal(fspSignal(mockFspProfile('DEMO-FSP-006'),'Data Science',NOW).points,6);
+ assert.equal(fspSignal(mockFspProfile('DEMO-FSP-006'),'Backend',NOW).points,5);
  const older=fspSignal(mockFspProfile('DEMO-FSP-011'),'Backend',NOW);
- assert.equal(older.items.length,2);assert.equal(older.items[0].recency,0.75);assert.equal(older.points,7);
+ assert.equal(older.items.length,2);assert.equal(older.items[0].recency,0.75);assert.equal(older.points,4);
  assert.ok(fspSignal(mockFspProfile('DEMO-FSP-011'),'Backend',Date.parse('2024-06-01')).points>older.points);
  const hidden=view(person('hidden',{fsp:mockFspProfile('DEMO-FSP-001')},{fspVisible:false}));
  assert.equal(hidden.fsp,null);assert.equal(part(matching(hidden,parseNeed(QUERY),NOW),'fsp').points,0);
@@ -130,7 +130,7 @@ test('category recommendations put the requested category first and explain neig
  // Keep this focused fixture independent of additions to the full demo bank.
  const originalRows=need=>scored(seed.candidates.filter(account=>account.id.startsWith('demo-')),need);
  let need=parseNeed(QUERY,TEAM),categories=recommendCategories(originalRows(need),need);
- assert.deepEqual(categories.map(c=>`${c.spec}|${c.grade}|${c.relation}`),['Backend|Middle|exact','Backend|Senior|higher','Data Science|Middle|adjacent','Backend|Junior|lower']);
+ assert.deepEqual(categories.map(c=>`${c.spec}|${c.grade}|${c.relation}`),['Backend|Middle|exact','Backend|Senior|higher','Backend|Junior|lower','Data Science|Middle|adjacent']);
  assert.equal(categories[0].count,4);assert.equal(categories[0].withFsp,3);assert.equal(categories[0].inBudget,4);
  assert.deepEqual(categories[0].salary,{min:150000,max:250000});
  assert.match(categories[1].reason,/выше бюджета/);assert.match(categories.find(c=>c.spec==='Data Science').reason,/Python/);
@@ -201,7 +201,7 @@ test('hidden or missing FSP history neither moves nor hides a real candidate in 
  assert.equal(part(before.match,'fsp').points,0);
  await action(repo,candidate,{action:'fsp-link',fspId:'DEMO-FSP-001'});
  const linked=await find();
- assert.equal(part(linked.match,'fsp').points,6);assert.equal(linked.match.score,before.match.score+6);
+ assert.equal(part(linked.match,'fsp').points,4);assert.equal(linked.match.score,before.match.score+4);
  await action(repo,candidate,{action:'settings',visible:true,consent:true,notifications:true,fspVisible:false});
  const hidden=await find();
  assert.equal(hidden.fsp,null);assert.equal(hidden.match.score,before.match.score);assert.equal(hidden.match.fsp,null);

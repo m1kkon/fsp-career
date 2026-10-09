@@ -40,8 +40,8 @@ test('positive resume evidence can satisfy canonical required skills; denied exp
 test('about text alone gets partial skill credit, repeated words and longer unrelated prose add none',()=>{
  const about=candidate({about:'Разрабатываю сервисы на Python.'});
  const work=candidate({work:'Разрабатываю сервисы на Python.'});
- assert.equal(points(matching(about,need)),4);assert.equal(points(matching(work,need)),8);
- assert.equal(points(matching(candidate({work:(work.work+' ').repeat(100)}),need)),8);
+ assert.equal(points(matching(about,need)),10);assert.equal(points(matching(work,need)),20);
+ assert.equal(points(matching(candidate({work:(work.work+' ').repeat(100)}),need)),20);
  assert.equal(points(matching(candidate({work:'Python '.repeat(100)}),need)),0);
  assert.equal(points(matching(candidate({work:'Разрабатываю интерфейсы на React. '.repeat(100)}),need)),0);
 });
@@ -72,7 +72,7 @@ test('evidence quotes hide direct contact details and personal names do not affe
  assert.ok(fit.resumeEvidence.skills.every(item=>item.quote.length<=220));
  assert.doesNotMatch(JSON.stringify(fit.resumeEvidence),/me@example.test|999/);
  assert.equal(fit.score,matching({...first,name:'Other Person',birthDate:'2000-01-01'},parseNeed('Middle Backend Python API')).score);
- assert.equal(matching(first,null).score,null);assert.equal(matching(first,null).parts.reduce((sum,part)=>sum+part.max,0),30);
+ assert.equal(matching(first,null).score,null);assert.equal(matching(first,null).parts.reduce((sum,part)=>sum+part.max,0),18);
 });
 
 test('explicit required, preferred and excluded technologies retain their priorities',()=>{

@@ -34,11 +34,11 @@ test('opening an application selects its vacancy score even when the candidate i
  const context=client();
  context.payload={candidates:[{...profile,match:matching(profile,null)}],applications:[{id:'first',owner:profile.id,job:{title:'First'},candidate:{...profile,match:matching(profile,parseNeed('Senior Frontend React'))}},{id:'second',owner:profile.id,job:{title:'Backend API'},candidate:{...profile,match:matching(profile,parseNeed('Middle Backend Python'))}}]};
  const display=vm.runInContext('state=payload;candidateDetail("candidate","second");display',context);
- assert.equal(display.match.score,86);
- assert.match(display.heading,/86\/100.*Backend API/);
+ assert.equal(display.match.score,92);
+ assert.match(display.heading,/92\/100.*Backend API/);
  vm.runInContext('candidateDetail("candidate")',context);
  assert.equal(context.display.match.score,null);
- assert.match(context.display.heading,/16\/30/);
+ assert.match(context.display.heading,/10\/18/);
 });
 
 test('optional card explanation opens the current catalogue score and also handles browsing without a need',()=>{
@@ -47,15 +47,15 @@ test('optional card explanation opens the current catalogue score and also handl
  const html=vm.runInContext('state=payload;candidateCard(state.candidates[0])',context);
  assert.match(html,/data-action="candidate-score" data-id="candidate"/);
  assert.match(html,/aria-label="Как рассчитана оценка Candidate"/);
- assert.match(html,/Соответствие: 86\/100/);
+ assert.match(html,/Соответствие: 92\/100/);
  assert.doesNotMatch(html,/по запросу|сила профиля/i);
  const display=vm.runInContext('candidateScore("candidate");display',context);
  assert.equal(display.match.score,context.payload.candidates[0].match.score);
- assert.equal(display.heading,'Соответствие профиля: 86/100');
+ assert.equal(display.heading,'Соответствие профиля: 92/100');
  context.payload.candidates[0].match=matching(profile,null);
  vm.runInContext('candidateScore("candidate")',context);
- assert.equal(context.display.match.score,null);assert.equal(context.display.heading,'Тесты и ФСП: 16/30');
- assert.match(vm.runInContext('candidateCard(state.candidates[0])',context),/Тесты и ФСП: 16\/30/);
+ assert.equal(context.display.match.score,null);assert.equal(context.display.heading,'Тесты и ФСП: 10/18');
+ assert.match(vm.runInContext('candidateCard(state.candidates[0])',context),/Тесты и ФСП: 10\/18/);
 });
 
 test('a saved strength sort cannot override profile fit ordering after confirming a request',()=>{
