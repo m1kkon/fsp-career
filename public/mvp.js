@@ -1,6 +1,34 @@
 import {historyDefaults,resumeHistory,historyHeading,historyPeriod} from './resume-history.mjs';
 import {citySuggestions,canonicalCity,loadWorldCities,worldCitiesReady} from './cities.mjs';
 import {hiringTemplates,templateSkills,suggestedTemplate,initialSkillSelection,skillDisplayOrder} from './hiring-templates.mjs';
+// Filled by the asset publisher; each feature stylesheet is cached after first use.
+const featureStyleUrls = /* versioned styles */ {};
+const readyFeatureStyles=new Set(),pendingFeatureStyles=new Map();
+let featureStyleRenderPending=false;
+function ensureViewStyles(){
+ const features=[];
+ if(standaloneTestAdmin||page==='tests'||page==='maintainer'||assessmentExamActive())features.push('assessment');
+ if(page==='profile')features.push('resume');
+ const missing=features.filter(name=>featureStyleUrls[name]&&!readyFeatureStyles.has(name));
+ if(!missing.length)return true;
+ if(featureStyleRenderPending)return false;
+ featureStyleRenderPending=true;
+ const loads=missing.map(name=>{
+  if(pendingFeatureStyles.has(name))return pendingFeatureStyles.get(name);
+  const load=new Promise((resolve,reject)=>{
+   const link=document.createElement('link');link.rel='stylesheet';link.href=featureStyleUrls[name];link.dataset.featureStyles=name;
+   link.onload=()=>{readyFeatureStyles.add(name);resolve();};
+   link.onerror=()=>{link.remove();pendingFeatureStyles.delete(name);reject(new Error('Не удалось загрузить оформление страницы.'));};
+   document.head.appendChild(link);
+  });
+  pendingFeatureStyles.set(name,load);return load;
+ });
+ Promise.all(loads).then(()=>{featureStyleRenderPending=false;render();}).catch(error=>{
+  featureStyleRenderPending=false;
+  app.innerHTML=`<main class="boot-error"><h1>Не удалось открыть страницу</h1><p>${esc(error.message)}</p><button class="button" onclick="location.reload()">Повторить</button></main>`;
+ });
+ return false;
+}
 const iconPaths = {
 eyeOff: '<path d="m3 3 18 18M10.5 5.1C16 4 22 12 22 12a17 17 0 0 1-4 4M6 6C3.5 8 2 12 2 12s3 7 10 7a13 13 0 0 0 5-1M10 10a3 3 0 0 0 4 4"/>',
 eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
@@ -41,6 +69,9 @@ const initials = name => name.split(' ').slice(0,2).map(x => x[0] || '').join(''
 
 const standaloneTestAdmin=(location.pathname||'/').replace(/\/$/,'')==='/admin/tests';
 const app=document.getElementById('app'),overlay=document.getElementById('overlay-root');
+// Text inputs also match :focus-visible after a pointer click; preserve the user's quiet mouse state.
+document.addEventListener('pointerdown',()=>{document.body.dataset.inputMode='pointer';},true);
+document.addEventListener('keydown',event=>{if(event.key==='Tab')document.body.dataset.inputMode='keyboard';},true);
 const specs=['Backend','Frontend','Data Science','ML Engineering','DevOps','QA'],grades=['Junior','Middle','Senior'];
 const industries=['Финтех','Электронная коммерция','Образование','Медиа','Государственные сервисы','Другое'];
 const professionalRoles=['Разработчик','Тестировщик','Аналитик','Инженер инфраструктуры','Технический лидер','Архитектор','Наставник','Исследователь'];
@@ -272,7 +303,9 @@ async function selectAudience(wanted){
  homeMode=wanted;role=wanted;localStorage.setItem('fsp-audience',wanted);localStorage.setItem('fsp-role',wanted);go('home');
  try{await refresh();if(role===wanted&&page==='home')render();}catch(error){toast(error.message);}
 }
-function nav(){if(!state.roles.includes(role)||['home','employers','method','privacy','help','onboarding-candidate','onboarding-employer'].includes(page))return '';const menus=role==='employer'?[['dashboard','Обзор'],['catalog','Поиск кандидатов'],['needs','Подборки'],['invites','Приглашения'],['jobs','Вакансии'],['applications','Отклики'],['tasks','Задания'],['company','Компания'],['api-access','API-ключи']]:[['dashboard','Обзор'],['profile','Моё резюме'],['survey','Анкета'],['tests','Подтверждение навыков'],['offers','Приглашения'],['jobs','Вакансии'],['applications','Мои отклики'],['tasks','Задания'],['settings','Настройки'],['api-access','API-ключи']];return `<nav class="product-nav" aria-label="Личный кабинет">${(state.assessment?.maintainer?[...menus,['maintainer','Управление тестами']]:menus).map(([key,label])=>`<a href="#${key}" data-action="nav" data-page="${key}" class="nav-item ${page===key||(page==='job'&&key==='jobs')?'active':''}">${label}${(role==='employer'||state.privacy?.notifications)&&key===(role==='employer'?'invites':'offers')&&state.invites.filter(i=>i.status==='sent').length?`<span class="nav-count">${state.invites.filter(i=>i.status==='sent').length}</span>`:''}</a>`).join('')}</nav>`;}
+function nav(){if(!state.roles.includes(role)||['home','employers','method','privacy','help','onboarding-candidate','onboarding-employer'].includes(page))return '';const menus=role==='employer'?[['dashboard','Обзор'],['catalog','Поиск кандидатов'],['needs','Подборки'],['invites','Приглашения'],['jobs','Вакансии'],['applications','Отклики'],['tasks','Задания'],['company','Компания'],['api-access','API-ключи']]:[['dashboard','Обзор'],['profile','Моё резюме'],['survey','Анкета'],['tests','Подтверждение навыков'],['offers','Приглашения'],['jobs','Вакансии'],['applications','Мои отклики'],['tasks','Задания'],['settings','Настройки'],['api-access','API-ключи']];const available=state.assessment?.maintainer?[...menus,['maintainer','Управление тестами']]:menus,active=page==='job'?'jobs':page;
+ return `<nav class="product-nav" aria-label="Личный кабинет"><label class="cabinet-section-picker"><span>Раздел</span><select name="cabinetPage" aria-label="Раздел личного кабинета">${available.map(([key,label])=>`<option value="${key}" ${active===key?'selected':''}>${label}${(role==='employer'||state.privacy?.notifications)&&key===(role==='employer'?'invites':'offers')&&state.invites.filter(i=>i.status==='sent').length?` (${state.invites.filter(i=>i.status==='sent').length})`:''}</option>`).join('')}</select></label>${available.map(([key,label])=>`<a href="#${key}" data-action="nav" data-page="${key}" class="nav-item ${active===key?'active':''}" ${active===key?'aria-current="page"':''}>${label}${(role==='employer'||state.privacy?.notifications)&&key===(role==='employer'?'invites':'offers')&&state.invites.filter(i=>i.status==='sent').length?`<span class="nav-count">${state.invites.filter(i=>i.status==='sent').length}</span>`:''}</a>`).join('')}</nav>`;}
+
 function footer(){return `<footer class="site-footer"><div><a class="footer-brand" href="#home">ФСП Карьера</a><p>Работа в IT начинается с навыков.</p><small>Достижения ФСП и демонстрационные профили помечены в интерфейсе</small></div><div><strong>Кандидатам</strong><a href="#jobs">Вакансии</a><a href="#tests" data-action="join" data-role="candidate">Подтвердить навыки</a><a href="#profile" data-action="join" data-role="candidate">Создать резюме</a></div><div><strong>Компаниям</strong><a href="#employers">Подбор специалистов</a><a href="#catalog" data-action="join" data-role="employer">Найти кандидата</a><a href="#company" data-action="join" data-role="employer">Профиль компании</a></div><div><strong>О сервисе</strong><a href="#method">Механика подбора</a><a href="#privacy">Данные и приватность</a><a href="#help">Помощь</a><a href="/api-docs">API</a></div></footer>`;}
 function home(){
  const employer=homeMode==='employer';
@@ -284,7 +317,7 @@ function home(){
  const candidateVisual=`<aside class="hero-companies" aria-label="Примеры компаний в демовакансиях"><div class="hero-company-caption">Разработка. Данные. Инфраструктура.</div><div class="hero-company-mosaic">${companyExamples.map(j=>`<a href="${jobHref(j.id)}" data-action="job-detail" data-id="${esc(j.id)}" class="hero-company-tile">${companyLogo(j)}<strong>${esc(j.company)}</strong><span>${esc(j.spec)}</span></a>`).join('')}</div><p class="hero-company-disclaimer">Компании и направления в демовакансиях</p></aside>`;
  const hero=`<section class="home-hero product-hero" data-audience="${homeMode}"><div class="hero-copy"><div class="eyebrow">${employer?'Обратный найм в IT':'IT-специалисты и команды'}</div><h1>${employer?'Найдите человека<br>под задачу команды.':'Работа, в которой<br>нужны ваши навыки.'}</h1><p>${employer?'Опишите роль и технологии. Выберите специалиста с подтверждёнными навыками и предложите условия напрямую.':'Вакансии с открытой зарплатой и прямые предложения от команд.'}</p><form id="${employer?'home-demand-form':'home-search'}" class="hero-search" role="search"><div class="hero-search-field">${icon('search')}<input name="query" aria-label="${employer?'Кого ищете в команду?':'Поиск работы'}" placeholder="${employer?'Например, Middle Backend: Python, PostgreSQL':'Должность, компания или технология'}" value="${esc(employer?query:jobQuery)}" ${employer?'required':''} maxlength="1000"></div><button class="button" type="submit">${employer?'Подобрать':'Найти работу'}</button></form><div class="popular-queries"><span>Например:</span>${samples.map(([label,text])=>`<button type="button" data-action="${employer?'home-demand':'job-query'}" data-query="${esc(text)}">${label}</button>`).join('')}</div>${employer?`<div class="hero-hiring-points"><span>${icon('checkCircle','small-icon')}Подтверждённая категория</span><span>${icon('document','small-icon')}Причины совпадения</span><span>${icon('mail','small-icon')}Прямое приглашение</span></div>`:''}<div class="hero-resume-link"><span>${employer?'Ищете работу?':'Пусть команды сами находят вас.'}</span>${button(state.roles.includes('candidate')?'Открыть резюме':'Создать резюме','join','data-role="candidate" href="#profile"',true)}</div></div>${employer?employerVisual:candidateVisual}</section>`;
  const directions=`<section class="home-directions"><div class="section-heading"><h2>${employer?'Кого ищет ваша команда?':'В каком направлении ищете работу?'}</h2><span>Junior · Middle · Senior</span></div><div class="specialization-grid">${[['Backend','Серверная разработка'],['Frontend','Веб-интерфейсы'],['Data Science','Данные и ML'],['DevOps','Инфраструктура'],['QA','Тестирование']].map(([spec,label])=>`<button data-action="${employer?'home-demand':'job-direction'}" data-query="Middle ${spec}" data-spec="${spec}"><strong>${spec}</strong><span>${label}</span></button>`).join('')}</div></section>`;
- const vacancies=jobs.length?`<section class="home-vacancies"><div class="section-heading"><div><h2>${employer?'Открытые вакансии компаний':'Вакансии с открытой зарплатой'}</h2><p>${employer?'Публикация вакансии — ещё один способ познакомиться с кандидатами.':'Можно откликнуться напрямую или получать предложения через профиль.'}</p></div><button class="text-button" data-action="browse-jobs">Все вакансии</button></div><div class="home-vacancy-grid">${jobs.map(j=>`<article class="home-vacancy"><div class="job-company">${companyLogo(j)}<strong>${esc(j.company)}</strong></div><h3>${jobLink(j)}</h3><strong class="home-vacancy-salary">${salary(j.min,j.max)}</strong><p>${esc(j.city||'Россия')} · ${esc(j.format)} · ${esc(j.grade)}</p>${tag(j.stack)}</article>`).join('')}</div></section>`:'';
+ const vacancies=jobs.length?`<section class="home-vacancies"><div class="section-heading"><div><h2>${employer?'Открытые вакансии компаний':'Вакансии с открытой зарплатой'}</h2><p>${employer?'Публикация вакансии — ещё один способ познакомиться с кандидатами.':'Можно откликнуться напрямую или получать предложения через профиль.'}</p></div><button class="text-button" data-action="browse-jobs">Все вакансии</button></div><div class="home-vacancy-grid">${jobs.map(j=>`<article class="home-vacancy"><div class="job-company">${companyLogo(j)}<strong>${esc(j.company)}</strong>${j.synthetic?'<span class="home-vacancy-demo">Демовакансия</span>':''}</div><h3>${jobLink(j)}</h3><strong class="home-vacancy-salary">${salary(j.min,j.max)}</strong><p>${esc(j.city||'Россия')} · ${esc(j.format)} · ${esc(j.grade)}</p>${tag(j.stack)}</article>`).join('')}</div></section>`:'';
  const flow=`<section class="reverse-flow home-section"><div class="section-heading"><div><h2>${employer?'От задачи команды к приглашению':'От навыков к предложению'}</h2><p>Компания находит подходящего специалиста и первой предлагает условия.</p></div><a href="#method">Как работает подбор</a></div><ol>${[['Профиль и тест','Специалист заполняет резюме и подтверждает категорию.'],['Потребность команды','Компания указывает роль, технологии и условия.'],['Осознанный выбор','В подборке видно, из чего складывается соответствие.'],['Прямое приглашение','Кандидат видит зарплату и решает, открывать ли контакт.']].map(([h,p],i)=>`<li><span>0${i+1}</span><div><h3>${h}</h3><p>${p}</p></div></li>`).join('')}</ol></section>`;
  return hero+directions+(employer?flow+vacancies:vacancies+flow);
 }
@@ -425,6 +458,7 @@ function testClock(){
  }
 }
 function render(){
+ if(!ensureViewStyles())return;
  syncLocationPreference();
  const beforePage=renderedPage,beforeAttempt=renderedAttempt,beforeQuestion=renderedQuestion,beforeProgress=renderedProgress;
  renderView(); testClock(); assessmentClock(); prepareResumePDF();
@@ -677,3 +711,12 @@ async function boot(){readEmailLink();const initialPage=page;try{await refresh()
 boot();
 
 setInterval(async()=>{if(!state.authenticated||busy||test||overlay.firstElementChild||document.hidden||!['dashboard','offers','invites','applications','tasks'].includes(page))return;const previous=JSON.stringify([state.invites,state.applications,state.tasks,state.submissions,state.messages]);try{await refresh();if(previous!==JSON.stringify([state.invites,state.applications,state.tasks,state.submissions,state.messages]))render();}catch{}},20000);
+
+document.addEventListener('change',event=>{if(event.target.name==='cabinetPage')go(event.target.value);});
+document.addEventListener('keydown',event=>{
+ const tab=event.target.closest?.('[role="tab"]'),list=tab?.closest('[role="tablist"]');
+ if(!list||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+ const tabs=[...list.querySelectorAll('[role="tab"]')],index=tabs.indexOf(tab),step=event.key==='ArrowLeft'?-1:1;
+ const next=event.key==='Home'?tabs[0]:event.key==='End'?tabs.at(-1):tabs[(index+step+tabs.length)%tabs.length];
+ event.preventDefault();next.focus();next.click();
+});

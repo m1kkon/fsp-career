@@ -1,2 +1,3 @@
 import Editor from './editor';
-export default function SandboxPage(){return <Editor/>;}
+import {assetUrls} from '../asset-urls';
+export default function SandboxPage(){return <><link rel="stylesheet" href={assetUrls['assessment.css']}/><Editor/></>;}

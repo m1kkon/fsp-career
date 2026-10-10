@@ -298,7 +298,7 @@ test('coding task formats and examples render beside the editor and escape autho
  const markup=vm.runInContext('assessmentExamMarkup()',context);
  for(const label of ['Формат ввода','Формат вывода','Примеры','Пример 1','Пример 2','Два положительных числа.'])assert.ok(markup.includes(label));
  assert.ok(markup.indexOf('coding-task')<markup.indexOf('Формат ввода'));
- assert.ok(markup.indexOf('Пример 2')<markup.indexOf('coding-solution'));
+ assert.ok(markup.indexOf('Пример 2')<markup.indexOf('class="coding-solution"'));
  assert.ok(markup.includes('&lt;script&gt;'));assert.ok(!markup.includes('<script>'));
 });
 

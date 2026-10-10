@@ -14,7 +14,7 @@ test('result cards distinguish difficulty-adjusted coding points from raw comple
  const legacy=context.assessmentResultRows([old]);assert.ok(legacy.includes('Кодинг 50%'));assert.ok(!legacy.includes('Средний зачёт задач'));
 });
 const skill=(id,created,score,completedAt)=>({id,created,status:'finished',targetKind:'skill',targetId:'python',results:[result('python',score,completedAt)]});
-function render(config){const context={location:{hash:''},state:{assessment:config},page:'tests',setInterval:()=>{},document:{addEventListener:()=>{}},esc:String,button:()=>'',date:String,icon:()=>'<svg></svg>'};runInNewContext(source,context);return {latest:context.assessmentLatestResults(config),html:context.assessmentTestsPage(),context};}
+function render(config){const context={location:{hash:''},state:{assessment:config},page:'tests',setInterval:()=>{},app:{querySelector:()=>null},document:{addEventListener:()=>{}},esc:String,button:()=>'',date:String,icon:()=>'<svg></svg>'};runInNewContext(source,context);return {latest:context.assessmentLatestResults(config),html:context.assessmentTestsPage(),context};}
 
 test('confirmed skills show the latest completed score even when lower, independent of history order',()=>{
  const config={...base,history:[skill('new',200,40,300),skill('old',100,95,150)]};
@@ -143,4 +143,78 @@ test('role result labels distinguish all five outcomes and preserve legacy repor
  for(const [result,label] of cases)assert.equal(context.assessmentRoleOutcome(result),label);
  const report={id:'plus-role',created:100,status:'finished',targetKind:'role',targetId:'backend',roleResult:{...cases[0][0],completed:true},results:[result('python',90,110),result('sql',95,120),result('integration-backend',90,130)]};
  assert.ok(render({...base,history:[report]}).html.includes('Middle+ подтверждён · потенциал Senior'));
+});
+
+test('large banks render one page, move across pages and reset pagination on filters',async()=>{
+ const questions=Array.from({length:63},(_,i)=>({id:'q'+i,prompt:'Вопрос '+i,moduleId:i<30?'python':'sql',familyId:'family'+i,status:'working',difficulty:1,format:'choice',templateVersion:1,version:1,exposure:0,familyExposure:0}));
+ const config={...base,maintainer:true};const {context}=render(config);
+ context.title=()=>'';context.tag=()=>'';context.badge=()=>'';context.render=()=>{};context.app={querySelector:()=>null};
+ context.api=async()=>({admin:{questions,modules:base.modules}});
+ context.assessmentAdminPage();await new Promise(resolve=>setImmediate(resolve));
+ const first=context.assessmentAdminPage();assert.equal((first.match(/<article /g)||[]).length,25);assert.ok(first.includes('Вопрос 0</h3>'));assert.ok(!first.includes('Вопрос 25</h3>'));assert.ok(first.includes('Страница 1 из 3'));
+ await context.assessmentHandleAction({dataset:{action:'assessment-bank-page',id:'3'}});
+ const last=context.assessmentAdminPage();assert.equal((last.match(/<article /g)||[]).length,13);assert.ok(last.includes('Вопрос 62</h3>'));assert.ok(last.includes('Страница 3 из 3'));
+ context.assessmentHandleChange({target:{dataset:{assessmentFilter:'module'},value:'sql'}});
+ const filtered=context.assessmentAdminPage();assert.ok(filtered.includes('Страница 1 из 2'));assert.ok(filtered.includes('Вопрос 30</h3>'));
+ context.assessmentHandleChange({target:{dataset:{assessmentFilter:'query'},value:'нет такого вопроса'}});
+ const empty=context.assessmentAdminPage();assert.ok(empty.includes('Вопросы не найдены.'));assert.equal((empty.match(/<article /g)||[]).length,0);
+});
+
+test('code indentation preserves Tab and Shift+Tab leaves the editor without changing the source',()=>{
+ const handlers={},editor={name:'assessmentCode',selectionStart:0,selectionEnd:0,setRangeText:text=>{editor.value=text+editor.value;},dispatchEvent:()=>{},value:'print(1)'};
+ let focused=false,prevented=0;
+ const context={page:'tests',setInterval:()=>{},clearTimeout:()=>{},Event:class{},overlay:{firstElementChild:null},document:{activeElement:editor,addEventListener:(name,fn)=>handlers[name]=fn},app:{querySelector:selector=>selector==='[name=assessmentStdin]'?{focus:()=>{focused=true;}}:null}};
+ runInNewContext(source,context);
+ context.assessmentAccept({id:'attempt',status:'active',currentModule:{id:'python',questionIndex:0,answers:{},questions:[{id:'q',format:'coding'}]}});
+ handlers.keydown({key:'Tab',preventDefault:()=>prevented++});assert.equal(editor.value,'  print(1)');assert.equal(focused,false);
+ handlers.keydown({key:'Tab',shiftKey:true,preventDefault:()=>prevented++});assert.equal(editor.value,'  print(1)');assert.equal(focused,true);assert.equal(prevented,2);
+});
+
+test('coding Next requires explicit confirmation without a submission, and a stale dialog cannot advance another question',async()=>{
+ const {context}=render(base),calls=[];let dialog;
+ context.clearTimeout=()=>{};context.button=(label,action,attrs)=>`<button data-action="${action}" ${attrs||''}>${label}</button>`;
+ context.modal=(title,description,body)=>{dialog={title,description,body};};context.close=()=>{};
+ context.assessmentRun=async(action,body)=>calls.push({action,body});
+ const attempt=q=>({id:'attempt',status:'active',currentModule:{id:'python',questionIndex:0,answers:{},questions:[q]}});
+ context.assessmentAccept(attempt({id:'q1',format:'coding',coding:{submission:{used:0}}}));
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-next'}});
+ assert.equal(calls.length,0);assert.match(dialog.description,/не получит баллы/);assert.match(dialog.body,/data-id="q1"/);
+ context.assessmentAccept(attempt({id:'q2',format:'coding',coding:{submission:{used:0}}}));
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-leave',id:'q1',attemptId:'attempt'}});
+ assert.equal(calls.length,0,'a dialog opened for an expired question must not skip the next one');
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-leave',id:'q2',attemptId:'attempt'}});
+ assert.equal(calls.length,1);assert.deepEqual(JSON.parse(JSON.stringify(calls[0])),{action:'assessment-answer',body:{questionId:'q2',answer:null}});
+});
+
+test('coding Next proceeds after a judged submission without another interruption',async()=>{
+ const {context}=render(base);let advanced=0;context.clearTimeout=()=>{};
+ context.modal=()=>assert.fail('judged code should not show an unsubmitted warning');context.assessmentRun=async()=>advanced++;
+ context.assessmentAccept({id:'a',status:'active',currentModule:{id:'python',questionIndex:0,answers:{},questions:[{id:'q',format:'coding',coding:{submission:{used:1,passed:4,total:4}}}]}});
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-next'}});assert.equal(advanced,1);
+});
+
+test('qualification search filters case-insensitively, excludes integration skills and preserves an actionable empty state',()=>{
+ const {context}=render(base);
+ assert.match(context.assessmentBookingResults(base,{kind:'skill',query:'PYt'}),/Python/);
+ assert.ok(!context.assessmentBookingResults(base,{kind:'skill',query:'PYt'}).includes('SQL'));
+ assert.match(context.assessmentBookingResults(base,{kind:'role',query:'backend'}),/Backend Developer/);
+ assert.match(context.assessmentBookingResults(base,{kind:'skill',query:'Интеграция'}),/Попробуйте другое название/);
+});
+
+test('preparation displays only the selected grade requirements from the versioned configuration',()=>{
+ const {context}=render(base),configs={python:{thresholds:{Junior:40,Middle:65,Senior:85},scoring:{theoryWeight:.6,codingWeight:.4,grades:{Junior:{theoryMin:35,codingMin:30,difficultyMin:1,solvedMin:1},Middle:{theoryMin:55,codingMin:50,difficultyMin:2,solvedMin:1},Senior:{theoryMin:75,codingMin:75,difficultyMin:3,solvedMin:1}}}}};
+ const middle=context.assessmentScoringDetails(configs,['python'],'Middle',true);
+ assert.match(middle,/итог от 65\/100/);assert.match(middle,/теория от 55\/100/);assert.ok(!middle.includes('Senior'));
+ const senior=context.assessmentScoringDetails(configs,['python'],'Senior',true);assert.match(senior,/итог от 85\/100/);assert.match(senior,/сложности 3\+/);
+ const all=context.assessmentScoringDetails(configs,['python']);assert.match(all,/caption/);assert.match(all,/Junior/);assert.match(all,/Middle/);assert.match(all,/Senior/);
+});
+
+test('switching mobile coding panes changes presentation without replacing editors or saving a different answer',()=>{
+ const {context}=render(base);context.clearTimeout=()=>{};let pane;
+ const tabs=['task','solution'].map(id=>({dataset:{id},setAttribute:(key,value)=>{if(key==='aria-selected')tabs.find(t=>t.dataset.id===id).selected=value;}}));
+ context.app={querySelector:()=>({setAttribute:(_key,value)=>{pane=value;}}),querySelectorAll:()=>tabs};
+ context.render=()=>assert.fail('pane changes must preserve editor DOM and scroll');
+ context.assessmentAccept({id:'a',status:'active',currentModule:{id:'python',questionIndex:0,answers:{q:'print(2)'},questions:[{id:'q',format:'coding'}]}});
+ context.assessmentSwitchCodingPanel('solution');assert.equal(pane,'solution');assert.equal(tabs[1].selected,'true');assert.equal(tabs[0].selected,'false');
+ context.assessmentSwitchCodingPanel('invalid');assert.equal(pane,'solution');
 });
