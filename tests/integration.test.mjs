@@ -289,13 +289,16 @@ test('a timeout during autosave recovery clears the old draft and cannot submit 
  assert.equal(vm.runInContext('assessmentQuestion',context),1);assert.equal(vm.runInContext('assessmentDraft',context),null);
 });
 
-test('coding task formats and examples render above the editor and escape authored HTML',()=>{
+test('coding task formats and examples render beside the editor and escape authored HTML',()=>{
  const context=client();
  context.codingQuestion={id:'code-docs',format:'coding',coding:{language:'python',starter:'print(0)',inputFormat:'Массив из stdin',outputFormat:'Число в stdout',examples:[{input:'[1, 2]',output:'2',explanation:'Два положительных числа.'},{input:'<script>bad()</script>',output:'0'}]}};
  vm.runInContext('assessmentDraftKey=()=>"code-docs";',context);
- const markup=vm.runInContext('assessmentCodingMarkup(codingQuestion,null)',context);
+ context.exam={id:'code-docs',status:'active',modules:['python'],moduleIndex:0,currentModule:{id:'python',name:'Python',questionIndex:0,answers:{},questions:[context.codingQuestion],questionSeconds:300}};
+ vm.runInContext('assessmentAccept(exam);',context);
+ const markup=vm.runInContext('assessmentExamMarkup()',context);
  for(const label of ['Формат ввода','Формат вывода','Примеры','Пример 1','Пример 2','Два положительных числа.'])assert.ok(markup.includes(label));
- assert.ok(markup.indexOf('Формат ввода')<markup.indexOf('coding-editor'));
+ assert.ok(markup.indexOf('coding-task')<markup.indexOf('Формат ввода'));
+ assert.ok(markup.indexOf('Пример 2')<markup.indexOf('coding-solution'));
  assert.ok(markup.includes('&lt;script&gt;'));assert.ok(!markup.includes('<script>'));
 });
 
@@ -303,7 +306,7 @@ test('coding editor has editable example input, separate output and bounded subm
  const context=client();context.q={id:'code-ui',format:'coding',coding:{language:'python',starter:'print(0)',input:'[1,2]',inputFormat:'JSON',outputFormat:'JSON',examples:[],submission:{used:2,limit:3,passed:2,total:4,results:[true,true,false,false]}}};
  vm.runInContext('assessmentDraftKey=()=>"code-ui";',context);
  const editor=vm.runInContext('assessmentCodingMarkup(q,null)',context),actions=vm.runInContext('assessmentCodingActions(q,true)',context);
- assert.match(editor,/name="assessmentStdin"/);assert.match(editor,/>\[1,2\]<\/textarea>/);assert.ok(editor.indexOf('coding-io')<editor.indexOf('coding-editor-wrap'));
+ assert.match(editor,/name="assessmentStdin"/);assert.match(editor,/>\[1,2\]<\/textarea>/);assert.ok(editor.indexOf('coding-editor-wrap')<editor.indexOf('coding-io'));
  assert.match(actions,/Отправить/);assert.match(actions,/Далее/);assert.match(actions,/1 из 3/);assert.equal((actions.match(/<circle /g)||[]).length,4);assert.equal((actions.match(/stroke="#60c84c"/g)||[]).length,2);assert.match(actions,/Пройдено тестов: 2 из 4/);
  vm.runInContext('q.coding.submission.used=3;',context);assert.match(vm.runInContext('assessmentCodingActions(q,true)',context),/data-action="assessment-code-submit" disabled/);
 });

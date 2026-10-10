@@ -407,9 +407,9 @@ test('a role begun just before midnight keeps the old pool and can open its next
 
 test('mixed coding bank and all module parts have distinct families, fixed counts and exact difficulty quotas',async()=>{
  const repo=memory(),day=await ensureDailyPool(repo);
- assert.equal(MIXED_CODING_QUESTIONS.length,108);
+ assert.equal(MIXED_CODING_QUESTIONS.length,540);
  for(const spec of day.specs){
-  const tasks=MIXED_CODING_QUESTIONS.filter(q=>q.moduleId===spec.moduleId);assert.equal(tasks.length,6);
+  const tasks=MIXED_CODING_QUESTIONS.filter(q=>q.moduleId===spec.moduleId);assert.equal(tasks.length,30);
   for(const q of tasks){assert.equal(validateQuestion(q).format,'coding');assert.equal(q.questionSeconds,300);}
   const tree=assembleAdaptiveVariant(day.pool.filter(q=>q.moduleId===spec.moduleId),spec);
   assert.equal(spec.codingPerPart,2);assert.equal(spec.seconds,1760);
@@ -471,11 +471,23 @@ test('reviewed daily bank revision creates a new pool without rewriting previous
  const repo=memory(),at=Date.parse('2026-10-08T09:00:00Z'),oldId=dailyPoolWindow(at).id+'-mixed-v2';
  const old={id:oldId,kind:'test-day',owner:'platform',created:at,status:'published',version:1,pool:[{...INITIAL_QUESTIONS[0],version:1,options:['old','a','b','c'],correct:0}]};
  await repo.put('test-day',old);
- const reviewed=await ensureDailyPool(repo,at);assert.notEqual(reviewed.id,old.id);assert.equal(reviewed.bankRevision,'2026-10-08');
+ const reviewed=await ensureDailyPool(repo,at);assert.notEqual(reviewed.id,old.id);assert.equal(reviewed.bankRevision,'2026-10-10');
  assert.deepEqual(await repo.record(oldId),old);assert.ok(reviewed.pool.every(q=>q.status==='working'||q.status==='experimental'));
  assert.ok(!reviewed.pool.some(q=>q.id==='coding-integration-backend-v1'));
- assert.ok(reviewed.pool.filter(q=>q.format==='choice').every(q=>q.version===2));
+ assert.ok(reviewed.pool.filter(q=>q.format==='choice').every(q=>[2,3].includes(q.version)));
  assert.deepEqual(await ensureDailyPool(repo,at+1000),reviewed);
+});
+
+test('daily pools retain coding alternatives and unseen tasks outrank global exposure in every module',async()=>{
+ const day=await ensureDailyPool(memory());
+ for(const spec of day.specs){
+  const pool=day.pool.filter(q=>q.moduleId===spec.moduleId);
+  for(const d of [1,2,3])assert.equal(pool.filter(q=>q.format==='coding'&&q.difficulty===d).length,10,spec.moduleId);
+  const first=assembleAdaptiveVariant(pool,spec).first.filter(q=>q.format==='coding'),seen=new Set(first.map(q=>q.id));
+  const exposure=new Map(pool.filter(q=>!seen.has(q.id)).flatMap(q=>[[q.familyId,10000],['question:'+q.id,10000]]));
+  const next=assembleAdaptiveVariant(pool,spec,0,seen,exposure);
+  assert.ok(next.first.filter(q=>q.format==='coding').every(q=>!seen.has(q.id)),spec.moduleId+' repeated a seen coding task while alternatives existed');
+ }
 });
 
 
