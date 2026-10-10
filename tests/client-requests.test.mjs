@@ -184,3 +184,24 @@ test('salary bounds travel through search refresh and mutation state, even witho
  params=new URL(calls[2].url,'http://localhost').searchParams;
  assert.equal(params.get('query'),'');assert.equal(params.get('budgetMin'),'100000');assert.equal(params.get('budgetMax'),'200000');
 });
+
+test('adding the same technology twice keeps one visible chip and one selected value',()=>{
+ const hidden={value:''},tags={insertions:[],insertAdjacentHTML(_position,html){this.insertions.push(html);}};
+ const box={querySelector:selector=>selector==='input[type="hidden"]'?hidden:tags};
+ const input={value:'Python',closest:()=>box};
+ const context=vm.createContext({technologyOptions:['Python'],esc:String,input});
+ vm.runInContext(source.slice(source.indexOf('function addTechnology('),source.indexOf('\n',source.indexOf('function addTechnology('))),context);
+ vm.runInContext('addTechnology(input)',context);
+ input.value='python';vm.runInContext('addTechnology(input)',context);
+ assert.equal(hidden.value,'Python');assert.equal(tags.insertions.length,1);assert.equal(input.value,'');
+});
+
+test('applying with both roles loads candidate state before showing the form',async()=>{
+ const saved=[],sequence=[];
+ const context=vm.createContext({role:'employer',homeMode:'employer',state:{roles:['employer','candidate'],jobs:[]},localStorage:{setItem:(key,value)=>saved.push([key,value])},esc:String,icon:()=>'',textarea:()=>'',formEnd:()=>'',ensureRole(){assert.fail('existing candidate role must not restart onboarding');},
+  async refresh(){sequence.push('refresh:'+context.role);context.state.jobs=[{id:'demo',title:'Developer',company:'Demo',synthetic:true}];},render(){sequence.push('render');},modal(title,_hint,body){sequence.push('modal');context.form={title,body};}});
+ vm.runInContext(source.slice(source.indexOf('async function apply('),source.indexOf('function applicationReview(')),context);
+ await vm.runInContext("apply('demo')",context);
+ assert.equal(context.role,'candidate');assert.deepEqual(sequence,['refresh:candidate','render','modal']);
+ assert.match(context.form.body,/id="apply-form" data-id="demo"/);assert.deepEqual(saved,[['fsp-role','candidate'],['fsp-audience','candidate']]);
+});

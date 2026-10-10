@@ -47,7 +47,7 @@ test('optional card explanation opens the current catalogue score and also handl
  const html=vm.runInContext('state=payload;candidateCard(state.candidates[0])',context);
  assert.match(html,/data-action="candidate-score" data-id="candidate"/);
  assert.match(html,/aria-label="Как рассчитана оценка Candidate"/);
- assert.match(html,/Соответствие: 92\/100/);
+ assert.match(html.replace(/<[^>]*>/g,''),/92\/100Соответствие профиля/);
  assert.doesNotMatch(html,/по запросу|сила профиля/i);
  const display=vm.runInContext('candidateScore("candidate");display',context);
  assert.equal(display.match.score,context.payload.candidates[0].match.score);
@@ -55,7 +55,7 @@ test('optional card explanation opens the current catalogue score and also handl
  context.payload.candidates[0].match=matching(profile,null);
  vm.runInContext('candidateScore("candidate")',context);
  assert.equal(context.display.match.score,null);assert.equal(context.display.heading,'Тесты и ФСП: 10/18');
- assert.match(vm.runInContext('candidateCard(state.candidates[0])',context),/Тесты и ФСП: 10\/18/);
+ assert.match(vm.runInContext('candidateCard(state.candidates[0])',context),/<strong>10<small>\/18<\/small><\/strong><small>Тесты и ФСП/);
 });
 
 test('a saved strength sort cannot override profile fit ordering after confirming a request',()=>{

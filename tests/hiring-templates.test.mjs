@@ -8,7 +8,7 @@ import {parseNeed,selectedNeed} from '../lib/matching.mjs';
 import {hiringTemplates,templateSkills,suggestedTemplate,initialSkillSelection,skillDisplayOrder} from '../public/hiring-templates.mjs';
 
 const source=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
-const functions=source.slice(source.indexOf('function confirmNeed(){'),source.indexOf('function locationLabel(){'));
+const functions=source.slice(source.indexOf('function confirmNeed('),source.indexOf('function locationLabel(){'));
 function dialog(need,needRules={},needConfirmed=false){
  let html;
  const context=vm.createContext({state:{need},needContext:{},contextDraft:null,formatMoneyInput:value=>String(value??''),needRules,needConfirmed,needSpec:'',needGrade:'',query:need.text,
