@@ -1,0 +1,23 @@
+{
+  "version": "domain-challenge-authored-v1",
+  "asOf": "2026-10-11T19:00:00Z",
+  "scenarioCount": 8,
+  "profileCount": 96,
+  "specializationCount": 6,
+  "expandedFixtureSha256": "ca7bcd703bbb1b28cfb7e5579572e98c524f21d1dde6bc9a70b7e24ef32f89d0",
+  "files": {
+    "scripts/benchmarks/fixtures/domain-challenge-v1.mjs": "126f4b4736094b3389b5b0ad2044810b13bf4a26a514f60bbae4fd94ad95bd9b",
+    "docs/domain-challenge-rubric.md": "e9d7efdf9300a6f86ce49967830bc629e6f8eb77559abb9a9b681f636255b477"
+  },
+  "evaluated": false,
+  "labelsAuthoredBeforeEvaluation": true,
+  "externalHoldout": false,
+  "candidateImplementationFrozen": false,
+  "structuralValidation": {
+    "uniqueIds": true,
+    "completeReasons": true,
+    "eligibilityMatchesExplicitMandatoryFacts": true,
+    "algorithmImported": false
+  },
+  "protocol": "Dataset freeze before evaluation. Matching agent must freeze candidate before reading texts/labels. Challenge is not used to select a fix. Single final evaluation with baseline and identical mandatory filters."
+}
