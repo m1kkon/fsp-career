@@ -15,7 +15,7 @@
       "passed": true
     },
     {
-      "name": "required missing technology fails, optional missing technology remains eligible",
+      "name": "required unreported technology needs clarification, optional missing technology remains eligible",
       "passed": true
     },
     {
@@ -88,13 +88,13 @@
     }
   ],
   "implementation": {
-    "lib/matching.mjs": "92380762cc0ba2c015f64c66b1bb7389e1c89e85d2f05f70fec909b2e5aa9d88",
-    "lib/resume-fit.mjs": "9a76b08c8ca0883dc824913086912b5e3d98f7dd856bbb5f922294fd55f2f226",
-    "lib/ats.mjs": "211e5e36e1f92c05a50bd1431169d723c85ba617487143add959f5ce0f441606",
+    "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+    "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+    "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
     "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
     "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b"
   },
-  "guardHash": "0e2a6f38f95942e1782402f435e1bcb65c416c3294deb0df30d4463fe3732b20",
+  "guardHash": "7b0998374e81e54037284050f235647eb018082df9735a6e0cc62adcaf911ff6",
   "limitations": [
     "These controlled cases are authored by us, not independent recruiter labels or real hires.",
     "No external dataset informs FSP/test/confirmed-grade expectations.",

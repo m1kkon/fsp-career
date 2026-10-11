@@ -5413,11 +5413,11 @@
   ],
   "continuousIntegration": {
     "status": "passed",
-    "revision": "dc5a2fe682087a2dd8181a19b0c2b3ae0d840369",
-    "runUrl": "https://github.com/m1kkon/fsp-career/actions/runs/38168961386",
+    "revision": "36c4e8e562cbab14015d3fdfc84daf358180ba96",
+    "runUrl": "https://github.com/m1kkon/fsp-career/actions/runs/38170524774",
     "tests": {
-      "total": 502,
-      "passed": 502,
+      "total": 526,
+      "passed": 526,
       "failed": 0,
       "skipped": 0
     },
@@ -5428,15 +5428,15 @@
       "all 559 reference solutions and 2881 checks across 8 languages",
       "PostgreSQL 17",
       "TypeScript",
-      "lint with zero errors"
+      "lint with zero errors and 24 warnings"
     ],
     "concurrency": {
       "accounts": 50,
       "actions": 100,
-      "elapsedMs": 195,
+      "elapsedMs": 146,
       "scope": "CI service calls during a controlled pending judge; not a production HTTP SLA"
     },
-    "scope": "Previous implementation dc5a2fe passed. The final blended implementation requires a new CI run; this result is not its validation."
+    "scope": "Final blended product implementation. Subsequent README and jury PDF changes do not alter tested product source."
   },
   "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c"
 }
