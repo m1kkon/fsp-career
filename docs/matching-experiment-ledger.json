@@ -1,0 +1,266 @@
+{
+  "version": 1,
+  "baseRevision": "8b87bfba1f0aae9c26d6d61df9571d5140775a10",
+  "protocol": "3 bounded hypotheses; development only for selection; freeze candidate before a single known-holdout reproduction. No external services, no raw resumes in artifacts.",
+  "source": {
+    "repository": "https://github.com/MALINAYAGODA/Talent-Match",
+    "commit": "a892ad12f2a84f92b9619ee05fbba5fbbf99fd56",
+    "sha256": "bfa8e4b1f1080b6decba654daf8379356145df80a8ffceeda2577195646da32a",
+    "url": "https://raw.githubusercontent.com/MALINAYAGODA/Talent-Match/a892ad12f2a84f92b9619ee05fbba5fbbf99fd56/case_2_data_for_members.json",
+    "bytes": 4533882
+  },
+  "referenceDate": "2024-03-01",
+  "splitSeed": "fsp-talentmatch-baseline-v1",
+  "hypotheses": [
+    {
+      "name": "h1-rarity",
+      "mode": "development-only",
+      "implementation": {
+        "matching": "f6b68209b4647625822322b0c49eb0f5db6028424f0b34eefeb5afad0aa94d6f",
+        "resumeFit": "63ce720c41a2375d1694ed1504e4e4f954fa16d319b76d00c4be3dec3dae6002"
+      },
+      "development": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.4,
+        "recallAtK": 0.32539682539682535,
+        "ndcgAtK": 0.39793020188233397,
+        "reciprocalRank": 0.4722222222222222,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.4185185185185185
+      }
+    },
+    {
+      "name": "h2-balanced-evidence",
+      "mode": "development-only",
+      "implementation": {
+        "matching": "e2e5dec5f173b62f6e6bec4aecb7e6c61ad1c8beaecab9bd37a3387b1fb40e7d",
+        "resumeFit": "ba086538f393a438e59151c2c4916a7d512d299425ff71219b9c7a8b3327d7e9"
+      },
+      "development": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.4444444444444444,
+        "recallAtK": 0.3702821869488536,
+        "ndcgAtK": 0.44040829564786804,
+        "reciprocalRank": 0.5037037037037037,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.41481481481481475
+      }
+    },
+    {
+      "name": "h3-experience-actions",
+      "mode": "development-only",
+      "implementation": {
+        "matching": "e2e5dec5f173b62f6e6bec4aecb7e6c61ad1c8beaecab9bd37a3387b1fb40e7d",
+        "resumeFit": "0e6280f25d5614c6a03125f62e89f396bea6f884fc656b526f905f96f5f0f60d"
+      },
+      "development": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.4,
+        "recallAtK": 0.32539682539682535,
+        "ndcgAtK": 0.40054261885945636,
+        "reciprocalRank": 0.48148148148148145,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.41111111111111115
+      }
+    }
+  ],
+  "weights": {
+    "spec": 25,
+    "grade": 15,
+    "stack": 12,
+    "resume": 20,
+    "test": 12,
+    "fsp": 6,
+    "format": 4,
+    "salary": 4,
+    "domain": 2
+  },
+  "selected": {
+    "name": "h2-balanced-evidence",
+    "frozenBeforeHoldout": true,
+    "files": {
+      "lib/resume-fit.mjs": "9a76b08c8ca0883dc824913086912b5e3d98f7dd856bbb5f922294fd55f2f226",
+      "tests/resume-evidence-balance.test.mjs": "1331c8747adfd8b3a31f66f417dcad4e8b69d32f1db178bbd9b471de2af5b1db"
+    },
+    "holdoutEvaluationCount": 1,
+    "reason": "Only candidate improves development P@5, nDCG@5 and Recall@5 without altering assessment/FSP/category weights or mandatory conditions. Harmonic task+technology coverage prevents compensating for a wholly missing evidence dimension.",
+    "tests": {
+      "focused": 69,
+      "balance": 5,
+      "full": {
+        "total": 405,
+        "passed": 377,
+        "failed": 0,
+        "skipped": 28
+      },
+      "skipReason": "Local PostgreSQL and Docker integration environment unavailable; these checks are not counted as passes."
+    }
+  },
+  "comparison": {
+    "development": {
+      "before": {
+        "product": {
+          "vacancies": 9,
+          "pairs": 246,
+          "precisionAtK": 0.4,
+          "recallAtK": 0.32539682539682535,
+          "ndcgAtK": 0.40054261885945636,
+          "reciprocalRank": 0.48148148148148145,
+          "randomPrecisionAtK": 0.3159016101211502,
+          "randomNdcgAtK": 0.33359600380338666,
+          "tieAdjustedPrecisionAtK": 0.41111111111111115
+        },
+        "lexical": {
+          "vacancies": 9,
+          "pairs": 246,
+          "precisionAtK": 0.3333333333333333,
+          "recallAtK": 0.3067019400352734,
+          "ndcgAtK": 0.36215262521137725,
+          "reciprocalRank": 0.5436507936507936,
+          "randomPrecisionAtK": 0.3159016101211502,
+          "randomNdcgAtK": 0.33359600380338666,
+          "tieAdjustedPrecisionAtK": 0.3333333333333333
+        },
+        "stack": {
+          "vacancies": 9,
+          "pairs": 246,
+          "precisionAtK": 0.3111111111111111,
+          "recallAtK": 0.2873015873015872,
+          "ndcgAtK": 0.3510109532204011,
+          "reciprocalRank": 0.49158249158249157,
+          "randomPrecisionAtK": 0.3159016101211502,
+          "randomNdcgAtK": 0.33359600380338666,
+          "tieAdjustedPrecisionAtK": 0.2923685573685573
+        }
+      },
+      "after": {
+        "product": {
+          "vacancies": 9,
+          "pairs": 246,
+          "precisionAtK": 0.4444444444444444,
+          "recallAtK": 0.3702821869488536,
+          "ndcgAtK": 0.44040829564786804,
+          "reciprocalRank": 0.5037037037037037,
+          "randomPrecisionAtK": 0.3159016101211502,
+          "randomNdcgAtK": 0.33359600380338666,
+          "tieAdjustedPrecisionAtK": 0.41481481481481475
+        },
+        "lexical": {
+          "vacancies": 9,
+          "pairs": 246,
+          "precisionAtK": 0.3333333333333333,
+          "recallAtK": 0.3067019400352734,
+          "ndcgAtK": 0.36215262521137725,
+          "reciprocalRank": 0.5436507936507936,
+          "randomPrecisionAtK": 0.3159016101211502,
+          "randomNdcgAtK": 0.33359600380338666,
+          "tieAdjustedPrecisionAtK": 0.3333333333333333
+        },
+        "stack": {
+          "vacancies": 9,
+          "pairs": 246,
+          "precisionAtK": 0.3111111111111111,
+          "recallAtK": 0.2873015873015872,
+          "ndcgAtK": 0.3510109532204011,
+          "reciprocalRank": 0.49158249158249157,
+          "randomPrecisionAtK": 0.3159016101211502,
+          "randomNdcgAtK": 0.33359600380338666,
+          "tieAdjustedPrecisionAtK": 0.2923685573685573
+        }
+      }
+    },
+    "knownHoldout": {
+      "before": {
+        "product": {
+          "vacancies": 4,
+          "pairs": 102,
+          "precisionAtK": 0.35,
+          "recallAtK": 0.4583333333333333,
+          "ndcgAtK": 0.43181103512320956,
+          "reciprocalRank": 0.5833333333333333,
+          "randomPrecisionAtK": 0.23357371794871795,
+          "randomNdcgAtK": 0.2822688655542725,
+          "tieAdjustedPrecisionAtK": 0.35
+        },
+        "lexical": {
+          "vacancies": 4,
+          "pairs": 102,
+          "precisionAtK": 0.25,
+          "recallAtK": 0.3125,
+          "ndcgAtK": 0.33655241080596404,
+          "reciprocalRank": 0.5634920634920635,
+          "randomPrecisionAtK": 0.23357371794871795,
+          "randomNdcgAtK": 0.2822688655542725,
+          "tieAdjustedPrecisionAtK": 0.25
+        },
+        "stack": {
+          "vacancies": 4,
+          "pairs": 102,
+          "precisionAtK": 0.3,
+          "recallAtK": 0.3958333333333333,
+          "ndcgAtK": 0.4538720923116531,
+          "reciprocalRank": 0.7631578947368421,
+          "randomPrecisionAtK": 0.23357371794871795,
+          "randomNdcgAtK": 0.2822688655542725,
+          "tieAdjustedPrecisionAtK": 0.26666666666666666
+        }
+      },
+      "after": {
+        "product": {
+          "vacancies": 4,
+          "pairs": 102,
+          "precisionAtK": 0.35,
+          "recallAtK": 0.4583333333333333,
+          "ndcgAtK": 0.5038909215346277,
+          "reciprocalRank": 0.875,
+          "randomPrecisionAtK": 0.23357371794871795,
+          "randomNdcgAtK": 0.2822688655542725,
+          "tieAdjustedPrecisionAtK": 0.33749999999999997
+        },
+        "lexical": {
+          "vacancies": 4,
+          "pairs": 102,
+          "precisionAtK": 0.25,
+          "recallAtK": 0.3125,
+          "ndcgAtK": 0.33655241080596404,
+          "reciprocalRank": 0.5634920634920635,
+          "randomPrecisionAtK": 0.23357371794871795,
+          "randomNdcgAtK": 0.2822688655542725,
+          "tieAdjustedPrecisionAtK": 0.25
+        },
+        "stack": {
+          "vacancies": 4,
+          "pairs": 102,
+          "precisionAtK": 0.3,
+          "recallAtK": 0.3958333333333333,
+          "ndcgAtK": 0.4538720923116531,
+          "reciprocalRank": 0.7631578947368421,
+          "randomPrecisionAtK": 0.23357371794871795,
+          "randomNdcgAtK": 0.2822688655542725,
+          "tieAdjustedPrecisionAtK": 0.26666666666666666
+        }
+      }
+    }
+  },
+  "interpretation": "Development P@5 and nDCG improve. Known-holdout P@5 and Recall@5 stay unchanged; nDCG and MRR improve, tie-adjusted P@5 declines. This is not evidence of an overall FSP matching-quality improvement.",
+  "domainLimits": [
+    "TalentMatch is a text-screening dataset, not an FSP dataset and not a validation of the complete product.",
+    "The source contains no verified assessments, grades or FSP history. Those weights, contracts, category eligibility and visibility rules were not fitted to it.",
+    "Previously inspected holdout is used once after freezing the development-selected candidate; it is not a newly independent evaluation.",
+    "All three hypotheses were selected and compared on development only; no candidate changes were made after holdout.",
+    "Development P@5 improves, known-holdout P@5 and Recall@5 do not. Holdout nDCG/MRR improve while tie-adjusted P@5 declines.",
+    "No raw resumes, candidate texts, contact data or per-candidate outputs are included in this artifact. No data were sent to external services.",
+    "Local PostgreSQL/Docker skips do not demonstrate production readiness; product guards and CI validation are separate."
+  ],
+  "reproduction": {
+    "benchmark": "node scripts/benchmarks/talentmatch.mjs --download --output /local/results",
+    "tests": "node --test tests/resume-evidence-balance.test.mjs tests/matching.test.mjs tests/resume-matching.test.mjs tests/ats.test.mjs tests/matching-benchmark.test.mjs tests/synthetic-validation.test.mjs",
+    "warning": "Do not present the previously inspected holdout as new independent data."
+  }
+}
