@@ -45,14 +45,14 @@ export async function verifyFrozenDiagnostic(){
  return {freeze,implementation,fixtures};
 }
 
-export function evaluateStressDiagnostic(fixtures=domainStressScenarios()){
+export function evaluateStressDiagnostic(fixtures=domainStressScenarios(),{asOf=AS_OF,version=VERSION}={}){
  const cases=fixtures.map(scenario=>{
   const need=selectedNeed(scenario.need.text,scenario.need.selection);
   const texts=scenario.candidates.map(row=>text(row.candidate)),query=[need.text,need.team,...need.stack].filter(Boolean).join(' ');
   const rows=scenario.candidates.map((row,index)=>{
    const candidate={...row.candidate,fsp:row.candidate.fspId?mockFspProfile(row.candidate.fspId):null},skills=new Set(candidateResumeSkills(candidate));
    return {...candidate,relevance:row.relevance,truthEligibility:row.eligibility,
-    match:matching(candidate,need,Date.parse(AS_OF),texts),lexical:tfidfSimilarity(query,texts[index],texts).score,
+    match:matching(candidate,need,Date.parse(asOf),texts),lexical:tfidfSimilarity(query,texts[index],texts).score,
     stackCoverage:need.stack.length?need.stack.filter(skill=>skills.has(skill)).length/need.stack.length:0};
   });
   const order=method=>method==='full'?rankCandidates(rows,need):[...rows].sort((a,b)=>(method.startsWith('hard_filters_')?eligibility[a.match.eligibility.status]-eligibility[b.match.eligibility.status]:0)
@@ -67,14 +67,14 @@ export function evaluateStressDiagnostic(fixtures=domainStressScenarios()){
    eligibilityErrors:rows.filter(row=>row.truthEligibility!==row.match.eligibility.status).map(row=>({id:row.id,expected:row.truthEligibility,actual:row.match.eligibility.status,checks:row.match.eligibility.checks}))};
  });
  const summarize=rows=>Object.fromEntries(METHODS.map(method=>[method,meanMetrics(rows.map(row=>row.metrics[method]))]));
- return {version:VERSION,asOf:AS_OF,weights:WEIGHTS,dataset:{scenarios:cases.length,pairs:cases.reduce((sum,row)=>sum+row.pairs,0),type:'new authored difficult diagnostic; not independently collected users or external holdout'},
+ return {version,asOf,weights:WEIGHTS,dataset:{scenarios:cases.length,pairs:cases.reduce((sum,row)=>sum+row.pairs,0),type:'new authored difficult diagnostic; not independently collected users or external holdout'},
   metricDefinitions:{primary:'Binary relevant iff authored professional relevance>=2 and authored eligibility=pass. P@5, Recall@5, binary nDCG@5 and full-pool MRR use this label.',
    gradedNdcgAtFive:'Linear graded gains 0–3, with unknown/fail eligibility set to zero; ideal order is computed over the same pool.',
    textOnlyPrecisionAtFive:'Professional relevance>=2 without eligibility; separate diagnostic, not the primary ranking metric.',
    precisionAtFiveCeiling:'Maximum possible P@5 in each pool given its relevant eligible count; fewer than five positives lowers the ceiling.',
    fractionOfAvailableTopFiveRelevant:'Hits in top five divided by min(5,relevant eligible count). This is not market accuracy.',
    ties:'Expected binary P@5 under random ID order within identical actual non-ID sorting signals.',
-   averaging:'Macro average over the 12 needs. Baselines have the same complete professional text/technologies; filtered baselines use product eligibility, never authored truth.'},
+   averaging:`Macro average over the ${cases.length} needs. Baselines have the same complete professional text/technologies; filtered baselines use product eligibility, never authored truth.`},
   summary:summarize(cases),bySpecialization:Object.fromEntries([...new Set(cases.map(row=>row.spec))].map(spec=>[spec,summarize(cases.filter(row=>row.spec===spec))])),
   checks:{eligibilityCorrect:cases.reduce((sum,row)=>sum+row.eligibilityCorrect,0),explanationsCorrect:cases.reduce((sum,row)=>sum+row.explanationsCorrect,0),pairs:cases.reduce((sum,row)=>sum+row.pairs,0)},cases,
   limitations:[
