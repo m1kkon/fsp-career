@@ -456,11 +456,16 @@ test('retrying an accepted coding submission after its response was lost returns
  assert.equal(replay.revision,accepted.revision);assert.equal(feedback.used,1);assert.equal(feedback.lastSource,source);assert.equal(feedback.passed,1);assert.equal(feedback.total,total);assert.deepEqual(feedback.results,results);
  assert.deepEqual(await repo.record(view.id),accepted,'replay neither spends another retry nor changes stored answers');
  await assert.rejects(assessmentAction(repo,{...a,id:'another-candidate'},body),e=>e.status===404);
+ await assert.rejects(assessmentAction(repo,a,{...body,source:'changed source'}),e=>e.status===409);
  await assert.rejects(assessmentAction(repo,a,{...body,submissionId:'different-submit'}),e=>e.status===409);
  const future=m.questions.find(other=>other.format==='coding'&&other.id!==q.id);
  await assert.rejects(assessmentAction(repo,a,{...body,revision:accepted.revision,questionId:future.id}),e=>e.status===409);
  const next=(await assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:accepted.revision,questionId:q.id,answer:null})).assessment;
- await assert.rejects(assessmentAction(repo,a,{...body,revision:next.revision}),e=>e.status===409);
+ const advanced=await repo.record(view.id);
+ const acknowledged=(await assessmentAction(repo,a,{...body,revision:next.revision})).assessment;
+ assert.equal(acknowledged.revision,next.revision);
+ assert.equal(acknowledged.currentModule.questions[acknowledged.currentModule.questionIndex].id,next.currentModule.questions[next.currentModule.questionIndex].id);
+ assert.deepEqual(await repo.record(view.id),advanced,'acknowledging a previous submission does not reopen the question or change credit');
 });
 test('coding run uses editable stdin without grading; submission limit, idempotency and best result survive drafts and Next',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
  const {repo,a,q,view:initial}=await codingAttempt();let view=initial;
