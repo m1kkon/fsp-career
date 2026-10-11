@@ -1,0 +1,413 @@
+{
+ "n_vacancies_dump": 499817,
+ "vac_classes": {
+  "non_it": 491374,
+  "core": 2003,
+  "tag_dev": 2025,
+  "tag_qa": 55,
+  "core_and_it_sphere": 790,
+  "it_sphere_total": 6567,
+  "it_sphere_other": 5427,
+  "sysadmin": 713,
+  "tag_sysadmin": 722,
+  "tag_analyst": 144,
+  "tag_data_ml": 71,
+  "1c": 300,
+  "tag_1c": 300,
+  "tag_devops": 20
+ },
+ "cv_sample_fraction": 0.010939477431883922,
+ "response": {
+  "records": 1039573,
+  "vacancy_resolved_records": 182051,
+  "vacancy_resolved_share": 0.1751,
+  "resolved_share_by_year": {
+   "2024": 0.045,
+   "2025": 0.0802,
+   "2026": 0.3269
+  },
+  "by_class_type": {
+   "1c|Отказ": 555,
+   "1c|Приглашение": 24,
+   "1c|Принятие": 1,
+   "core|Отказ": 1888,
+   "core|Приглашение": 158,
+   "core|Принятие": 14,
+   "it_sphere_any|Отказ": 4778,
+   "it_sphere_any|Приглашение": 535,
+   "it_sphere_any|Принятие": 26,
+   "it_sphere_other|Отказ": 2949,
+   "it_sphere_other|Приглашение": 420,
+   "it_sphere_other|Принятие": 13,
+   "non_it|Отказ": 75278,
+   "non_it|Приглашение": 98142,
+   "non_it|Принятие": 2187,
+   "sysadmin|Отказ": 385,
+   "sysadmin|Приглашение": 37,
+   "unresolved|Отказ": 431265,
+   "unresolved|Приглашение": 415303,
+   "unresolved|Принятие": 10954
+  },
+  "distinct_vacancies_by_class": {
+   "non_it": 35065,
+   "core": 424,
+   "it_sphere_any": 998,
+   "it_sphere_other": 671,
+   "sysadmin": 117,
+   "1c": 84
+  },
+  "distinct_cvs_by_class": {
+   "non_it": 122245,
+   "core": 1317,
+   "it_sphere_any": 3694,
+   "it_sphere_other": 2560,
+   "sysadmin": 310,
+   "1c": 402
+  },
+  "core_by_month": [
+   [
+    "2024-10",
+    4
+   ],
+   [
+    "2024-11",
+    3
+   ],
+   [
+    "2024-12",
+    8
+   ],
+   [
+    "2025-01",
+    1
+   ],
+   [
+    "2025-02",
+    15
+   ],
+   [
+    "2025-03",
+    7
+   ],
+   [
+    "2025-04",
+    7
+   ],
+   [
+    "2025-05",
+    6
+   ],
+   [
+    "2025-06",
+    15
+   ],
+   [
+    "2025-07",
+    14
+   ],
+   [
+    "2025-08",
+    21
+   ],
+   [
+    "2025-09",
+    25
+   ],
+   [
+    "2025-10",
+    19
+   ],
+   [
+    "2025-11",
+    27
+   ],
+   [
+    "2025-12",
+    48
+   ],
+   [
+    "2026-01",
+    54
+   ],
+   [
+    "2026-02",
+    58
+   ],
+   [
+    "2026-03",
+    134
+   ],
+   [
+    "2026-04",
+    111
+   ],
+   [
+    "2026-05",
+    83
+   ],
+   [
+    "2026-06",
+    219
+   ],
+   [
+    "2026-07",
+    201
+   ],
+   [
+    "2026-08",
+    300
+   ],
+   [
+    "2026-09",
+    471
+   ],
+   [
+    "2026-10",
+    209
+   ]
+  ],
+  "cv_sample_hits_records_by_cvclass": {
+   "non_it": 10418,
+   "core": 152,
+   "it_sphere_other": 303,
+   "sysadmin": 28,
+   "1c": 37
+  },
+  "cv_sample_hits_by_cvclass_type": {
+   "non_it|Отказ": 5225,
+   "non_it|Приглашение": 5057,
+   "core|Приглашение": 46,
+   "non_it|Принятие": 136,
+   "it_sphere_other|Отказ": 199,
+   "it_sphere_other|Приглашение": 102,
+   "sysadmin|Отказ": 19,
+   "core|Отказ": 105,
+   "core|Принятие": 1,
+   "it_sphere_other|Принятие": 2,
+   "1c|Отказ": 25,
+   "1c|Приглашение": 12,
+   "sysadmin|Приглашение": 9
+  },
+  "cv_sample_hits_cvclass_x_vacclass": {
+   "non_it|unresolved": 8445,
+   "core|unresolved": 106,
+   "it_sphere_other|unresolved": 232,
+   "sysadmin|unresolved": 24,
+   "non_it|non_it": 1948,
+   "1c|unresolved": 26,
+   "it_sphere_other|non_it": 61,
+   "core|core": 15,
+   "core|non_it": 24,
+   "1c|non_it": 8,
+   "non_it|it_sphere_other": 18,
+   "non_it|core": 1,
+   "core|sysadmin": 5,
+   "non_it|1c": 6,
+   "1c|1c": 2,
+   "it_sphere_other|it_sphere_other": 6,
+   "it_sphere_other|core": 3,
+   "it_sphere_other|1c": 1,
+   "core|it_sphere_other": 1,
+   "sysadmin|non_it": 2,
+   "core|1c": 1,
+   "sysadmin|sysadmin": 1,
+   "1c|core": 1,
+   "sysadmin|it_sphere_other": 1
+  },
+  "cv_side_extrapolated_records_by_cvclass": {
+   "non_it": 952331,
+   "core": 13895,
+   "it_sphere_other": 27698,
+   "sysadmin": 2560,
+   "1c": 3382
+  }
+ },
+ "invitation": {
+  "records": 3639201,
+  "vacancy_resolved_records": 471686,
+  "vacancy_resolved_share": 0.1296,
+  "resolved_share_by_year": {
+   "2024": 0.0144,
+   "2025": 0.028,
+   "2026": 0.2485
+  },
+  "by_class_type": {
+   "1c|Отклик": 1675,
+   "core|Отклик": 7654,
+   "it_sphere_any|Отклик": 18816,
+   "it_sphere_other|Отклик": 12440,
+   "non_it|Отклик": 447712,
+   "sysadmin|Отклик": 2205,
+   "unresolved|Отклик": 3167515
+  },
+  "distinct_vacancies_by_class": {
+   "non_it": 123404,
+   "core": 1236,
+   "it_sphere_any": 2855,
+   "sysadmin": 407,
+   "it_sphere_other": 2066,
+   "1c": 212
+  },
+  "distinct_cvs_by_class": {
+   "non_it": 205257,
+   "core": 3294,
+   "it_sphere_any": 10379,
+   "sysadmin": 1272,
+   "it_sphere_other": 8033,
+   "1c": 987
+  },
+  "core_by_month": [
+   [
+    "2024-10",
+    14
+   ],
+   [
+    "2024-11",
+    13
+   ],
+   [
+    "2024-12",
+    12
+   ],
+   [
+    "2025-01",
+    13
+   ],
+   [
+    "2025-02",
+    26
+   ],
+   [
+    "2025-03",
+    22
+   ],
+   [
+    "2025-04",
+    14
+   ],
+   [
+    "2025-05",
+    20
+   ],
+   [
+    "2025-06",
+    34
+   ],
+   [
+    "2025-07",
+    45
+   ],
+   [
+    "2025-08",
+    69
+   ],
+   [
+    "2025-09",
+    74
+   ],
+   [
+    "2025-10",
+    108
+   ],
+   [
+    "2025-11",
+    134
+   ],
+   [
+    "2025-12",
+    182
+   ],
+   [
+    "2026-01",
+    226
+   ],
+   [
+    "2026-02",
+    303
+   ],
+   [
+    "2026-03",
+    356
+   ],
+   [
+    "2026-04",
+    410
+   ],
+   [
+    "2026-05",
+    504
+   ],
+   [
+    "2026-06",
+    617
+   ],
+   [
+    "2026-07",
+    910
+   ],
+   [
+    "2026-08",
+    1018
+   ],
+   [
+    "2026-09",
+    1859
+   ],
+   [
+    "2026-10",
+    671
+   ]
+  ],
+  "cv_sample_hits_records_by_cvclass": {
+   "non_it": 36852,
+   "it_sphere_other": 964,
+   "sysadmin": 97,
+   "1c": 167,
+   "core": 346
+  },
+  "cv_sample_hits_by_cvclass_type": {
+   "non_it|Отклик": 36852,
+   "it_sphere_other|Отклик": 964,
+   "sysadmin|Отклик": 97,
+   "1c|Отклик": 167,
+   "core|Отклик": 346
+  },
+  "cv_sample_hits_cvclass_x_vacclass": {
+   "non_it|unresolved": 31254,
+   "it_sphere_other|unresolved": 749,
+   "sysadmin|unresolved": 87,
+   "1c|unresolved": 91,
+   "non_it|non_it": 5487,
+   "core|unresolved": 250,
+   "it_sphere_other|non_it": 154,
+   "non_it|1c": 10,
+   "core|non_it": 24,
+   "non_it|core": 8,
+   "core|core": 56,
+   "non_it|it_sphere_other": 91,
+   "1c|non_it": 54,
+   "core|sysadmin": 6,
+   "sysadmin|sysadmin": 6,
+   "core|it_sphere_other": 8,
+   "it_sphere_other|it_sphere_other": 49,
+   "sysadmin|core": 1,
+   "1c|core": 3,
+   "it_sphere_other|core": 6,
+   "sysadmin|non_it": 1,
+   "non_it|sysadmin": 2,
+   "1c|1c": 17,
+   "sysadmin|it_sphere_other": 2,
+   "core|1c": 2,
+   "1c|it_sphere_other": 2,
+   "it_sphere_other|sysadmin": 3,
+   "it_sphere_other|1c": 3
+  },
+  "cv_side_extrapolated_records_by_cvclass": {
+   "non_it": 3368717,
+   "it_sphere_other": 88121,
+   "sysadmin": 8867,
+   "1c": 15266,
+   "core": 31629
+  }
+ }
+}
