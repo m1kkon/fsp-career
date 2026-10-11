@@ -27,7 +27,10 @@
 | Отчёт | Статус |
 |---|---|
 | [Текущая проверка продукта](current-product-validation.json) | 427/427 в CI с PostgreSQL/Docker; локальные проверки, синтетический holdout и хеши реализации |
-| [Текущая проверка matching](matching-current-validation.json) | Точные хеши реализации, 35% на ранее известном holdout; ограничения и 69 языковых/matching тестов |
+| [Текущий H2 и внешние baseline](matching-selected-validation.json) | Один TalentMatch holdout: P@5, nDCG@5, MRR, R@5, равные баллы и provenance |
+| [Доменные baseline и абляции](domain-matching-comparison.json) | 24 фиксированных авторских потребности/480 пар; одинаковые hard filters, вклад текстов и ограничения доказательства ФСП/тестов |
+| [Функциональные guards подбора](full-product-matching-guards.json) | 20/20 авторских проверок подтверждения категории, тестов, ФСП, пустой истории и приватности |
+| [Предыдущая проверка matching](matching-current-validation.json) | Исторический snapshot до H2, точные хеши, 69 языковых/matching тестов |
 | [Улучшение v2 → v3](grade-hardening.md) · [JSON](grade-hardening-results.json) | Последний эксперимент: Middle, повторяемость, сложность кодинга, языковые регрессии |
 | [Первый этап исходная модель → v2](synthetic-validation.md) · [JSON](synthetic-validation-results.json) | Исторический эксперимент; его численные результаты не пересчитаны под v3 |
 | [Архив проверок 5–7 октября](history/validation-2026-10-05-to-07.md) | Прежние Sites/D1/Vinext и переход на PostgreSQL; не инструкция текущего запуска |

@@ -72,6 +72,8 @@ def parse(source, styles, width):
                 i += 1
             n = len(rows[0])
             weights = {2:[0.27,0.73],3:[0.16,0.32,0.52],4:[0.11,0.29,0.37,0.23]}.get(n,[1/n]*n)
+            if rows[0][0] == 'Метод':
+                weights = [0.46] + [0.54/(n-1)]*(n-1)
             data = [[Paragraph(inline(c), styles['CellHeader'] if r == 0 else styles['Cell']) for c in row] for r,row in enumerate(rows)]
             header_row = 1 if pending_caption else 0
             if pending_caption:

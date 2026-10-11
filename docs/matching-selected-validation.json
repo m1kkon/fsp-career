@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "asOf": "2026-10-11",
+  "status": "frozen-selected-text-ranking-and-separate-domain-guards",
+  "selectedMethod": "h2-balanced-evidence",
+  "source": {
+    "repository": "https://github.com/MALINAYAGODA/Talent-Match",
+    "commit": "a892ad12f2a84f92b9619ee05fbba5fbbf99fd56",
+    "sha256": "bfa8e4b1f1080b6decba654daf8379356145df80a8ffceeda2577195646da32a",
+    "url": "https://raw.githubusercontent.com/MALINAYAGODA/Talent-Match/a892ad12f2a84f92b9619ee05fbba5fbbf99fd56/case_2_data_for_members.json",
+    "bytes": 4533882
+  },
+  "referenceDate": "2024-03-01",
+  "splitSeed": "fsp-talentmatch-baseline-v1",
+  "scope": {
+    "supported": {
+      "vacancies": 13,
+      "pairs": 348
+    },
+    "development": {
+      "vacancies": 9,
+      "pairs": 246
+    },
+    "previouslyInspectedHoldout": {
+      "vacancies": 4,
+      "pairs": 102
+    }
+  },
+  "holdout": {
+    "product": {
+      "vacancies": 4,
+      "pairs": 102,
+      "precisionAtK": 0.35,
+      "recallAtK": 0.4583333333333333,
+      "ndcgAtK": 0.5038909215346277,
+      "reciprocalRank": 0.875,
+      "randomPrecisionAtK": 0.23357371794871795,
+      "randomNdcgAtK": 0.2822688655542725,
+      "tieAdjustedPrecisionAtK": 0.33749999999999997
+    },
+    "lexical": {
+      "vacancies": 4,
+      "pairs": 102,
+      "precisionAtK": 0.25,
+      "recallAtK": 0.3125,
+      "ndcgAtK": 0.33655241080596404,
+      "reciprocalRank": 0.5634920634920635,
+      "randomPrecisionAtK": 0.23357371794871795,
+      "randomNdcgAtK": 0.2822688655542725,
+      "tieAdjustedPrecisionAtK": 0.25
+    },
+    "stack": {
+      "vacancies": 4,
+      "pairs": 102,
+      "precisionAtK": 0.3,
+      "recallAtK": 0.3958333333333333,
+      "ndcgAtK": 0.4538720923116531,
+      "reciprocalRank": 0.7631578947368421,
+      "randomPrecisionAtK": 0.23357371794871795,
+      "randomNdcgAtK": 0.2822688655542725,
+      "tieAdjustedPrecisionAtK": 0.26666666666666666
+    }
+  },
+  "randomExpected": {
+    "precisionAtK": 0.23357371794871795,
+    "ndcgAtK": 0.2822688655542725
+  },
+  "metricDefinitions": {
+    "aggregation": "Macro average; each vacancy has equal weight.",
+    "precisionAtK": "Relevant labels in top min(5,pool size), divided by that top-list length.",
+    "recallAtK": "Relevant labels in top 5 divided by all relevant labels in the vacancy pool.",
+    "ndcgAtK": "Binary relevance, discount 1/log2(rank+1), normalized ideal top-5 order.",
+    "reciprocalRank": "Inverse rank of first relevant item over the entire candidate pool, not truncated at 5.",
+    "tieAdjustedPrecisionAtK": "Expected P@5 over uniform ordering within equal ranking groups.",
+    "random": "Exact expected P@5 and nDCG@5; random MRR and R@5 not computed."
+  },
+  "frozenImplementation": {
+    "lib/matching.mjs": "e2e5dec5f173b62f6e6bec4aecb7e6c61ad1c8beaecab9bd37a3387b1fb40e7d",
+    "lib/resume-fit.mjs": "9a76b08c8ca0883dc824913086912b5e3d98f7dd856bbb5f922294fd55f2f226",
+    "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791",
+    "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+    "lib/domain.mjs": "8b112fec79803aa09ededb9efc4fff78f8ba083e2d4c67c73931b094b7a07442",
+    "lib/ats.mjs": "1600c6079d241ba302c20205c215fcd93451ce9d8e308145ec6e75cd9de41fd9",
+    "lib/taxonomy.mjs": "3dbea7a04f992cab9373bdabffa597705b0b2665af92ffc49ab30d6e017c8d47",
+    "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+    "scripts/benchmarks/talentmatch.mjs": "e3cb6c3a4bd911bb9d1ead03b8ce32193f43be5e5db1c2a72c316c089412a236",
+    "scripts/benchmarks/ranking-metrics.mjs": "748b4750206818364cbb6716c74d0db0dc9edb433af9fe3f1bae6a160bafebb6",
+    "package-lock.json": "ea9bbabebbca8437724d114b4feb4e9efb3537d461a771e409dd2b5f2893fa67"
+  },
+  "domainValidation": {
+    "report": "docs/full-product-matching-guards.json",
+    "cases": 20,
+    "passed": 20,
+    "failed": 0,
+    "implementation": {
+      "lib/matching.mjs": "92380762cc0ba2c015f64c66b1bb7389e1c89e85d2f05f70fec909b2e5aa9d88",
+      "lib/resume-fit.mjs": "9a76b08c8ca0883dc824913086912b5e3d98f7dd856bbb5f922294fd55f2f226",
+      "lib/ats.mjs": "211e5e36e1f92c05a50bd1431169d723c85ba617487143add959f5ce0f441606",
+      "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
+      "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b"
+    },
+    "guardHash": "0e2a6f38f95942e1782402f435e1bcb65c416c3294deb0df30d4463fe3732b20",
+    "strictVerificationContract": {
+      "verifiedOnlyWhen": "verified === true",
+      "unknownInputs": [
+        null,
+        false,
+        "true",
+        1,
+        "missing"
+      ],
+      "publicProjection": "Always boolean",
+      "externalDatasetEffect": "TalentMatch adapter supplies verified:false, so strict verification does not change its ranking inputs or frozen result."
+    },
+    "kind": "Author-controlled functional invariants; not external recruiter-label accuracy."
+  },
+  "limitations": [
+    "В исходных данных нет результатов тестов, подтверждённых грейдов или истории ФСП. Они остаются неизвестными.",
+    "Проверяется ранжирование по текстам и доступным полям, а не полный сценарий каталога с подтверждёнными категориями.",
+    "Навыки вакансии — предложения парсера, не обязательные требования, подтверждённые работодателем. Шаблоны ролей не добавляются.",
+    "Confirmed/failed — неточный сигнал соответствия после скрининга. Это не факты найма и не вероятности.",
+    "К каждой вакансии заранее отобран свой пул резюме. Метрики не оценивают поиск по всему рынку.",
+    "Специализация и грейд из текста резюме не подтверждены тестом: баллы за подтверждённую категорию не начисляются.",
+    "Development и holdout не пересекаются по вакансиям и резюме. Ошибки отдельных вакансий анализируются только на development.",
+    "Лексический TF-IDF — отдельный baseline для сравнения. Это не семантические embeddings; в рабочем ранжировании он не включён.",
+    "Веса в этом прогоне не подбираются. Веса ФСП и тестов нельзя калибровать по этому датасету.",
+    "При равных баллах используется порядок анонимных идентификаторов. Tie P@5 показывает результат без влияния этой случайности.",
+    "This small holdout was previously inspected; it is not new independent data.",
+    "No claim of superiority to unmeasured neural or LLM methods.",
+    "Frozen text-ranking measurement precedes the strict verification guard fix. The TalentMatch adapter supplies verified:false, so that fix does not alter its inputs; independent development metrics were checked unchanged. The known holdout was not repeatedly re-evaluated.",
+    "Synthetic grading and matching use separate authored labels and do not estimate external market quality."
+  ],
+  "reproduction": {
+    "textRanking": "node scripts/benchmarks/talentmatch.mjs --download --output output/benchmarks/reproduction",
+    "domainGuards": "MATCHING_GUARD_REPORT_PATH=docs/full-product-matching-guards.json node --test tests/full-product-matching-guards.test.mjs"
+  },
+  "domainComparison": {
+    "report": "docs/domain-matching-comparison.json",
+    "dataset": {
+      "scenarios": 24,
+      "pairs": 480,
+      "type": "existing controlled author-labeled fixture"
+    },
+    "kind": "Separate domain evaluation; not comparable to external text-ranking accuracy."
+  }
+}
