@@ -1,7 +1,7 @@
 {
   "version": "synthetic-hardening-v2",
   "fixtureHash": "f48e807358a6ecebeb97b617a543e0f7a04a9bd2ebace15a9b158ca3ed13e0cf",
-  "sourceHash": "6e98b9974d40e2062348977e5beb8ed6ebecfe05faa2440b1d7c9ae92a37ff04",
+  "sourceHash": "895a8226cb57dcd04e89d3ad0b44934c821b51dc3f07bed2e65b233e72110327",
   "sourceFiles": [
     {
       "path": "lib/action-dispatch.mjs",
@@ -33,7 +33,7 @@
     },
     {
       "path": "lib/ats.mjs",
-      "sha256": "211e5e36e1f92c05a50bd1431169d723c85ba617487143add959f5ce0f441606"
+      "sha256": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e"
     },
     {
       "path": "lib/auth.mjs",
@@ -117,7 +117,7 @@
     },
     {
       "path": "lib/matching.mjs",
-      "sha256": "92380762cc0ba2c015f64c66b1bb7389e1c89e85d2f05f70fec909b2e5aa9d88"
+      "sha256": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e"
     },
     {
       "path": "lib/mixed-coding-bank.mjs",
@@ -161,7 +161,7 @@
     },
     {
       "path": "lib/resume-fit.mjs",
-      "sha256": "9a76b08c8ca0883dc824913086912b5e3d98f7dd856bbb5f922294fd55f2f226"
+      "sha256": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1"
     },
     {
       "path": "lib/resume-pdf.mjs",
@@ -218,9 +218,1833 @@
     "Item discrimination here measures the simulator, not empirical question-bank validity."
   ],
   "fresh": {
+    "personas": [
+      {
+        "id": "novice",
+        "grade": "BelowJunior",
+        "theory": [
+          0.45,
+          0.2,
+          0.08
+        ],
+        "coding": [
+          0.25,
+          0.05,
+          0.01
+        ]
+      },
+      {
+        "id": "junior",
+        "grade": "Junior",
+        "theory": [
+          0.88,
+          0.6,
+          0.25
+        ],
+        "coding": [
+          0.88,
+          0.25,
+          0.04
+        ]
+      },
+      {
+        "id": "middle",
+        "grade": "Middle",
+        "theory": [
+          0.96,
+          0.85,
+          0.58
+        ],
+        "coding": [
+          0.97,
+          0.86,
+          0.35
+        ]
+      },
+      {
+        "id": "senior",
+        "grade": "Senior",
+        "theory": [
+          0.99,
+          0.97,
+          0.91
+        ],
+        "coding": [
+          0.99,
+          0.97,
+          0.9
+        ]
+      }
+    ],
     "seedNamespace": "2026-10-10:fresh-grades-v2:locked",
     "peoplePerGrade": 100,
     "formsPerModule": 20,
+    "policies": [
+      {
+        "moduleId": "python",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "sql",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "backend",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-backend",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "javascript",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "browser",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "react",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-frontend",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "test-design",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "automation",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-qa",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "infrastructure",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-devops",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "statistics",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "ml",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-ds",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "ml-engineering",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-mle",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      }
+    ],
     "formHash": "bde9ad4e6c0e31ab4097aa6494e91b25da0e74161cbfdc66b504f1e2be4510e2",
     "summary": {
       "n": 4800,
@@ -909,6 +2733,17 @@
           "Senior": 94.26100000000001
         }
       }
+    },
+    "discrimination": {
+      "items": 2335,
+      "coveredItems": 2014,
+      "meanDifference": 0.49053342568755043,
+      "negativeItems": [],
+      "byDifficulty": {
+        "1": 0.3120760091503026,
+        "2": 0.5707908369187028,
+        "3": 0.575547106195292
+      }
     }
   },
   "matching": {
@@ -934,7 +2769,7 @@
       "randomNdcgAtK": 0.32499999999999984,
       "gradedNdcgAt5": 1,
       "tiedPrecisionAt5": 1,
-      "eligibilityAccuracy": 1,
+      "eligibilityAccuracy": 0.9499999999999996,
       "invalidTop5": 0,
       "scoreExplanationAccuracy": 1
     },
@@ -948,7 +2783,7 @@
         "randomNdcgAtK": 0.32499999999999996,
         "gradedNdcgAt5": 1,
         "tiedPrecisionAt5": 1,
-        "eligibilityAccuracy": 1,
+        "eligibilityAccuracy": 0.9499999999999998,
         "invalidTop5": 0,
         "scoreExplanationAccuracy": 1
       },
@@ -961,7 +2796,7 @@
         "randomNdcgAtK": 0.32499999999999996,
         "gradedNdcgAt5": 1,
         "tiedPrecisionAt5": 1,
-        "eligibilityAccuracy": 1,
+        "eligibilityAccuracy": 0.9499999999999998,
         "invalidTop5": 0,
         "scoreExplanationAccuracy": 1
       }
@@ -970,12 +2805,1837 @@
       "higherVsIrrelevant": 1,
       "relevantVsDenied": 1,
       "relevantVsTags": 1
-    }
+    },
+    "legacyPolicyDifference": "24 of 480 unchanged v1 labels mark an unreported required skill as fail; the current clarification policy returns unknown. Their labels are retained; agreement is 456/480."
   },
   "safety": {
+    "personas": [
+      {
+        "id": "theory-only",
+        "grade": "BelowJunior",
+        "theory": [
+          1,
+          1,
+          1
+        ],
+        "coding": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "coding-only",
+        "grade": "BelowJunior",
+        "theory": [
+          0,
+          0,
+          0
+        ],
+        "coding": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "id": "random-choice",
+        "grade": "BelowJunior",
+        "theory": [
+          0.25,
+          0.25,
+          0.25
+        ],
+        "coding": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "weak-practice",
+        "grade": "BelowJunior",
+        "theory": [
+          0.95,
+          0.9,
+          0.8
+        ],
+        "coding": [
+          0.08,
+          0.02,
+          0
+        ]
+      }
+    ],
     "seedNamespace": "2026-10-10:grade-safety-v2:locked",
     "peoplePerGrade": 100,
     "formsPerModule": 20,
+    "policies": [
+      {
+        "moduleId": "python",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "sql",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "backend",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-backend",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "javascript",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "browser",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "react",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-frontend",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "test-design",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "automation",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-qa",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "infrastructure",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-devops",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "statistics",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "ml",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-ds",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "ml-engineering",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      },
+      {
+        "moduleId": "integration-mle",
+        "specVersion": 8,
+        "thresholds": {
+          "Junior": 40,
+          "Middle": 60,
+          "Senior": 85
+        },
+        "scoring": {
+          "rule": "rasch-theory-practice-v3",
+          "calibration": "synthetic-v2-provisional",
+          "routingCodingSolvedMin": 1,
+          "codingScoreModel": "difficulty-adjusted-v1",
+          "codingDifficultyAnchors": {
+            "1": 0,
+            "2": 0,
+            "3": 2
+          },
+          "difficultyAnchors": {
+            "1": -1,
+            "2": 0,
+            "3": 1
+          },
+          "theoryWeight": 0.6,
+          "codingWeight": 0.4,
+          "grades": {
+            "Junior": {
+              "theoryMin": 35,
+              "codingMin": 30,
+              "plusCodingMin": 60,
+              "difficultyMin": 1,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Middle": {
+              "theoryMin": 55,
+              "codingMin": 50,
+              "plusCodingMin": 80,
+              "difficultyMin": 2,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            },
+            "Senior": {
+              "theoryMin": 75,
+              "codingMin": 75,
+              "plusCodingMin": 90,
+              "difficultyMin": 3,
+              "solvedMin": 1,
+              "plusSolvedMin": 1
+            }
+          }
+        },
+        "adaptive": {
+          "rule": "two-stage-16-mixed-coding-v3",
+          "firstCount": 16,
+          "secondCount": 16,
+          "firstDifficultyCounts": {
+            "1": 5,
+            "2": 6,
+            "3": 5
+          },
+          "routes": {
+            "foundation": {
+              "1": 8,
+              "2": 6,
+              "3": 2
+            },
+            "advanced": {
+              "1": 2,
+              "2": 6,
+              "3": 8
+            }
+          },
+          "routingThreshold": 65,
+          "difficultyWeights": {
+            "1": 1,
+            "2": 2,
+            "3": 3
+          },
+          "codingDifficultyCounts": {
+            "first": {
+              "1": 0,
+              "2": 2,
+              "3": 0
+            },
+            "foundation": {
+              "1": 2,
+              "2": 0,
+              "3": 0
+            },
+            "advanced": {
+              "1": 0,
+              "2": 0,
+              "3": 2
+            }
+          }
+        }
+      }
+    ],
     "formHash": "bdb33659375ab44ee5caad4324dcc101e744388d8d61ace19844b9f45fed3abd",
     "summary": {
       "n": 4800,
@@ -1697,8 +5357,8 @@
   },
   "localVerification": {
     "testSuite": {
-      "total": 475,
-      "passed": 447,
+      "total": 499,
+      "passed": 471,
       "failed": 0,
       "skipped": 28,
       "skipReason": "PostgreSQL, Docker sandbox and environment-dependent checks require configured services; not claimed as locally passed."
@@ -1710,7 +5370,7 @@
     },
     "lint": {
       "errors": 0,
-      "existingWarnings": 23
+      "existingWarnings": 24
     },
     "bankStructure": {
       "questions": 2359,
@@ -1737,7 +5397,8 @@
         "Review original answer instructions",
         "Send feedback",
         "Candidate retains original instructions and sees feedback"
-      ]
+      ],
+      "revisionScope": "Observed before the final responsive UI and blended ranking changes; final browser access is blocked by a saved permission setting. This is not a current production walkthrough."
     },
     "typeScript": {
       "status": "passed",
@@ -1775,6 +5436,7 @@
       "elapsedMs": 195,
       "scope": "CI service calls during a controlled pending judge; not a production HTTP SLA"
     },
-    "scope": "Measured on final product implementation; subsequent authored stress diagnostics and jury PDF are evaluated separately."
-  }
+    "scope": "Previous implementation dc5a2fe passed. The final blended implementation requires a new CI run; this result is not its validation."
+  },
+  "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c"
 }

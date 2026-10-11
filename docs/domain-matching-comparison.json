@@ -1059,7 +1059,7 @@
   },
   "invariants": {
     "pairs": 480,
-    "eligibilityCorrect": 480,
+    "eligibilityCorrect": 456,
     "explanationCorrect": 480,
     "noHistoryRelevantEligible": 24,
     "noHistoryRelevantTopFive": 22,
@@ -1075,16 +1075,17 @@
     "The synthetic split is a historical fixture partition, not a newly sealed or independent holdout.",
     "Criterion 6.1 also requires a real employer need-to-selection scenario and end-to-end testing with jury/users; this offline report does not replace them."
   ],
-  "productSnapshot": "21bec5adf8fc90fb7cd2802e9dd3543ed448e129",
+  "productSnapshot": "0fc850c5868b5b0193abfc48eb4098d8079473c8",
+  "legacyEligibilityPolicy": "The frozen v1 rubric labels unreported required skills as fail. The current product asks for clarification (unknown). The 24 legacy labels are retained; label agreement is reported without relabelling them.",
   "implementation": {
-    "lib/matching.mjs": "92380762cc0ba2c015f64c66b1bb7389e1c89e85d2f05f70fec909b2e5aa9d88",
-    "lib/resume-fit.mjs": "9a76b08c8ca0883dc824913086912b5e3d98f7dd856bbb5f922294fd55f2f226",
-    "lib/ats.mjs": "211e5e36e1f92c05a50bd1431169d723c85ba617487143add959f5ce0f441606",
+    "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+    "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+    "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
     "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
     "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
     "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
     "scripts/benchmarks/fixtures/synthetic-v1.mjs": "335a17cf48d1ac1f67160d6850d34610f246c304dd36d2000d24b946e18a9001",
     "scripts/benchmarks/ranking-metrics.mjs": "748b4750206818364cbb6716c74d0db0dc9edb433af9fe3f1bae6a160bafebb6",
-    "scripts/benchmarks/domain-matching-comparison.mjs": "03e44c243e56a2c5fcc2d2b2bf32e6285de8f08a32a4e2bbf16191557566e0ee"
+    "scripts/benchmarks/domain-matching-comparison.mjs": "034995e2cbb81fd5a60d427a2e621c401a431fa8458a320ea2f6dc73f89ab323"
   }
 }

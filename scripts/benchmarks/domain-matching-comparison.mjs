@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {spawnSync} from 'node:child_process';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -99,7 +100,8 @@ export function evaluateDomainMatching(){
 async function main(){
  const report=evaluateDomainMatching();
  const files=['lib/matching.mjs','lib/resume-fit.mjs','lib/ats.mjs','lib/domain.mjs','lib/fsp.mjs','lib/technology-catalog.mjs','scripts/benchmarks/fixtures/synthetic-v1.mjs','scripts/benchmarks/ranking-metrics.mjs','scripts/benchmarks/domain-matching-comparison.mjs'];
- report.productSnapshot='21bec5adf8fc90fb7cd2802e9dd3543ed448e129';
+ report.productSnapshot=spawnSync('git',['rev-parse','HEAD'],{cwd:fileURLToPath(new URL('../../',import.meta.url)),encoding:'utf8'}).stdout.trim();
+ report.legacyEligibilityPolicy='The frozen v1 rubric labels unreported required skills as fail. The current product asks for clarification (unknown). The 24 legacy labels are retained; label agreement is reported without relabelling them.';
  report.implementation=Object.fromEntries(await Promise.all(files.map(async file=>[file,hash(await readFile(new URL('../../'+file,import.meta.url)))])));
  const output=resolve(process.argv[2]||'docs/domain-matching-comparison.json');
  await mkdir(dirname(output),{recursive:true});await writeFile(output,JSON.stringify(report,null,2)+'\n');

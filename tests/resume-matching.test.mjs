@@ -34,7 +34,7 @@ test('positive resume evidence can satisfy canonical required skills; denied exp
  assert.deepEqual(candidateResumeSkills(denied),[]);
  assert.equal(matching(denied,request).eligibility.status,'fail');
  const sql=candidate({stack:['SQL'],work:'Разработал SQL-запросы.'});
- assert.equal(matching(sql,request).eligibility.status,'fail');
+ assert.equal(matching(sql,request).eligibility.status,'unknown');
 });
 
 test('about text alone gets partial skill credit, repeated words and longer unrelated prose add none',()=>{

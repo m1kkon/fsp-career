@@ -1,15 +1,23 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {domainStressScenarios} from '../scripts/benchmarks/fixtures/domain-stress-v1.mjs';
 import {diagnosticMetrics,verifyFrozenDiagnostic} from '../scripts/benchmarks/domain-stress-diagnostic.mjs';
 
 const row=(id,relevance,truthEligibility='pass',score=100-id)=>({id:String(id),relevance,truthEligibility,score,lexical:score,stackCoverage:score,
  match:{score,strength:0,eligibility:{status:truthEligibility}}});
 
-test('fixture, rubric and product fingerprint verify before evaluation without ranking new profiles',async()=>{
- const {freeze,fixtures,implementation}=await verifyFrozenDiagnostic();
+test('historical fixture remains intact and refuses the changed product implementation',async()=>{
+ const hash=value=>createHash('sha256').update(value).digest('hex');
+ const freeze=JSON.parse(await readFile(new URL('../docs/domain-stress-freeze.json',import.meta.url))),fixtures=domainStressScenarios();
  assert.equal(freeze.evaluated,false);assert.equal(freeze.labelsAuthoredBeforeEvaluation,true);
  assert.equal(fixtures.length,12);assert.equal(fixtures.flatMap(s=>s.candidates).length,120);
- assert.equal(Object.keys(implementation).length,7);
+ assert.equal(hash(JSON.stringify(fixtures)),freeze.expandedFixtureSha256);
+ for(const [file,expected]of Object.entries(freeze.files))assert.equal(hash(await readFile(new URL('../'+file,import.meta.url))),expected);
+ // A shallow CI checkout may not contain the historical source commit. Either
+ // absence or a changed current implementation must prevent its reuse.
+ await assert.rejects(verifyFrozenDiagnostic(),/Product changed from the frozen snapshot|Cannot verify product snapshot/);
 });
 
 test('primary binary relevance respects authored eligibility while text-only evidence is reported separately',()=>{

@@ -1,0 +1,3083 @@
+{
+  "version": "blended-known-stress-regression-v1",
+  "asOf": "2026-10-11T18:00:00Z",
+  "weights": {
+    "spec": 25,
+    "grade": 15,
+    "stack": 12,
+    "resume": 20,
+    "test": 12,
+    "fsp": 6,
+    "format": 4,
+    "salary": 4,
+    "domain": 2
+  },
+  "dataset": {
+    "scenarios": 12,
+    "pairs": 120,
+    "type": "Previously evaluated authored development/regression fixture; not fresh holdout"
+  },
+  "metricDefinitions": {
+    "primary": "Binary relevant iff authored professional relevance>=2 and authored eligibility=pass. P@5, Recall@5, binary nDCG@5 and full-pool MRR use this label.",
+    "gradedNdcgAtFive": "Linear graded gains 0–3, with unknown/fail eligibility set to zero; ideal order is computed over the same pool.",
+    "textOnlyPrecisionAtFive": "Professional relevance>=2 without eligibility; separate diagnostic, not the primary ranking metric.",
+    "precisionAtFiveCeiling": "Maximum possible P@5 in each pool given its relevant eligible count; fewer than five positives lowers the ceiling.",
+    "fractionOfAvailableTopFiveRelevant": "Hits in top five divided by min(5,relevant eligible count). This is not market accuracy.",
+    "ties": "Expected binary P@5 under random ID order within identical actual non-ID sorting signals.",
+    "averaging": "Macro average over the 12 needs. Baselines have the same complete professional text/technologies; filtered baselines use product eligibility, never authored truth."
+  },
+  "summary": {
+    "full": {
+      "precisionAtK": 0.5666666666666667,
+      "recallAtK": 0.8194444444444443,
+      "ndcgAtK": 0.6718119516453581,
+      "reciprocalRank": 0.6527777777777778,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.5763888888888888,
+      "gradedNdcgAtFive": 0.7447285070545178,
+      "textOnlyPrecisionAtFive": 0.5666666666666667,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.8194444444444443,
+      "invalidTopFive": 0
+    },
+    "tfidf": {
+      "precisionAtK": 0.3666666666666667,
+      "recallAtK": 0.5277777777777778,
+      "ndcgAtK": 0.4858567099654499,
+      "reciprocalRank": 0.673611111111111,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.3666666666666667,
+      "gradedNdcgAtFive": 0.5715619697298221,
+      "textOnlyPrecisionAtFive": 0.7166666666666667,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.5277777777777778,
+      "invalidTopFive": 1.75
+    },
+    "stack": {
+      "precisionAtK": 0.3333333333333333,
+      "recallAtK": 0.4861111111111111,
+      "ndcgAtK": 0.4973180161268354,
+      "reciprocalRank": 0.7430555555555555,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.35648148148148145,
+      "gradedNdcgAtFive": 0.5458004132532038,
+      "textOnlyPrecisionAtFive": 0.5,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.4861111111111111,
+      "invalidTopFive": 0.9166666666666666
+    },
+    "hard_filters_tfidf": {
+      "precisionAtK": 0.48333333333333334,
+      "recallAtK": 0.701388888888889,
+      "ndcgAtK": 0.6425167843954306,
+      "reciprocalRank": 0.7569444444444443,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.48333333333333334,
+      "gradedNdcgAtFive": 0.7699943502429485,
+      "textOnlyPrecisionAtFive": 0.48333333333333334,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.701388888888889,
+      "invalidTopFive": 0
+    },
+    "hard_filters_stack": {
+      "precisionAtK": 0.46666666666666673,
+      "recallAtK": 0.673611111111111,
+      "ndcgAtK": 0.6309447596399888,
+      "reciprocalRank": 0.7777777777777777,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.5043650793650793,
+      "gradedNdcgAtFive": 0.7054851150296937,
+      "textOnlyPrecisionAtFive": 0.46666666666666673,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.673611111111111,
+      "invalidTopFive": 0
+    }
+  },
+  "bySpecialization": {
+    "Backend": {
+      "full": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.7083333333333333,
+        "ndcgAtK": 0.7067226467625796,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.7228256805330918,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.7083333333333333,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.2,
+        "recallAtK": 0.25,
+        "ndcgAtK": 0.27069983410995346,
+        "reciprocalRank": 0.5833333333333334,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.2,
+        "gradedNdcgAtFive": 0.40257472549944895,
+        "textOnlyPrecisionAtFive": 0.6000000000000001,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.25,
+        "invalidTopFive": 2
+      },
+      "stack": {
+        "precisionAtK": 0.2,
+        "recallAtK": 0.29166666666666663,
+        "ndcgAtK": 0.33223437550940366,
+        "reciprocalRank": 0.6666666666666666,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.35,
+        "gradedNdcgAtFive": 0.5269090728931233,
+        "textOnlyPrecisionAtFive": 0.30000000000000004,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.29166666666666663,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5416666666666666,
+        "ndcgAtK": 0.46934851985825266,
+        "reciprocalRank": 0.625,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.645443581996971,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.5416666666666666,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5416666666666666,
+        "ndcgAtK": 0.5173641346312046,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.5476190476190477,
+        "gradedNdcgAtFive": 0.7039045704506781,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.5416666666666666,
+        "invalidTopFive": 0
+      }
+    },
+    "Frontend": {
+      "full": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.5654495432396527,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.4,
+        "randomNdcgAtK": 0.4604078472911221,
+        "tieAdjustedPrecisionAtK": 0.625,
+        "gradedNdcgAtFive": 0.6565521171089832,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.45235861474353767,
+        "reciprocalRank": 0.6666666666666666,
+        "randomPrecisionAtK": 0.4,
+        "randomNdcgAtK": 0.4604078472911221,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.5594781192345473,
+        "textOnlyPrecisionAtFive": 0.7,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 1.5
+      },
+      "stack": {
+        "precisionAtK": 0.2,
+        "recallAtK": 0.25,
+        "ndcgAtK": 0.20721496250592372,
+        "reciprocalRank": 0.375,
+        "randomPrecisionAtK": 0.4,
+        "randomNdcgAtK": 0.4604078472911221,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.2927099063695135,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.25,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.625,
+        "ndcgAtK": 0.5755098091139026,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.4,
+        "randomNdcgAtK": 0.4604078472911221,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.7098611253994831,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.625,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.3717658250961956,
+        "reciprocalRank": 0.41666666666666663,
+        "randomPrecisionAtK": 0.4,
+        "randomNdcgAtK": 0.4604078472911221,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.4426889137966892,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 0
+      }
+    },
+    "QA": {
+      "full": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.875,
+        "ndcgAtK": 0.8048099750039492,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.8086860623657239,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.875,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5833333333333333,
+        "ndcgAtK": 0.48498383652951593,
+        "reciprocalRank": 0.625,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.6009366304419327,
+        "textOnlyPrecisionAtFive": 0.7,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.5833333333333333,
+        "invalidTopFive": 1.5
+      },
+      "stack": {
+        "precisionAtK": 0.30000000000000004,
+        "recallAtK": 0.4583333333333333,
+        "ndcgAtK": 0.5471490695131181,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.37222222222222223,
+        "gradedNdcgAtFive": 0.6135071623083471,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.4583333333333333,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.6346714984009253,
+        "reciprocalRank": 0.6666666666666666,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.7819422848171405,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.7706998341099535,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.55,
+        "gradedNdcgAtFive": 0.830637720066357,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      }
+    },
+    "DevOps": {
+      "full": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.8333333333333333,
+        "ndcgAtK": 0.5745048880132609,
+        "reciprocalRank": 0.41666666666666663,
+        "randomPrecisionAtK": 0.3,
+        "randomNdcgAtK": 0.41509474171137006,
+        "tieAdjustedPrecisionAtK": 0.5333333333333333,
+        "gradedNdcgAtFive": 0.682747514135378,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.6,
+        "fractionOfAvailableTopFiveRelevant": 0.8333333333333333,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.6666666666666666,
+        "ndcgAtK": 0.5907708962686763,
+        "reciprocalRank": 0.6666666666666666,
+        "randomPrecisionAtK": 0.3,
+        "randomNdcgAtK": 0.41509474171137006,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.6098277810722135,
+        "textOnlyPrecisionAtFive": 0.9,
+        "precisionAtFiveCeiling": 0.6,
+        "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+        "invalidTopFive": 2.5
+      },
+      "stack": {
+        "precisionAtK": 0.30000000000000004,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.4530127177673411,
+        "reciprocalRank": 0.6666666666666666,
+        "randomPrecisionAtK": 0.3,
+        "randomNdcgAtK": 0.41509474171137006,
+        "tieAdjustedPrecisionAtK": 0.31666666666666665,
+        "gradedNdcgAtFive": 0.4380668046189169,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.6,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.8333333333333333,
+        "ndcgAtK": 0.7490946287332063,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.3,
+        "randomNdcgAtK": 0.41509474171137006,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.8509757798799529,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.6,
+        "fractionOfAvailableTopFiveRelevant": 0.8333333333333333,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.6666666666666666,
+        "ndcgAtK": 0.5907708962686763,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.3,
+        "randomNdcgAtK": 0.41509474171137006,
+        "tieAdjustedPrecisionAtK": 0.4642857142857143,
+        "gradedNdcgAtFive": 0.6558223309745163,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.6,
+        "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+        "invalidTopFive": 0
+      }
+    },
+    "Data Science": {
+      "full": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.587160517107286,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.7260419697277024,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.30000000000000004,
+        "recallAtK": 0.41666666666666663,
+        "ndcgAtK": 0.44185432551730197,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.30000000000000004,
+        "gradedNdcgAtFive": 0.5832196904609825,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.41666666666666663,
+        "invalidTopFive": 1.5
+      },
+      "stack": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.875,
+        "ndcgAtK": 0.8938510284803185,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.35,
+        "gradedNdcgAtFive": 0.8258228856619951,
+        "textOnlyPrecisionAtFive": 0.7,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.875,
+        "invalidTopFive": 0.5
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5833333333333333,
+        "ndcgAtK": 0.5326252217859784,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.7373035598117446,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.5833333333333333,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.8183412193664159,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.42857142857142855,
+        "gradedNdcgAtFive": 0.8275613472857493,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      }
+    },
+    "ML Engineering": {
+      "full": {
+        "precisionAtK": 0.7,
+        "recallAtK": 1,
+        "ndcgAtK": 0.7922241397454204,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.7,
+        "gradedNdcgAtFive": 0.8715176984562276,
+        "textOnlyPrecisionAtFive": 0.7,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 1,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.674472752623714,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.6733348716698069,
+        "textOnlyPrecisionAtFive": 0.8,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 1.5
+      },
+      "stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5416666666666666,
+        "ndcgAtK": 0.5504459429849071,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.35,
+        "gradedNdcgAtFive": 0.5777866476673271,
+        "textOnlyPrecisionAtFive": 0.6000000000000001,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.5416666666666666,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.875,
+        "ndcgAtK": 0.8938510284803185,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.8944397695523991,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.875,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.6000000000000001,
+        "recallAtK": 0.8333333333333333,
+        "ndcgAtK": 0.7167266483674861,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.35,
+        "randomNdcgAtK": 0.43775129450124606,
+        "tieAdjustedPrecisionAtK": 0.5357142857142857,
+        "gradedNdcgAtFive": 0.772295807604172,
+        "textOnlyPrecisionAtFive": 0.6000000000000001,
+        "precisionAtFiveCeiling": 0.7,
+        "fractionOfAvailableTopFiveRelevant": 0.8333333333333333,
+        "invalidTopFive": 0
+      }
+    }
+  },
+  "checks": {
+    "eligibilityCorrect": 115,
+    "explanationsCorrect": 120,
+    "pairs": 120
+  },
+  "cases": [
+    {
+      "id": "payments-retries",
+      "spec": "Backend",
+      "pairs": 10,
+      "relevantEligible": 3,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.7039180890341347,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.7179285565704402,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0,
+          "recallAtK": 0,
+          "ndcgAtK": 0,
+          "reciprocalRank": 0.16666666666666666,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0,
+          "gradedNdcgAtFive": 0.20667465801942553,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.46927872602275644,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.3,
+          "gradedNdcgAtFive": 0.6434164465104167,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 0
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.20210734650054757,
+          "reciprocalRank": 0.25,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.4737304826520698,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.46927872602275644,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.42857142857142855,
+          "gradedNdcgAtFive": 0.6434164465104167,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "payments-retries-billing",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 89,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 7,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "payments-retries-denial",
+          "professionalRelevance": 0,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 79,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "payments-retries-orders",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 8,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "payments-retries-keywords",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "payments-retries-images",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [
+        "payments-retries-replay"
+      ],
+      "nonRelevantTopFive": [
+        "payments-retries-denial",
+        "payments-retries-keywords",
+        "payments-retries-images"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "migration-online",
+      "spec": "Backend",
+      "pairs": 10,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.7095272044910244,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.7277228044957434,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.5413996682199069,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.5984747929794724,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.19519002499605084,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.41040169927582987,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 2
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.7365896932159578,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.8171566813418722,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.5654495432396527,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6666666666666667,
+          "gradedNdcgAtFive": 0.7643926943909395,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "migration-online-release",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 94,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 4,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "migration-online-learner",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 82,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 2,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "migration-online-batch",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "migration-online-migration",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 3,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "migration-online-mixed",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 70,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "migration-online-expand-contract"
+      ],
+      "nonRelevantTopFive": [
+        "migration-online-learner",
+        "migration-online-batch"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "accessibility-keyboard",
+      "spec": "Frontend",
+      "pairs": 10,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.5654495432396527,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.6432016615838806,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.36331756126716835,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.44797298589015394,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.16812753627111746,
+          "reciprocalRank": 0.25,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.29422946477715906,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.592512031964586,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.6761547090014168,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.34620964322385606,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.5,
+          "gradedNdcgAtFive": 0.4699957130259643,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "accessibility-keyboard-animation",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 100,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "accessibility-keyboard-senior",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 92,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "accessibility-keyboard-denied",
+          "professionalRelevance": 0,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "accessibility-keyboard-forms",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "accessibility-keyboard-screen-reader",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "accessibility-keyboard-wcag"
+      ],
+      "nonRelevantTopFive": [
+        "accessibility-keyboard-animation",
+        "accessibility-keyboard-denied"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "frontend-finance-table",
+      "spec": "Frontend",
+      "pairs": 10,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.5654495432396527,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.65,
+          "gradedNdcgAtFive": 0.6699025726340858,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.5413996682199069,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.6709832525789405,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.24630238874073,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.29119034796186793,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.5585075862632192,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.7435675417975495,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.3973220069685352,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.5,
+          "gradedNdcgAtFive": 0.415382114567414,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "frontend-finance-table-static",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 100,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "frontend-finance-table-dashboard",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 92,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "frontend-finance-table-negation",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "frontend-finance-table-project",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "frontend-finance-table-stream",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "frontend-finance-table-table"
+      ],
+      "nonRelevantTopFive": [
+        "frontend-finance-table-static",
+        "frontend-finance-table-negation"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "qa-contracts",
+      "spec": "QA",
+      "pairs": 10,
+      "relevantEligible": 3,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 1,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.9254878899399764,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.6508205185601091,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.6842052122491501,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.7039180890341347,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.3,
+          "gradedNdcgAtFive": 0.7282594284395902,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.9060254355346823,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.9506457192978572,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 1,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 1,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 8,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "qa-contracts-manual-api",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 95,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 1
+          }
+        },
+        {
+          "id": "qa-contracts-automation",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 6,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "qa-contracts-compatibility",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 80,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 12,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "qa-contracts-tags",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "qa-contracts-manual-ui",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 1
+          }
+        }
+      ],
+      "missedRelevant": [],
+      "nonRelevantTopFive": [
+        "qa-contracts-tags",
+        "qa-contracts-manual-ui"
+      ],
+      "eligibilityErrors": [
+        {
+          "id": "qa-contracts-denied",
+          "expected": "pass",
+          "actual": "unknown",
+          "checks": [
+            {
+              "id": "spec",
+              "label": "Специализация",
+              "status": "pass",
+              "expected": "QA",
+              "actual": "QA",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "grade",
+              "label": "Подтверждённый уровень",
+              "status": "pass",
+              "expected": "не ниже Middle",
+              "actual": "Middle",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "skill-0",
+              "label": "Навык: Java",
+              "status": "unknown",
+              "expected": "Java",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "skill-1",
+              "label": "Навык: SQL",
+              "status": "pass",
+              "expected": "SQL",
+              "actual": "SQL",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "english",
+              "label": "Английский язык",
+              "status": "pass",
+              "expected": "не ниже B2",
+              "actual": "B2",
+              "source": "указано кандидатом"
+            },
+            {
+              "id": "experience",
+              "label": "Коммерческий опыт",
+              "status": "pass",
+              "expected": "от 2 лет",
+              "actual": "6 лет",
+              "source": "анкета"
+            },
+            {
+              "id": "format",
+              "label": "Формат работы",
+              "status": "pass",
+              "expected": "Удалённо",
+              "actual": "Удалённо",
+              "source": "анкета"
+            },
+            {
+              "id": "salary",
+              "label": "Зарплатные ожидания",
+              "status": "pass",
+              "expected": "150 000–250 000 ₽",
+              "actual": "180 000–230 000 ₽",
+              "source": "резюме"
+            }
+          ]
+        },
+        {
+          "id": "qa-contracts-future",
+          "expected": "pass",
+          "actual": "unknown",
+          "checks": [
+            {
+              "id": "spec",
+              "label": "Специализация",
+              "status": "pass",
+              "expected": "QA",
+              "actual": "QA",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "grade",
+              "label": "Подтверждённый уровень",
+              "status": "pass",
+              "expected": "не ниже Middle",
+              "actual": "Middle",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "skill-0",
+              "label": "Навык: Java",
+              "status": "unknown",
+              "expected": "Java",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "skill-1",
+              "label": "Навык: SQL",
+              "status": "pass",
+              "expected": "SQL",
+              "actual": "SQL",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "english",
+              "label": "Английский язык",
+              "status": "pass",
+              "expected": "не ниже B2",
+              "actual": "B2",
+              "source": "указано кандидатом"
+            },
+            {
+              "id": "experience",
+              "label": "Коммерческий опыт",
+              "status": "pass",
+              "expected": "от 2 лет",
+              "actual": "6 лет",
+              "source": "анкета"
+            },
+            {
+              "id": "format",
+              "label": "Формат работы",
+              "status": "pass",
+              "expected": "Удалённо",
+              "actual": "Удалённо",
+              "source": "анкета"
+            },
+            {
+              "id": "salary",
+              "label": "Зарплатные ожидания",
+              "status": "pass",
+              "expected": "150 000–250 000 ₽",
+              "actual": "180 000–230 000 ₽",
+              "source": "резюме"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "qa-mobile-sync",
+      "spec": "QA",
+      "pairs": 10,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.6096199500078984,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.6918842347914714,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.3191471544989227,
+          "reciprocalRank": 0.25,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.5176680486347153,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.3903800499921017,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.49875489617710406,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.36331756126716835,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.6132388503364237,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.5413996682199069,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.5,
+          "gradedNdcgAtFive": 0.6612754401327141,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "qa-mobile-sync-web",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 93,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "qa-mobile-sync-project",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "qa-mobile-sync-api-retries",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 85,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "qa-mobile-sync-sync",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 84,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 14,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "qa-mobile-sync-load",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 83,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "qa-mobile-sync-offline"
+      ],
+      "nonRelevantTopFive": [
+        "qa-mobile-sync-web",
+        "qa-mobile-sync-load"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "devops-disaster",
+      "spec": "DevOps",
+      "pairs": 10,
+      "relevantEligible": 3,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.41618115554873086,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4666666666666666,
+          "gradedNdcgAtFive": 0.5351809921291031,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.7653606369886217,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.729144103789701,
+          "textOnlyPrecisionAtFive": 1,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 3
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.46927872602275644,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.3,
+          "gradedNdcgAtFive": 0.4302109881994961,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.7653606369886217,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.8613066517491029,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.46927872602275644,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.42857142857142855,
+          "gradedNdcgAtFive": 0.49439222639036967,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "devops-disaster-deploy",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 98,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-disaster-denial",
+          "professionalRelevance": 0,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 92,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-disaster-backup",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-disaster-local",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-disaster-recovery",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [
+        "devops-disaster-sre"
+      ],
+      "nonRelevantTopFive": [
+        "devops-disaster-deploy",
+        "devops-disaster-denial",
+        "devops-disaster-local"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "devops-drift",
+      "spec": "DevOps",
+      "pairs": 10,
+      "relevantEligible": 3,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.7328286204777911,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.8303140361416531,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.41618115554873086,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.4905114583547259,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.4367467095119258,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.4459226210383377,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.7328286204777911,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.8406449080108029,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.7122630665145961,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.5,
+          "gradedNdcgAtFive": 0.8172524355586628,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 9,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "devops-drift-scripts",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 92,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-drift-iac",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-drift-linux",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-drift-state",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "devops-drift-tags",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 78,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [],
+      "nonRelevantTopFive": [
+        "devops-drift-scripts",
+        "devops-drift-tags"
+      ],
+      "eligibilityErrors": [
+        {
+          "id": "devops-drift-denial",
+          "expected": "pass",
+          "actual": "unknown",
+          "checks": [
+            {
+              "id": "spec",
+              "label": "Специализация",
+              "status": "pass",
+              "expected": "DevOps",
+              "actual": "DevOps",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "grade",
+              "label": "Подтверждённый уровень",
+              "status": "pass",
+              "expected": "не ниже Middle",
+              "actual": "Middle",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "skill-0",
+              "label": "Навык: Terraform",
+              "status": "unknown",
+              "expected": "Terraform",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "skill-1",
+              "label": "Навык: Linux",
+              "status": "unknown",
+              "expected": "Linux",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "english",
+              "label": "Английский язык",
+              "status": "pass",
+              "expected": "не ниже B2",
+              "actual": "B2",
+              "source": "указано кандидатом"
+            },
+            {
+              "id": "experience",
+              "label": "Коммерческий опыт",
+              "status": "pass",
+              "expected": "от 2 лет",
+              "actual": "6 лет",
+              "source": "анкета"
+            },
+            {
+              "id": "format",
+              "label": "Формат работы",
+              "status": "pass",
+              "expected": "Удалённо",
+              "actual": "Удалённо",
+              "source": "анкета"
+            },
+            {
+              "id": "salary",
+              "label": "Зарплатные ожидания",
+              "status": "pass",
+              "expected": "150 000–250 000 ₽",
+              "actual": "180 000–230 000 ₽",
+              "source": "резюме"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ds-causal",
+      "spec": "Data Science",
+      "pairs": 10,
+      "relevantEligible": 3,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.7328286204777911,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.8108023317251566,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.46927872602275644,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.5987469127360396,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 1,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.3,
+          "gradedNdcgAtFive": 0.867837452040598,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.6508205185601091,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.8527411367856936,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 1,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.42857142857142855,
+          "gradedNdcgAtFive": 0.9254878899399764,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "ds-causal-forecast",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 100,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-causal-ab",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-causal-causal",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-causal-counterfactual",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-causal-dashboard",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [],
+      "nonRelevantTopFive": [
+        "ds-causal-forecast",
+        "ds-causal-dashboard"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "ds-leakage",
+      "spec": "Data Science",
+      "pairs": 10,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.44149241373678083,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.6412816077302482,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.4144299250118475,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.5676924681859253,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.787702056960637,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.7838083192833922,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.4144299250118475,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.6218659828377954,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.6366824387328317,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.42857142857142855,
+          "gradedNdcgAtFive": 0.7296348046315222,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 9,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "ds-leakage-sales",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 10,
+            "test": 12,
+            "fsp": 6,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-leakage-classification",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 17,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-leakage-fraud",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 87,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 17,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-leakage-optimistic",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 80,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 10,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "ds-leakage-tags",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "ds-leakage-temporal",
+        "ds-leakage-project"
+      ],
+      "nonRelevantTopFive": [
+        "ds-leakage-sales",
+        "ds-leakage-optimistic",
+        "ds-leakage-tags"
+      ],
+      "eligibilityErrors": [
+        {
+          "id": "ds-leakage-project",
+          "expected": "pass",
+          "actual": "unknown",
+          "checks": [
+            {
+              "id": "spec",
+              "label": "Специализация",
+              "status": "pass",
+              "expected": "Data Science",
+              "actual": "Data Science",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "grade",
+              "label": "Подтверждённый уровень",
+              "status": "pass",
+              "expected": "не ниже Middle",
+              "actual": "Middle",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "skill-0",
+              "label": "Навык: Python",
+              "status": "unknown",
+              "expected": "Python",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "skill-1",
+              "label": "Навык: SQL",
+              "status": "unknown",
+              "expected": "SQL",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "english",
+              "label": "Английский язык",
+              "status": "pass",
+              "expected": "не ниже B2",
+              "actual": "B2",
+              "source": "указано кандидатом"
+            },
+            {
+              "id": "experience",
+              "label": "Коммерческий опыт",
+              "status": "pass",
+              "expected": "от 2 лет",
+              "actual": "6 лет",
+              "source": "анкета"
+            },
+            {
+              "id": "format",
+              "label": "Формат работы",
+              "status": "pass",
+              "expected": "Удалённо",
+              "actual": "Удалённо",
+              "source": "анкета"
+            },
+            {
+              "id": "salary",
+              "label": "Зарплатные ожидания",
+              "status": "pass",
+              "expected": "150 000–250 000 ₽",
+              "actual": "180 000–230 000 ₽",
+              "source": "резюме"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ml-serving",
+      "spec": "ML Engineering",
+      "pairs": 10,
+      "relevantEligible": 3,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.6797310500037655,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.8069215636895128,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 0.7122630665145961,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.5845352728312458,
+          "textOnlyPrecisionAtFive": 1,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.3333333333333333,
+          "ndcgAtK": 0.2960819109658652,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.3,
+          "gradedNdcgAtFive": 0.41158395913311047,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.3333333333333333,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 1,
+          "ndcgAtK": 1,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.9254878899399764,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.6666666666666666,
+          "ndcgAtK": 0.4776237035032179,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3,
+          "randomNdcgAtK": 0.41509474171137006,
+          "tieAdjustedPrecisionAtK": 0.5,
+          "gradedNdcgAtFive": 0.6487165110221194,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.6,
+          "fractionOfAvailableTopFiveRelevant": 0.6666666666666666,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 9,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "ml-serving-notebook",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 89,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 12,
+            "fsp": 4,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-serving-serving",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-serving-api",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 86,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 14,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-serving-batch",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 82,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 14,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-serving-versions",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 79,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 11,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [],
+      "nonRelevantTopFive": [
+        "ml-serving-notebook",
+        "ml-serving-api"
+      ],
+      "eligibilityErrors": [
+        {
+          "id": "ml-serving-negation",
+          "expected": "pass",
+          "actual": "unknown",
+          "checks": [
+            {
+              "id": "spec",
+              "label": "Специализация",
+              "status": "pass",
+              "expected": "ML Engineering",
+              "actual": "ML Engineering",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "grade",
+              "label": "Подтверждённый уровень",
+              "status": "pass",
+              "expected": "не ниже Senior",
+              "actual": "Senior",
+              "source": "подтверждено тестом"
+            },
+            {
+              "id": "skill-0",
+              "label": "Навык: Python",
+              "status": "unknown",
+              "expected": "Python",
+              "actual": "Противоречивые сведения",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "skill-1",
+              "label": "Навык: Docker",
+              "status": "pass",
+              "expected": "Docker",
+              "actual": "Docker",
+              "source": "резюме или анкета"
+            },
+            {
+              "id": "english",
+              "label": "Английский язык",
+              "status": "pass",
+              "expected": "не ниже B2",
+              "actual": "B2",
+              "source": "указано кандидатом"
+            },
+            {
+              "id": "experience",
+              "label": "Коммерческий опыт",
+              "status": "pass",
+              "expected": "от 5 лет",
+              "actual": "6 лет",
+              "source": "анкета"
+            },
+            {
+              "id": "format",
+              "label": "Формат работы",
+              "status": "pass",
+              "expected": "Удалённо",
+              "actual": "Удалённо",
+              "source": "анкета"
+            },
+            {
+              "id": "salary",
+              "label": "Зарплатные ожидания",
+              "status": "pass",
+              "expected": "150 000–250 000 ₽",
+              "actual": "180 000–230 000 ₽",
+              "source": "резюме"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ml-feature-store",
+      "spec": "ML Engineering",
+      "pairs": 10,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.8,
+          "recallAtK": 1,
+          "ndcgAtK": 0.9047172294870751,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.8,
+          "gradedNdcgAtFive": 0.9361138332229425,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.6366824387328317,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.7621344705083679,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.8048099750039491,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.7439893362015437,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.787702056960637,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.8633916491648219,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.8,
+          "recallAtK": 1,
+          "ndcgAtK": 0.9558295932317544,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4,
+          "randomNdcgAtK": 0.4604078472911221,
+          "tieAdjustedPrecisionAtK": 0.5714285714285714,
+          "gradedNdcgAtFive": 0.8958751041862247,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 1,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 10,
+      "explanationsCorrect": 10,
+      "topFive": [
+        {
+          "id": "ml-feature-store-feature",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 88,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-feature-store-warehouse",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 85,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-feature-store-move-no-city",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 83,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 15,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-feature-store-etl",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 81,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "ml-feature-store-point-time",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 78,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 10,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [],
+      "nonRelevantTopFive": [
+        "ml-feature-store-warehouse"
+      ],
+      "eligibilityErrors": []
+    }
+  ],
+  "limitations": [
+    "Authored labels are independent of the scoring formula but are not human participant/external expert ground truth. Ambiguous labels must be identified in the independent review.",
+    "This deliberately challenging authored sample is not a prevalence estimate of real market profiles, a training target, a 90-point objective, or a new external holdout.",
+    "Primary eligibility truth explicitly treats unspecified skills, contradictory experience and relocation without current city as described in the frozen rubric; disagreements may be policy mismatches rather than algorithmic ranking faults.",
+    "Five returned profiles can include non-relevant people when fewer than five relevant eligible people exist. Ceiling and Recall@5 prevent hiding that denominator.",
+    "Live employer need-to-selection and end-to-end testing with jury/users remain separate criterion 6.1 evidence.",
+    "The historical H2 report is preserved separately. This current blended method was developed using this known fixture; its metrics are not independent validation."
+  ],
+  "sourceFreeze": {
+    "version": 1,
+    "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c",
+    "frozenAt": "2026-10-11T19:59:33.150654+00:00",
+    "implementation": {
+      "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+      "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+      "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
+      "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
+      "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+      "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+      "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791"
+    },
+    "challengeFreezeCommit": "4d550e4",
+    "evaluationStarted": false,
+    "selection": "Two bounded variants evaluated only on TalentMatch development and previously known stress diagnostic; A selected before fresh challenge evaluation.",
+    "limits": [
+      "No fresh challenge results were used to tune implementation, weights or labels.",
+      "TalentMatch holdout has been seen historically; its final reproduction is not a new blind experiment."
+    ]
+  }
+}

@@ -102,6 +102,7 @@ test('every direction has a complete matching profile and a higher-test stack mi
   const need=selectedNeed(`Middle ${spec}`,{confirmed:true,spec,grade:'Middle',requiredStack:stacks[index],preferredStack:[],englishLevel:'B2',minExperience:3});
   const rows=rowsFor(need),fit=rows.find(row=>row.id===`search-demo-${index*8+3}`),other=rows.find(row=>row.id===`search-demo-${index*8+5}`);
   assert.equal(fit.match.eligibility.status,'pass',spec);
-  assert.ok(other.score>fit.score,spec);assert.equal(other.match.eligibility.status,'fail',spec);
+  assert.ok(other.score>fit.score,spec);assert.notEqual(other.match.eligibility.status,'pass',spec);
+  assert.ok(rows.indexOf(fit)<rows.indexOf(other),spec);
  }
 });
