@@ -2,7 +2,7 @@
   "version": 1,
   "asOf": "2026-10-11",
   "baseRevision": "bafa410063c68515f00ae99ca27aff2537ce202f",
-  "status": "local-uncommitted-validation",
+  "status": "validated-product-snapshot",
   "source": {
     "repository": "https://github.com/MALINAYAGODA/Talent-Match",
     "commit": "a892ad12f2a84f92b9619ee05fbba5fbbf99fd56",
@@ -24,7 +24,7 @@
     "lib/resume-fit.mjs": "63ce720c41a2375d1694ed1504e4e4f954fa16d319b76d00c4be3dec3dae6002",
     "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791",
     "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
-    "lib/domain.mjs": "16eb5453d49d89e2b86a2144170d7a42863990404d498746e69d6a499e5c4bc7",
+    "lib/domain.mjs": "8b112fec79803aa09ededb9efc4fff78f8ba083e2d4c67c73931b094b7a07442",
     "lib/ats.mjs": "1600c6079d241ba302c20205c215fcd93451ce9d8e308145ec6e75cd9de41fd9",
     "lib/taxonomy.mjs": "3dbea7a04f992cab9373bdabffa597705b0b2665af92ffc49ab30d6e017c8d47",
     "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
@@ -179,5 +179,6 @@
   "reproduction": {
     "command": "node scripts/benchmarks/talentmatch.mjs --input /absolute/path/source.json --output /local/results",
     "tests": "node --test tests/matching-language-regressions.test.mjs tests/resume-matching.test.mjs tests/matching.test.mjs tests/ats.test.mjs tests/matching-benchmark.test.mjs tests/synthetic-validation.test.mjs"
-  }
+  },
+  "runtimeVerificationRevision": "72ffb4c82bd7e52ea2e97fb22e192cb6ea627623"
 }
