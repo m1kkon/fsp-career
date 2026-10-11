@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "asOf": "2026-10-11",
+  "baseRevision": "bafa410063c68515f00ae99ca27aff2537ce202f",
+  "status": "local-uncommitted-validation",
+  "source": {
+    "repository": "https://github.com/MALINAYAGODA/Talent-Match",
+    "commit": "a892ad12f2a84f92b9619ee05fbba5fbbf99fd56",
+    "sha256": "bfa8e4b1f1080b6decba654daf8379356145df80a8ffceeda2577195646da32a",
+    "url": "https://raw.githubusercontent.com/MALINAYAGODA/Talent-Match/a892ad12f2a84f92b9619ee05fbba5fbbf99fd56/case_2_data_for_members.json",
+    "bytes": 4533882
+  },
+  "dataset": {
+    "vacancies": 29,
+    "pairs": 656,
+    "uniqueResumes": 656,
+    "confirmed": 193,
+    "supportedVacancies": 13
+  },
+  "referenceDate": "2024-03-01",
+  "splitSeed": "fsp-talentmatch-baseline-v1",
+  "implementation": {
+    "lib/matching.mjs": "e2e5dec5f173b62f6e6bec4aecb7e6c61ad1c8beaecab9bd37a3387b1fb40e7d",
+    "lib/resume-fit.mjs": "63ce720c41a2375d1694ed1504e4e4f954fa16d319b76d00c4be3dec3dae6002",
+    "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791",
+    "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+    "lib/domain.mjs": "16eb5453d49d89e2b86a2144170d7a42863990404d498746e69d6a499e5c4bc7",
+    "lib/ats.mjs": "1600c6079d241ba302c20205c215fcd93451ce9d8e308145ec6e75cd9de41fd9",
+    "lib/taxonomy.mjs": "3dbea7a04f992cab9373bdabffa597705b0b2665af92ffc49ab30d6e017c8d47",
+    "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+    "scripts/benchmarks/talentmatch.mjs": "e3cb6c3a4bd911bb9d1ead03b8ce32193f43be5e5db1c2a72c316c089412a236",
+    "scripts/benchmarks/ranking-metrics.mjs": "748b4750206818364cbb6716c74d0db0dc9edb433af9fe3f1bae6a160bafebb6",
+    "package-lock.json": "ea9bbabebbca8437724d114b4feb4e9efb3537d461a771e409dd2b5f2893fa67"
+  },
+  "weights": {
+    "spec": 25,
+    "grade": 15,
+    "stack": 12,
+    "resume": 20,
+    "test": 12,
+    "fsp": 6,
+    "format": 4,
+    "salary": 4,
+    "domain": 2
+  },
+  "change": "Fix polarity and temporal clause boundaries in resume evidence; recognize conventional minimum-experience phrases while keeping optional experience optional. No weight tuning or model training.",
+  "developmentBefore": {
+    "product": {
+      "vacancies": 9,
+      "pairs": 246,
+      "precisionAtK": 0.4,
+      "recallAtK": 0.32539682539682535,
+      "ndcgAtK": 0.40054261885945636,
+      "reciprocalRank": 0.48148148148148145,
+      "randomPrecisionAtK": 0.3159016101211502,
+      "randomNdcgAtK": 0.33359600380338666,
+      "tieAdjustedPrecisionAtK": 0.41111111111111115
+    },
+    "lexical": {
+      "vacancies": 9,
+      "pairs": 246,
+      "precisionAtK": 0.3333333333333333,
+      "recallAtK": 0.3067019400352734,
+      "ndcgAtK": 0.36215262521137725,
+      "reciprocalRank": 0.5436507936507936,
+      "randomPrecisionAtK": 0.3159016101211502,
+      "randomNdcgAtK": 0.33359600380338666,
+      "tieAdjustedPrecisionAtK": 0.3333333333333333
+    },
+    "stack": {
+      "vacancies": 9,
+      "pairs": 246,
+      "precisionAtK": 0.3111111111111111,
+      "recallAtK": 0.2873015873015872,
+      "ndcgAtK": 0.3510109532204011,
+      "reciprocalRank": 0.49158249158249157,
+      "randomPrecisionAtK": 0.3159016101211502,
+      "randomNdcgAtK": 0.33359600380338666,
+      "tieAdjustedPrecisionAtK": 0.2923685573685573
+    }
+  },
+  "currentSummaries": {
+    "development": {
+      "product": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.4,
+        "recallAtK": 0.32539682539682535,
+        "ndcgAtK": 0.40054261885945636,
+        "reciprocalRank": 0.48148148148148145,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.41111111111111115
+      },
+      "lexical": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.3333333333333333,
+        "recallAtK": 0.3067019400352734,
+        "ndcgAtK": 0.36215262521137725,
+        "reciprocalRank": 0.5436507936507936,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.3333333333333333
+      },
+      "stack": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.3111111111111111,
+        "recallAtK": 0.2873015873015872,
+        "ndcgAtK": 0.3510109532204011,
+        "reciprocalRank": 0.49158249158249157,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.2923685573685573
+      }
+    },
+    "holdout": {
+      "product": {
+        "vacancies": 4,
+        "pairs": 102,
+        "precisionAtK": 0.35,
+        "recallAtK": 0.4583333333333333,
+        "ndcgAtK": 0.43181103512320956,
+        "reciprocalRank": 0.5833333333333333,
+        "randomPrecisionAtK": 0.23357371794871795,
+        "randomNdcgAtK": 0.2822688655542725,
+        "tieAdjustedPrecisionAtK": 0.35
+      },
+      "lexical": {
+        "vacancies": 4,
+        "pairs": 102,
+        "precisionAtK": 0.25,
+        "recallAtK": 0.3125,
+        "ndcgAtK": 0.33655241080596404,
+        "reciprocalRank": 0.5634920634920635,
+        "randomPrecisionAtK": 0.23357371794871795,
+        "randomNdcgAtK": 0.2822688655542725,
+        "tieAdjustedPrecisionAtK": 0.25
+      },
+      "stack": {
+        "vacancies": 4,
+        "pairs": 102,
+        "precisionAtK": 0.3,
+        "recallAtK": 0.3958333333333333,
+        "ndcgAtK": 0.4538720923116531,
+        "reciprocalRank": 0.7631578947368421,
+        "randomPrecisionAtK": 0.23357371794871795,
+        "randomNdcgAtK": 0.2822688655542725,
+        "tieAdjustedPrecisionAtK": 0.26666666666666666
+      }
+    }
+  },
+  "checks": {
+    "focusedTests": 69,
+    "passed": 69,
+    "failed": 0,
+    "skipped": 0,
+    "newLanguageRegressions": 25,
+    "previousEvidenceRegressions": 16,
+    "previousEvidenceRegressionsPassed": 16
+  },
+  "limitations": [
+    "В исходных данных нет результатов тестов, подтверждённых грейдов или истории ФСП. Они остаются неизвестными.",
+    "Проверяется ранжирование по текстам и доступным полям, а не полный сценарий каталога с подтверждёнными категориями.",
+    "Навыки вакансии — предложения парсера, не обязательные требования, подтверждённые работодателем. Шаблоны ролей не добавляются.",
+    "Confirmed/failed — неточный сигнал соответствия после скрининга. Это не факты найма и не вероятности.",
+    "К каждой вакансии заранее отобран свой пул резюме. Метрики не оценивают поиск по всему рынку.",
+    "Специализация и грейд из текста резюме не подтверждены тестом: баллы за подтверждённую категорию не начисляются.",
+    "Development и holdout не пересекаются по вакансиям и резюме. Ошибки отдельных вакансий анализируются только на development.",
+    "Лексический TF-IDF — отдельный baseline для сравнения. Это не семантические embeddings; в рабочем ранжировании он не включён.",
+    "Веса в этом прогоне не подбираются. Веса ФСП и тестов нельзя калибровать по этому датасету.",
+    "При равных баллах используется порядок анонимных идентификаторов. Tie P@5 показывает результат без влияния этой случайности.",
+    "The holdout has been inspected in earlier product reviews; this is a reproducibility check, not a newly independent final evaluation.",
+    "Development P@5 is unchanged at 40%. No matching-quality gain is claimed from the language correctness fixes.",
+    "The additional 25 language cases are authored regression checks, not human-labelled hiring observations.",
+    "Results contain aggregate metrics, source hashes and implementation hashes only; no raw resumes, contact fields or per-candidate outputs."
+  ],
+  "reproduction": {
+    "command": "node scripts/benchmarks/talentmatch.mjs --input /absolute/path/source.json --output /local/results",
+    "tests": "node --test tests/matching-language-regressions.test.mjs tests/resume-matching.test.mjs tests/matching.test.mjs tests/ats.test.mjs tests/matching-benchmark.test.mjs tests/synthetic-validation.test.mjs"
+  }
+}

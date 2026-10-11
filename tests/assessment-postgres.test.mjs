@@ -1,12 +1,42 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import {postgresFixture,needsPostgres} from './helpers/postgres.mjs';
 import {accountFor,action,getState} from '../lib/service.mjs';
 import {assessmentAction,ensureDailyPool} from '../lib/assessments.mjs';
 import {ROLES} from '../lib/question-bank.mjs';
 import {assessmentAccount,isTestMaintainer,requireTestMaintainer} from '../lib/test-maintainer.mjs';
+import {executeAccountAction} from '../lib/action-dispatch.mjs';
+import {candidateAccount,codingAttempt,successfulJudge,deferred} from './helpers/tz-memory.mjs';
 
 const admin={id:'test-admin',maintainer:true};
+test('PostgreSQL confirmed-grade migration repairs only the current applied proof and is idempotent',needsPostgres,async t=>{
+ const {repo,pool}=await postgresFixture(t),snapshots=new Map();
+ const variants={repair:{},newerProof:{profile:{verificationAttemptId:'newer-proof'}},foreignOwner:{proof:{owner:'another-account'}},unconfirmed:{result:{status:'unconfirmed-lower',applied:false}},legacy:{proof:{roleOutcomeRule:'target-grade-five-outcomes-midpoint-v2'}},alreadyCorrect:{profile:{grade:'Middle'}},unverified:{profile:{verified:false}},wrongTarget:{proof:{targetGrade:'Senior'}},unapplied:{result:{applied:false}},otherGrade:{profile:{grade:'Junior'}}};
+ for(const [id,changes] of Object.entries(variants)){
+  const account={id,email:id+'@example.test',created:Date.now(),roles:['candidate'],profile:{grade:'Senior',verified:true,verificationAttemptId:'proof-'+id,gradeChangedAt:12345,score:96,competencies:[{name:'Python',score:96}],...changes.profile}};
+  const proof={id:'proof-'+id,owner:id,created:Date.now(),status:'finished',targetKind:'role',targetGrade:'Middle',roleOutcomeRule:'target-grade-five-outcomes-evidence-v3',...changes.proof,finalRoleResult:{completed:true,applied:true,status:'confirmed-plus-potential',confirmedGrade:'Middle',potentialHigher:'Senior',level:'Senior',...changes.result},modules:[]};
+  await repo.saveAccount(account);await repo.put('assessment',proof);snapshots.set(id,{account:await repo.account(id),proof:await repo.record(proof.id)});
+ }
+ const sql=await readFile(new URL('../db/migrations/005_confirmed_profile_grade.sql',import.meta.url),'utf8');await pool.query(sql);
+ const repaired=await repo.account('repair');assert.equal(repaired.profile.grade,'Middle');assert.deepEqual(repaired.profile.categoryCorrection,{rule:'confirmed-target-profile-v1',attemptId:'proof-repair',previousGrade:'Senior',confirmedGrade:'Middle'});
+ const unchanged=structuredClone(repaired.profile),original=structuredClone(snapshots.get('repair').account.profile);delete unchanged.grade;delete unchanged.categoryCorrection;delete original.grade;assert.deepEqual(unchanged,original);
+ for(const [id,snapshot] of snapshots){if(id!=='repair')assert.deepEqual(await repo.account(id),snapshot.account,id);assert.deepEqual(await repo.record(snapshot.proof.id),snapshot.proof,id);}
+ await pool.query(sql);assert.deepEqual(await repo.account('repair'),repaired);
+});
+test('PostgreSQL unrelated account save commits while a code judgment is pending',needsPostgres,async t=>{
+ const {repo,write}=await postgresFixture(t),candidate=await candidateAccount(repo,'pending-code'),other=await candidateAccount(repo,'unrelated-save');
+ const {attempt,body,question}=await codingAttempt(repo,candidate),entered=deferred(),release=deferred();
+ const pending=executeAccountAction(candidate.id,body,{write,judge:async q=>{entered.resolve();await release.promise;return successfulJudge(q);}});
+ await entered.promise;
+ try{
+  // This timeout is a failure guard, not an approximation of elapsed latency.
+  // The proof is that the PostgreSQL transaction commits before judge release.
+  let timer;try{await Promise.race([executeAccountAction(other.id,{action:'profile',about:'Saved while worker pending'},{write}),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Save blocked on code judge')),2000);})]);}finally{clearTimeout(timer);}
+  assert.equal((await repo.account(other.id)).profile.about,'Saved while worker pending');assert.equal((await repo.record(attempt.id)).revision,0);
+ }finally{release.resolve();}
+ await pending;const saved=await repo.record(attempt.id);assert.equal(saved.revision,1);assert.equal(saved.modules[0].answers[question.id].value.correct,true);
+});
 test('PostgreSQL daily pools are insert-only and concurrent immediate starts reuse one attempt',needsPostgres,async t=>{
  const {repo,write}=await postgresFixture(t);
  const candidate=await accountFor(repo,{id:'daily-candidate',email:'daily@example.test',name:'Daily Candidate'});
@@ -87,7 +117,7 @@ test('PostgreSQL qualification flow keeps attempts, profile proof, permissions a
   const raw=await repo.record(attemptId),saved=await repo.account(candidate.id);
   assert.equal(raw.status,'finished');assert.equal(raw.modules.length,4);
   assert.ok(raw.modules.every(m=>m.questions.filter(q=>q.scored).length===32));
-  assert.equal(saved.profile.grade,'Senior');assert.equal(saved.profile.verified,true);assert.equal(saved.profile.verificationAttemptId,attemptId);
+  assert.equal(saved.profile.grade,'Middle');assert.equal(saved.profile.verified,true);assert.equal(saved.profile.verificationAttemptId,attemptId);
   assert.equal(saved.profile.competencies.length,3);assert.equal(saved.profile.name,'Candidate');
   const state=await getState(repo,saved,'candidate');assert.equal(state.assessment.history[0].results.length,4);
  });

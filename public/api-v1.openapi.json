@@ -1486,6 +1486,9 @@
                     "$ref": "#/components/schemas/task"
                   },
                   {
+                    "$ref": "#/components/schemas/task-delete"
+                  },
+                  {
                     "$ref": "#/components/schemas/task-answer"
                   },
                   {
@@ -4110,6 +4113,10 @@
               "DevOps",
               "QA"
             ]
+          },
+          "id": {
+            "type": "string",
+            "description": "Идентификатор собственного задания для редактирования"
           }
         },
         "required": [
@@ -4474,6 +4481,17 @@
                 }
               }
             }
+          },
+          "lastPracticeAt": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Дата последней проверки практического задания работодателем; не изменяет подтверждённый грейд"
+          },
+          "industry": {
+            "type": "string",
+            "description": "Отрасль из анкеты; заявлено кандидатом, не подтверждено тестом"
           }
         }
       },
@@ -6827,6 +6845,23 @@
           "action": {
             "type": "string",
             "const": "invite-cancel"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "id"
+        ]
+      },
+      "task-delete": {
+        "type": "object",
+        "description": "Удалить своё задание; ответы и обратная связь сохраняются",
+        "properties": {
+          "action": {
+            "type": "string",
+            "const": "task-delete"
           },
           "id": {
             "type": "string"
