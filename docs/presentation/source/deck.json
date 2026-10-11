@@ -1,0 +1,66 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-11T17:40:00Z"
+  },
+  "lists": "css",
+  "title": "ФСП Карьера — презентация проекта",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "problem",
+    "solution",
+    "flow",
+    "candidate",
+    "employer",
+    "assessment",
+    "ranking",
+    "quality",
+    "fsp",
+    "architecture",
+    "unique",
+    "market",
+    "roadmap",
+    "challenges",
+    "team",
+    "final"
+  ],
+  "sections": {
+    "intro": {
+      "description": "Проект, задача и постановщик",
+      "start": "cover"
+    },
+    "idea": {
+      "description": "Проблема найма в IT и наше решение",
+      "start": "problem"
+    },
+    "product": {
+      "description": "Как сервис работает для кандидата и работодателя",
+      "start": "flow"
+    },
+    "tech": {
+      "description": "Проверка навыков, объяснимый подбор, качество и технологии",
+      "start": "assessment"
+    },
+    "business": {
+      "description": "Уникальность, рынок и планы развития",
+      "start": "unique"
+    },
+    "team": {
+      "description": "Сложности, команда и контакты",
+      "start": "challenges"
+    }
+  },
+  "faces": {
+    "unbounded": {
+      "family": "Unbounded",
+      "href": "https://fonts.googleapis.com/css2?family=Unbounded:wght@400..800&display=swap"
+    },
+    "golos-text": {
+      "family": "Golos Text",
+      "href": "https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..700&display=swap"
+    }
+  },
+  "designSystems": []
+}

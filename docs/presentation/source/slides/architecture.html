@@ -1,0 +1,32 @@
+<section id="architecture" data-transition="fade" style="background:#F5F5F9;color:#121318;font-family:'Golos Text', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:row;align-items:center;gap:14px"><div style="width:14px;height:14px;border-radius:50%;background:#4934F8"></div><p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#4934F8">Технологии</p></div>
+<h2 style="font-family:'Unbounded', Arial, sans-serif;font-size:80px;font-weight:700;line-height:1.08;letter-spacing:-3px;color:#121318">Как это устроено</h2>
+</div>
+<div style="display:flex;flex-direction:row;align-items:center">
+<div style="width:464px;display:flex;flex-direction:column;gap:12px;background:#FDFDFF;border:2px solid #E1E2EC;border-radius:28px;padding:40px">
+<h3 style="font-family:'Unbounded', Arial, sans-serif;font-size:34px;font-weight:600;line-height:1.2;color:#121318">Браузер</h3>
+<p style="font-size:26px;line-height:1.4;color:#5A5F70">интерфейс кабинетов</p>
+</div>
+<div style="width:136px;display:flex;align-items:center;justify-content:center"><x-shape kind="arrow-right" style="width:72px;height:36px;background:#4934F8"></x-shape></div>
+<div style="width:464px;display:flex;flex-direction:column;gap:12px;background:#4934F8;border-radius:28px;padding:40px">
+<h3 style="font-family:'Unbounded', Arial, sans-serif;font-size:34px;font-weight:600;line-height:1.2;color:#F5F4FF">Next.js 16</h3>
+<p style="font-size:26px;line-height:1.4;color:#DCD8FF">Node.js: API, подбор, тесты</p>
+</div>
+<div style="width:136px;display:flex;align-items:center;justify-content:center"><x-shape kind="arrow-right" style="width:72px;height:36px;background:#4934F8"></x-shape></div>
+<div style="width:464px;display:flex;flex-direction:column;gap:12px;background:#FDFDFF;border:2px solid #E1E2EC;border-radius:28px;padding:40px">
+<h3 style="font-family:'Unbounded', Arial, sans-serif;font-size:34px;font-weight:600;line-height:1.2;color:#121318">PostgreSQL 17</h3>
+<p style="font-size:26px;line-height:1.4;color:#5A5F70">данные и транзакции</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:16px">
+<p style="font-size:26px;color:#4934F8;background:#E8E6FF;padding:14px 28px;border-radius:999px">Docker-песочница для кода</p>
+<p style="font-size:26px;color:#4934F8;background:#E8E6FF;padding:14px 28px;border-radius:999px">Публичный API v1</p>
+<p style="font-size:26px;color:#4934F8;background:#E8E6FF;padding:14px 28px;border-radius:999px">GitHub Actions → автодеплой</p>
+<p style="font-size:26px;color:#4934F8;background:#E8E6FF;padding:14px 28px;border-radius:999px">GCP · Cloudflare · Caddy</p>
+<p style="font-size:26px;color:#4934F8;background:#E8E6FF;padding:14px 28px;border-radius:999px">scrypt · HttpOnly-сессии</p>
+<p style="font-size:26px;color:#F5F4FF;background:#4934F8;padding:14px 28px;border-radius:999px">377 автотестов</p>
+</div>
+<p style="position:absolute;left:1672px;bottom:64px;width:120px;font-size:24px;color:#9A9DAD;text-align:right;font-variant-numeric:tabular-nums">11</p>
+<aside>Модульный монолит: Next.js и Node.js держат API и всю бизнес-логику на сервере, данные — в PostgreSQL с транзакциями. Код кандидатов исполняется в Docker-песочнице без сети, с лимитами памяти и времени. Пароли хешируются scrypt, сессии — HttpOnly-cookie, в базе хранится только хеш токена, очередь писем зашифрована; контакт кандидата виден только компании, которой он дал согласие. Каждый пуш в main проходит 377 автотестов с PostgreSQL и автоматически деплоится на GCP.</aside>
+</section>
