@@ -1697,10 +1697,10 @@
   },
   "localVerification": {
     "testSuite": {
-      "total": 399,
+      "total": 400,
       "passed": 372,
       "failed": 0,
-      "skipped": 27,
+      "skipped": 28,
       "skipReason": "PostgreSQL, Docker sandbox and environment-dependent checks require configured services; not claimed as locally passed."
     },
     "productionBuild": {
@@ -1721,6 +1721,23 @@
       "retired": 10,
       "checks": 2881,
       "scope": "Structural validation; reference executions require Docker."
+    },
+    "browser": {
+      "environment": "Local disposable demo at 127.0.0.1:3103, not production",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false
+      },
+      "flow": [
+        "Publish employer task",
+        "See specialization-matched weekly suggestion",
+        "Submit candidate answer",
+        "Edit employer task",
+        "Review original answer instructions",
+        "Send feedback",
+        "Candidate retains original instructions and sees feedback"
+      ]
     }
   },
   "reproduce": [

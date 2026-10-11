@@ -26,7 +26,7 @@
 
 | Отчёт | Статус |
 |---|---|
-| [Текущая проверка продукта](current-product-validation.json) | 399 локальных тестов, явные пропуски, новый синтетический holdout, source hashes и агрегаты |
+| [Текущая проверка продукта](current-product-validation.json) | 400 локальных тестов, явные пропуски, новый синтетический holdout, source hashes и агрегаты |
 | [Текущая проверка matching](matching-current-validation.json) | Точные хеши реализации, 35% на ранее известном holdout; ограничения и 69 языковых/matching тестов |
 | [Улучшение v2 → v3](grade-hardening.md) · [JSON](grade-hardening-results.json) | Последний эксперимент: Middle, повторяемость, сложность кодинга, языковые регрессии |
 | [Первый этап исходная модель → v2](synthetic-validation.md) · [JSON](synthetic-validation-results.json) | Исторический эксперимент; его численные результаты не пересчитаны под v3 |

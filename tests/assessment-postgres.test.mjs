@@ -37,6 +37,32 @@ test('PostgreSQL unrelated account save commits while a code judgment is pending
  }finally{release.resolve();}
  await pending;const saved=await repo.record(attempt.id);assert.equal(saved.revision,1);assert.equal(saved.modules[0].answers[question.id].value.correct,true);
 });
+test('PostgreSQL fifty concurrent accounts retain resume and settings saves while judge waits',{...needsPostgres,timeout:30000},async t=>{
+ const {repo,write}=await postgresFixture(t),candidate=await candidateAccount(repo,'fifty-pending-code');
+ const accounts=await Promise.all(Array.from({length:50},(_,index)=>candidateAccount(repo,'concurrent-user-'+index)));
+ const {attempt,body,question}=await codingAttempt(repo,candidate),entered=deferred(),release=deferred();let judgeFinished=false;
+ const pending=executeAccountAction(candidate.id,body,{write,judge:async q=>{entered.resolve();await release.promise;judgeFinished=true;return successfulJudge(q);}});
+ await entered.promise;const started=performance.now();
+ const saves=Promise.all(accounts.map(async(account,index)=>{
+  await executeAccountAction(account.id,{action:'profile',about:'Resume from user '+index,stack:['Python','User-'+index],min:100000+index,max:200000+index},{write});
+  await executeAccountAction(account.id,{action:'settings',visible:index%2===0,consent:true,notifications:index%3===0,fspVisible:false},{write});
+ }));
+ let timer;
+ try{
+  // Fifty application-service callers use actual PostgreSQL transactions.
+  // This catches serialization behind the judge; it is not an HTTP load test
+  // or an assertion about production latency/throughput.
+  await Promise.race([saves,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Fifty saves did not finish before judge release')),10000);})]);
+  assert.equal(judgeFinished,false);assert.equal((await repo.record(attempt.id)).revision,0);
+  const persisted=await Promise.all(accounts.map(account=>repo.account(account.id)));assert.equal(persisted.length,50);assert.equal(new Set(persisted.map(a=>a.id)).size,50);
+  persisted.forEach((saved,index)=>{
+   assert.equal(saved.profile.name,accounts[index].profile.name);assert.equal(saved.profile.about,'Resume from user '+index);assert.deepEqual(saved.profile.stack,['Python','User-'+index]);assert.equal(saved.profile.min,100000+index);assert.equal(saved.profile.max,200000+index);
+   assert.deepEqual(saved.privacy,{visible:index%2===0,consent:true,notifications:index%3===0,fspVisible:false});
+  });
+  t.diagnostic(`50 accounts committed 100 service actions during pending judge in ${Math.round(performance.now()-started)} ms; observation, not a production SLA`);
+ }finally{clearTimeout(timer);release.resolve();await Promise.allSettled([saves,pending]);}
+ await pending;const saved=await repo.record(attempt.id);assert.equal(judgeFinished,true);assert.equal(saved.revision,1);assert.equal(saved.modules[0].answers[question.id].value.correct,true);assert.equal(saved.modules[0].codingSubmissions[question.id].length,1);
+});
 test('PostgreSQL daily pools are insert-only and concurrent immediate starts reuse one attempt',needsPostgres,async t=>{
  const {repo,write}=await postgresFixture(t);
  const candidate=await accountFor(repo,{id:'daily-candidate',email:'daily@example.test',name:'Daily Candidate'});
