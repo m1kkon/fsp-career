@@ -32,7 +32,7 @@ test('navigation waits for feature CSS, reuses it and loads no workspace styles 
  const code=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
  const setup=code.slice(code.indexOf('const featureStyleUrls'),code.indexOf('const iconPaths')).replace('/* versioned styles */ {}','{assessment:"/exam.css",resume:"/resume.css"}');
  const links=[];let renders=0;
- const context={page:'home',standaloneTestAdmin:false,assessmentExamActive:()=>false,document:{createElement:()=>({dataset:{}}),head:{appendChild:link=>links.push(link)}},render:()=>renders++,app:{},esc:String};
+ const context={page:'home',standaloneTestAdmin:false,assessmentExamActive:()=>false,document:{createElement:()=>({dataset:{}}),head:{appendChild:link=>links.push(link)}},render:()=>renders++,app:{querySelector:()=>null},esc:String,setTimeout,clearTimeout};
  runInNewContext(setup,context);
  assert.equal(context.ensureViewStyles(),true);assert.equal(links.length,0);
  context.page='tests';assert.equal(context.ensureViewStyles(),false);assert.equal(context.ensureViewStyles(),false);assert.equal(links.length,1);assert.equal(renders,0);

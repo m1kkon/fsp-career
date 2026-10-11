@@ -444,6 +444,24 @@ test('candidate coding feedback separates best graded credit from the last submi
  assert.equal(publicView.currentModule.answers[q.id],'edited unsent draft');assert.ok(!('source' in feedback.best));
  assert.ok(!('correct' in feedback));assert.equal(m.answers[q.id].value.source,'checked best source');
 });
+test('retrying an accepted coding submission after its response was lost returns feedback with the original revision',async()=>{
+ const {repo,a,view,q}=await codingAttempt(),stored=await repo.record(view.id),m=stored.modules[0];
+ const source='recorded judge source',submissionId='lost-response-submit',total=q.coding.tests.length,results=q.coding.tests.map((_,i)=>i===0);
+ // This is the persisted judge outcome whose API response never reached the client.
+ m.codingSubmissions={[q.id]:[{id:submissionId,source,at:Date.now(),passed:1,total,results}]};
+ m.answers[q.id]={value:{source,judged:true,correct:false,passed:1,total},savedAt:Date.now()};
+ m.codingDrafts={[q.id]:source};stored.revision++;await repo.put('assessment',stored);
+ const accepted=await repo.record(view.id),body={action:'assessment-submit-code',id:view.id,revision:view.revision,questionId:q.id,source,submissionId};
+ const replay=(await assessmentAction(repo,a,body)).assessment,feedback=replay.currentModule.questions[replay.currentModule.questionIndex].coding.submission;
+ assert.equal(replay.revision,accepted.revision);assert.equal(feedback.used,1);assert.equal(feedback.lastSource,source);assert.equal(feedback.passed,1);assert.equal(feedback.total,total);assert.deepEqual(feedback.results,results);
+ assert.deepEqual(await repo.record(view.id),accepted,'replay neither spends another retry nor changes stored answers');
+ await assert.rejects(assessmentAction(repo,{...a,id:'another-candidate'},body),e=>e.status===404);
+ await assert.rejects(assessmentAction(repo,a,{...body,submissionId:'different-submit'}),e=>e.status===409);
+ const future=m.questions.find(other=>other.format==='coding'&&other.id!==q.id);
+ await assert.rejects(assessmentAction(repo,a,{...body,revision:accepted.revision,questionId:future.id}),e=>e.status===409);
+ const next=(await assessmentAction(repo,a,{action:'assessment-answer',id:view.id,revision:accepted.revision,questionId:q.id,answer:null})).assessment;
+ await assert.rejects(assessmentAction(repo,a,{...body,revision:next.revision}),e=>e.status===409);
+});
 test('coding run uses editable stdin without grading; submission limit, idempotency and best result survive drafts and Next',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
  const {repo,a,q,view:initial}=await codingAttempt();let view=initial;
  const request=(action,extra={})=>assessmentAction(repo,a,{action,id:view.id,revision:view.revision,questionId:q.id,...extra});
@@ -454,6 +472,7 @@ test('coding run uses editable stdin without grading; submission limit, idempote
  const run=await request('assessment-run-code',{source:echo,stdin});assert.equal(run.run.stdout,stdin);assert.ok(!('results' in run.run));assert.ok(!('correct' in run.run));
  assert.deepEqual(view.currentModule.questions[4].coding.submission,{used:0,limit:3});assert.ok(!(await repo.record(view.id)).modules[0].answers[q.id]);
  const partial='import sys\nprint('+JSON.stringify(q.coding.tests[0].expected)+' if sys.stdin.read()=='+JSON.stringify(q.coding.tests[0].stdin)+' else "wrong")';
+ await request('assessment-submit-code',{source:partial,submissionId:'first-submit'}); // Discard the response as if the connection dropped after saving.
  view=(await request('assessment-submit-code',{source:partial,submissionId:'first-submit'})).assessment;
  let feedback=view.currentModule.questions[4].coding.submission;
  assert.equal(feedback.used,1);assert.equal(feedback.passed,1);assert.deepEqual(feedback.results,q.coding.tests.map((_,i)=>i===0));

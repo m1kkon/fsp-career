@@ -67,7 +67,7 @@ test('preparing the daily pool preserves grade and consent selected while loadin
  context.assessmentHandleChange({target:{name:'accepted',checked:true,form:{id:'assessment-start-form'}}});
  resolve({preparation:{targetId:'backend'}});await load;
  context.location.hash='#tests/start/backend';context.title=(h,p)=>h+p;
- const html=context.assessmentTestsPage();assert.ok(html.includes('value="Senior" checked'));assert.ok(html.includes('name="accepted" required checked'));
+ const html=context.assessmentTestsPage();assert.ok(html.includes('value="Senior" checked'));assert.match(html,/name="accepted"\s+required\s+checked/);
 });
 
 test('role start page offers a grade and submits the target directly, with no day booking',async()=>{

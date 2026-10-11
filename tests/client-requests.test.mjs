@@ -13,7 +13,7 @@ function client(fetch){
  const button={textContent:'Сохранить',disabled:false,setAttribute(){},removeAttribute(){}};
  const error={textContent:'',focus(){}};
  const context=vm.createContext({standaloneTestAdmin:false,serverOffset:0,assessmentAttempt:null,assessmentAdmin:null,assessmentBooking:null,assessmentRenderKey:null,fetch,AbortController,setTimeout,clearTimeout,Date,JSON,Error,URLSearchParams,
-  needContext:{},needSpec:'',needGrade:'',needStack:'',needConfirmed:false,compare:[],contextDraft:null,activeNeed:null,contextFields:()=>({}),
+  needContext:{},needRules:{},needSpec:'',needGrade:'',needStack:'',needConfirmed:false,compare:[],contextDraft:null,activeNeed:null,contextFields:()=>({}),
   role:'candidate',query:'',page:'profile',busy:false,pendingHomeSearch:false,homeMode:'candidate',
   state:{authenticated:true,user:{id:'a',email:'a@example.test'},roles:['candidate'],profile:{name:'Original'},privacy:{fspVisible:true},invites:[]},
   overlay:{querySelector:s=>s==='[data-error]'?error:button},app:{querySelector:()=>null},
@@ -59,12 +59,13 @@ test('email form clicks retain native submit and confirmation uses the session e
  const calls=[];
  const {context,button,error}=client(async(url,options)=>{calls.push({url,body:JSON.parse(options.body)});return Response.json({message:'Email подтверждён.'});});
  const handlers={};let prevented=false;
- context.document={addEventListener:(type,handler)=>{handlers[type]=handler;}};
+ context.document={querySelector:()=>null,addEventListener:(type,handler)=>{handlers[type]=handler;}};
+ vm.runInContext(source.slice(source.indexOf('function closeHeaderMenu('),source.indexOf('function toggleHeaderMenu(')),context);
  context.assessmentHandleAction=async()=>false;context.assessmentHandleSubmit=async()=>false;
  context.FormData=class { *[Symbol.iterator](){} };
  context.authModal=()=>{context.loginOpened=true;};
  vm.runInContext(source.slice(source.indexOf("document.addEventListener('click'"),source.indexOf('// Keep digit positions')),context);
- vm.runInContext(source.slice(source.indexOf("document.addEventListener('submit'"),source.indexOf("window.addEventListener('hashchange'")),context);
+ vm.runInContext(source.slice(source.indexOf('const submittedForms='),source.indexOf("window.addEventListener('hashchange'")),context);
  vm.runInContext("emailLinkToken='a'.repeat(64)",context);
  const form={id:'email-link-form',tagName:'FORM',dataset:{action:'verify-email'},querySelector:s=>s==='[data-error]'?error:button,querySelectorAll:()=>[]};
  await handlers.click({target:{closest:s=>s==='[data-action]'?form:null,matches:()=>false},preventDefault(){prevented=true;}});
@@ -198,10 +199,23 @@ test('adding the same technology twice keeps one visible chip and one selected v
 
 test('applying with both roles loads candidate state before showing the form',async()=>{
  const saved=[],sequence=[];
- const context=vm.createContext({role:'employer',homeMode:'employer',state:{roles:['employer','candidate'],jobs:[]},localStorage:{setItem:(key,value)=>saved.push([key,value])},esc:String,icon:()=>'',textarea:()=>'',formEnd:()=>'',ensureRole(){assert.fail('existing candidate role must not restart onboarding');},
+ const context=vm.createContext({page:'job',role:'employer',homeMode:'employer',state:{roles:['employer','candidate'],jobs:[]},localStorage:{setItem:(key,value)=>saved.push([key,value])},esc:String,icon:()=>'',textarea:()=>'',formEnd:()=>'',ensureRole(){assert.fail('existing candidate role must not restart onboarding');},
   async refresh(){sequence.push('refresh:'+context.role);context.state.jobs=[{id:'demo',title:'Developer',company:'Demo',synthetic:true}];},render(){sequence.push('render');},modal(title,_hint,body){sequence.push('modal');context.form={title,body};}});
- vm.runInContext(source.slice(source.indexOf('async function apply('),source.indexOf('function applicationReview(')),context);
+ vm.runInContext(source.slice(source.indexOf('function writePreference('),source.indexOf('let viewRevision='))+source.slice(source.indexOf('async function apply('),source.indexOf('function applicationReview(')),context);
  await vm.runInContext("apply('demo')",context);
  assert.equal(context.role,'candidate');assert.deepEqual(sequence,['refresh:candidate','render','modal']);
  assert.match(context.form.body,/id="apply-form" data-id="demo"/);assert.deepEqual(saved,[['fsp-role','candidate'],['fsp-audience','candidate']]);
+});
+
+test('compact header disclosure preserves the current draft, reports its state and returns keyboard focus on Escape',()=>{
+ const dataset={menuOpen:'false'},attributes={'aria-expanded':'false'};let focused=false,menuFocused=false;
+ const toggle={closest:()=>header,setAttribute:(key,value)=>attributes[key]=value,focus(){focused=true;}};
+ const header={dataset,querySelector:selector=>selector.startsWith('.header-menu ')?{focus(){menuFocused=true;}}:toggle};
+ const context=vm.createContext({toggle,document:{querySelector:()=>dataset.menuOpen==='true'?header:null},query:'Unsaved search',render(){assert.fail('menu toggling must not redraw a form');}});
+ vm.runInContext(source.slice(source.indexOf('function closeHeaderMenu('),source.indexOf('async function selectAudience(')),context);
+ vm.runInContext('toggleHeaderMenu(toggle)',context);assert.equal(dataset.menuOpen,'true');assert.equal(attributes['aria-expanded'],'true');assert.equal(context.query,'Unsaved search');
+ assert.equal(vm.runInContext('closeHeaderMenu(true)',context),true);assert.equal(dataset.menuOpen,'false');assert.equal(attributes['aria-expanded'],'false');assert.equal(focused,true);
+ assert.equal(vm.runInContext('closeHeaderMenu()',context),false);
+ focused=false;vm.runInContext('toggleHeaderMenu(toggle,true)',context);assert.equal(menuFocused,true);assert.equal(focused,false);vm.runInContext('closeHeaderMenu(true)',context);assert.equal(focused,true);
+ vm.runInContext('toggleHeaderMenu(toggle);toggleHeaderMenu(toggle)',context);assert.equal(attributes['aria-expanded'],'false');
 });
