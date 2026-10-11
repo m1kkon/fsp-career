@@ -8,4 +8,4 @@
 
 Дополнительные критерии включены: вакансии/отклики, периодические короткие задания, свежая практика, мобильная версия и проработанные концепции ATS/антифрода. Внешние ATS и корпоративная верификация описаны как концепции в объёме, ожидаемом ТЗ.
 
-Исходное ТЗ сохранено в [source](source/README.md). Результаты исторических экспериментов не переписываются: [валидация](validation.md), [синтетика](synthetic-validation.md), [v3](grade-hardening.md), [текущий продукт JSON](current-product-validation.json), [текущий matching JSON](matching-current-validation.json). Точный production-релиз проверяется по `/api/health`, а не дате документа или локальному изменению.
+Исходное ТЗ сохранено в [source](source/README.md). Результаты исторических экспериментов не переписываются: [валидация](validation.md), [синтетика](synthetic-validation.md), [v3](grade-hardening.md), [текущий продукт JSON](current-product-validation.json), [текущий matching JSON](matching-blend-validation.json), [новая авторская диагностика](domain-challenge-validation.json). Точный production-релиз проверяется по `/api/health`, а не дате документа или локальному изменению.

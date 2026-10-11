@@ -26,9 +26,11 @@
 
 | Отчёт | Статус |
 |---|---|
-| [Текущая проверка продукта](current-product-validation.json) | 427/427 в CI с PostgreSQL/Docker; локальные проверки, синтетический holdout и хеши реализации |
-| [Текущий H2 и внешние baseline](matching-selected-validation.json) | Один TalentMatch holdout: P@5, nDCG@5, MRR, R@5, равные баллы и provenance |
-| [Доменные baseline и абляции](domain-matching-comparison.json) | 24 фиксированных авторских потребности/480 пар; одинаковые hard filters, вклад текстов и ограничения доказательства ФСП/тестов |
+| [Текущая проверка продукта](current-product-validation.json) | 526/526 в CI с PostgreSQL/Docker, все 559 эталонов/2881 проверка; локальные проверки, синтетический holdout и хеши реализации |
+| [Текущий blend и внешние baseline](matching-blend-validation.json) | Одна текущая реализация на TalentMatch: P@5 30%, nDCG@5 0,4704; метрики и provenance |
+| [Новая авторская диагностика](domain-challenge-validation.json) | 8 потребностей/96 пар, freeze до первого измерения; сильные baseline выше продукта |
+| [Исторический H2](matching-selected-validation.json) | Сохранённый snapshot до blend; его 35% не относятся к текущему методу |
+| [Доменные регрессии и абляции](domain-matching-comparison.json) | 24 простых авторских потребности/480 пар; соответствие заданным правилам, не доказательство качества на рынке |
 | [Функциональные guards подбора](full-product-matching-guards.json) | 20/20 авторских проверок подтверждения категории, тестов, ФСП, пустой истории и приватности |
 | [Предыдущая проверка matching](matching-current-validation.json) | Исторический snapshot до H2, точные хеши, 69 языковых/matching тестов |
 | [Улучшение v2 → v3](grade-hardening.md) · [JSON](grade-hardening-results.json) | Последний эксперимент: Middle, повторяемость, сложность кодинга, языковые регрессии |
