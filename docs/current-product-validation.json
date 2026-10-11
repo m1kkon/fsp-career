@@ -1751,30 +1751,30 @@
     "node scripts/benchmarks/harden-grades.mjs --assert --output output/validation/tz-current"
   ],
   "continuousIntegration": {
-    "revision": "72ffb4c82bd7e52ea2e97fb22e192cb6ea627623",
-    "run": "https://github.com/m1kkon/fsp-career/actions/runs/38166753173",
-    "status": "success",
+    "status": "passed",
+    "revision": "dc5a2fe682087a2dd8181a19b0c2b3ae0d840369",
+    "runUrl": "https://github.com/m1kkon/fsp-career/actions/runs/38168961386",
     "tests": {
-      "total": 427,
-      "passed": 427,
+      "total": 502,
+      "passed": 502,
       "failed": 0,
       "skipped": 0
     },
     "checks": [
       "npm ci",
       "default production build",
-      "Docker sandbox image",
-      "PostgreSQL 17 integration",
-      "real sandbox execution",
+      "real Docker sandbox",
+      "all 559 reference solutions and 2881 checks across 8 languages",
+      "PostgreSQL 17",
       "TypeScript",
-      "ESLint"
+      "lint with zero errors"
     ],
-    "fiftyAccountConcurrency": {
+    "concurrency": {
       "accounts": 50,
-      "serviceActions": 100,
-      "elapsedMs": 206,
-      "result": "committed before controlled judge release; judged answer committed afterward",
-      "scope": "CI service transactions against PostgreSQL; not HTTP production latency or SLA"
-    }
+      "actions": 100,
+      "elapsedMs": 195,
+      "scope": "CI service calls during a controlled pending judge; not a production HTTP SLA"
+    },
+    "scope": "Measured on final product implementation; subsequent authored stress diagnostics and jury PDF are evaluated separately."
   }
 }
