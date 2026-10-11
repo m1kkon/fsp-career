@@ -470,7 +470,7 @@
 .product-ui [data-motion="visible"] { animation: product-appear 420ms ease backwards; animation-delay: var(--motion-delay,0ms); }
 @keyframes product-appear { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 @media (hover:hover) {
- .product-ui .home-vacancy:hover { transform: translateY(-4px); border-color: var(--color-border-accent); box-shadow: 0 12px 28px rgba(37,25,62,.08); }
+ .product-ui .home-vacancy:hover { transform: translateY(-4px); border-color: var(--color-border-accent); box-shadow: 0 12px 28px rgba(28,24,63,.08); }
  .product-ui .specialization-grid>button:hover { transform: translateY(-2px); }
 }
 @media (max-width:980px) {
@@ -509,14 +509,14 @@
 .product-ui .hero-companies { position: relative; padding: 36px 0 0; align-self: center; }
 .product-ui .hero-company-caption { font-size: 12px; letter-spacing: .5px; color: var(--color-text-muted); margin: 0 0 22px 12px; }
 .product-ui .hero-company-mosaic { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; padding: 0 8px; }
-.product-ui .hero-company-tile { display: flex; flex-direction: column; align-items: flex-start; padding: 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; box-shadow: 0 7px 20px rgba(31,25,45,.035); text-decoration: none; transition: transform 220ms ease, box-shadow 220ms ease; }
+.product-ui .hero-company-tile { display: flex; flex-direction: column; align-items: flex-start; padding: 24px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 14px; box-shadow: 0 7px 20px rgba(27,24,46,.035); text-decoration: none; transition: transform 220ms ease, box-shadow 220ms ease; }
 .product-ui .hero-company-tile:nth-child(even) { transform: translateY(24px); }
 .product-ui .hero-company-tile .company-logo { width: 44px; height: 44px; margin-bottom: 22px; }
 .product-ui .hero-company-tile strong { color: var(--text); font-size: 17px; font-weight: 600; }
 .product-ui .hero-company-tile span { color: var(--muted); font-size: 12px; margin-top: 6px; }
 .product-ui .hero-company-disclaimer { font-size: 12px; text-align: center; color: var(--color-text-muted); margin-top: 48px; }
 @media (hover:hover) {
- .product-ui .hero-company-tile:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(31,25,45,.08); }
+ .product-ui .hero-company-tile:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(27,24,46,.08); }
  .product-ui .hero-company-tile:nth-child(even):hover { transform: translateY(21px); }
 }
 @media (max-width:1100px) {
@@ -567,7 +567,7 @@
 .product-ui .shortlist-caption { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding: 0 4px; font-size: 13px; color: var(--muted); }
 .product-ui .shortlist-caption .icon { color: var(--color-text-muted); }
 .product-ui .shortlist-preview { display: grid; gap: 12px; }
-.product-ui .shortlist-person { position: relative; width: 100%; display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 14px; text-align: left; border: 1px solid var(--color-border); border-radius: 12px; padding: 20px; background: var(--color-surface); box-shadow: 0 6px 16px rgba(35,26,55,.035); cursor: pointer; transition: transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease; }
+.product-ui .shortlist-person { position: relative; width: 100%; display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 14px; text-align: left; border: 1px solid var(--color-border); border-radius: 12px; padding: 20px; background: var(--color-surface); box-shadow: 0 6px 16px rgba(29,25,56,.035); cursor: pointer; transition: transform 180ms ease,border-color 180ms ease,box-shadow 180ms ease; }
 .product-ui .shortlist-person:nth-child(2) { transform: translateX(-14px); }
 .product-ui .shortlist-avatar { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: var(--color-surface-accent); color: var(--color-accent); font-size: 13px; font-weight: 600; }
 .product-ui .shortlist-avatar.tone-1 { background: var(--color-surface-success); color: var(--color-success); }
@@ -584,7 +584,7 @@
 .product-ui .hero-hiring-points .icon { width: 15px; height: 15px; color: var(--color-text-muted); }
 .product-ui .product-hero[data-audience="employer"]::after { border-radius: 24px; transform: none; width: 280px; height: 350px; top: 105px; right: -14px; }
 @media (hover:hover) {
- .product-ui .shortlist-person:hover { border-color: var(--color-border-accent); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(35,26,55,.065); }
+ .product-ui .shortlist-person:hover { border-color: var(--color-border-accent); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(29,25,56,.065); }
  .product-ui .shortlist-person:nth-child(2):hover { transform: translate(-14px,-2px); }
 }
 @media (max-width:980px) {
@@ -1129,3 +1129,14 @@
 @media(max-width:700px){.product-ui .method-rules{font-size:14px}.product-ui .method-documentation{gap:24px}}
 
 @media(max-width:360px){.product-ui .brand .brand-logo{width:140px}}
+
+/* Brand identity: the network sign from the logo and its red "your opportunity" dot. */
+.product-ui .product-hero::after,.product-ui .product-hero[data-audience="employer"]::after { width: 430px; height: 277px; top: 34px; right: 0; border: 0; border-radius: 0; transform: none; background: url("/brand/fsp-career-sign.svg") no-repeat center / contain; opacity: .1; }
+.product-ui .product-hero .eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+.product-ui .product-hero .eyebrow::before { content: ''; width: 14px; height: 14px; flex-shrink: 0; border-radius: 50%; background: radial-gradient(circle closest-side, var(--color-brand-red) 0 46%, var(--color-surface) 50% 70%, var(--color-accent) 74%); }
+.product-ui .reverse-flow li { position: relative; }
+.product-ui .reverse-flow li>span { position: relative; z-index: 1; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-accent); color: var(--color-on-accent); font-size: 13px; font-weight: 700; }
+.product-ui .reverse-flow li:not(:last-child)::before { content: ''; position: absolute; top: 19px; left: 40px; right: -24px; height: 2px; background: var(--color-border-accent); }
+.product-ui .reverse-flow li:last-child>span { background: radial-gradient(circle closest-side, var(--color-brand-red) 0 56%, var(--color-surface) 60% 76%, var(--color-accent) 80%); }
+@media (max-width: 980px) { .product-ui .reverse-flow li::before { display: none; } }
+@media (max-width: 980px) { .product-ui .product-hero::after,.product-ui .product-hero[data-audience="employer"]::after { width: 200px; height: 129px; top: 16px; right: 0; opacity: .08; } }
