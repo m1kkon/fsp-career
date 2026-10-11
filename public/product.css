@@ -770,6 +770,10 @@
 .api-access-heading{display:flex;justify-content:space-between;align-items:start;gap:20px;margin-bottom:24px}
 .api-access-heading h2,.api-access-aside h2{margin-top:0}
 .api-access-heading p,.api-access-aside p{color:var(--muted,var(--color-accent));line-height:1.6}
+.api-access-aside h2{margin-bottom:12px}.api-access-aside p{margin:0 0 12px}.api-access-aside .button{margin-top:8px}
+.api-access-aside h3{margin:28px 0 10px;padding-top:24px;border-top:1px solid var(--color-border)}
+.survey-required h2{margin:0 0 8px}.survey-required>p{margin:0 0 20px}
+.settings-layout aside .button+h3{margin:28px 0 10px;padding-top:24px;border-top:1px solid var(--color-border)}.settings-layout aside .button+a{display:inline-block;margin:8px 0 0 14px}
 .api-key-row{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 0;border-top:1px solid var(--color-border)}
 .api-key-row>div{display:grid;gap:7px;min-width:0}
 .api-key-row code,.api-key-row small{color:var(--color-accent)}.api-key-row code{overflow-wrap:anywhere}
@@ -802,6 +806,7 @@
    Page scopes deliberately exclude the assessment landing page and exam. */
 .product-ui main[data-page="catalog"] .marketplace-search { padding: 20px; margin-bottom: 20px; }
 .product-ui main[data-page="catalog"] .quick-filter-bar { margin-top: 16px; gap: 8px; }
+@media (max-width: 480px) { .product-ui .quick-filter-bar>select { flex-basis: 100%; } }
 .product-ui main[data-page="catalog"] .team-context { margin-top: 14px; padding-top: 14px; }
 .product-ui main[data-page="catalog"] .team-context-body { padding-top: 18px; }
 .product-ui main[data-page="catalog"] .team-context-note { max-width: 72ch; }
@@ -888,6 +893,8 @@
 .product-ui main[data-page="dashboard"] .dashboard-stats>div { padding: 20px; }
 .product-ui main[data-page="dashboard"] .dashboard-stats strong { font-size: 28px; }
 .product-ui main[data-page="dashboard"] .dashboard-stats span { font-size: 12px; }
+.product-ui .dashboard-stats span { overflow-wrap: normal; hyphens: auto; }
+@media (max-width: 600px) { .product-ui main[data-page="dashboard"] .dashboard-stats>div { padding: 16px 12px; } }
 .product-ui main[data-page="dashboard"] .checklist { gap: 12px; }
 .product-ui main[data-page="company"] .company-editor-section { margin-bottom: 18px; }
 .product-ui main[data-page="company"] .company-editor-section>header { margin-bottom: 22px; }
