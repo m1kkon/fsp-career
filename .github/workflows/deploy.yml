@@ -45,7 +45,11 @@ jobs:
       - run: npm ci --include=dev --include=optional
       # Build generates the content-hashed asset manifest used by TypeScript.
       - run: npm run build
+      - name: Build isolated code execution image
+        run: docker build -t fsp-code-sandbox:local sandbox
       - run: npm test
+        env:
+          CODE_SANDBOX_TESTS: '1'
       - run: npx tsc --noEmit
       - run: npm run lint
 

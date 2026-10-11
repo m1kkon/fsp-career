@@ -1,0 +1,1776 @@
+{
+  "version": "synthetic-hardening-v2",
+  "fixtureHash": "f48e807358a6ecebeb97b617a543e0f7a04a9bd2ebace15a9b158ca3ed13e0cf",
+  "sourceHash": "ee33f494f9779ac542e7ffb4a854b566fccf8eac347ec6ddb50d984cce833dd8",
+  "sourceFiles": [
+    {
+      "path": "lib/action-dispatch.mjs",
+      "sha256": "5987f7c5fd60c8b03392b08201d8c834e691c5bddd4eac1d2e1ffc630027fd02"
+    },
+    {
+      "path": "lib/action-response.mjs",
+      "sha256": "5f900d3192ccb480255e8d01e1666839a3e2ae0c73debfa326c4eae386bbf716"
+    },
+    {
+      "path": "lib/adaptive-testing.mjs",
+      "sha256": "cdf8dc518ac5985a569acc0ec02ebbc960b4ea7d8b56d186032b88fb1a89b240"
+    },
+    {
+      "path": "lib/api-keys.mjs",
+      "sha256": "d0ec44ced79f372d0a02dbb137352687207dd00276315dc539a07f1d6d8c3edf"
+    },
+    {
+      "path": "lib/assessment-results.mjs",
+      "sha256": "ce8b1149762ca9469a796e5809e442f4904f678080a270f664a3e0475c49f018"
+    },
+    {
+      "path": "lib/assessment-scoring.mjs",
+      "sha256": "3240b8325af9cb5727d0580ecebe441935112f45fc42b8d8b4356d0b7c97ebe6"
+    },
+    {
+      "path": "lib/assessments.mjs",
+      "sha256": "e07ca44f9d55b6b174a77ee432382b56b14d11250c695e8d3fe67d7f692d6ca8"
+    },
+    {
+      "path": "lib/ats.mjs",
+      "sha256": "1600c6079d241ba302c20205c215fcd93451ce9d8e308145ec6e75cd9de41fd9"
+    },
+    {
+      "path": "lib/auth.mjs",
+      "sha256": "e3e5ac3280f41fa236ae3e028055add0cd86b2169870db6e0c738e3e4a6b3159"
+    },
+    {
+      "path": "lib/code-runner.mjs",
+      "sha256": "1ed1d659a27d51ea731aeea4620046ed587a0a8da6b46ebd41ebc75f3021ac78"
+    },
+    {
+      "path": "lib/coding-bank-review.mjs",
+      "sha256": "e3b9f895a06f03290f110b497d7b20ea3a02d0f5781769509f55096b795ac69e"
+    },
+    {
+      "path": "lib/coding-bank.mjs",
+      "sha256": "e9a2f4eb43d191307278371c2bf52b52e856eed3872b62f1418dbd4c5d569a3d"
+    },
+    {
+      "path": "lib/coding-check-validation.mjs",
+      "sha256": "840363aba434afbd4189dd9f0b4f0d3966dcbe24faf09b58e89fafc33404c0fe"
+    },
+    {
+      "path": "lib/coding-contract.mjs",
+      "sha256": "9e989e9c105de756ed66b499399b6b2ab4b4f01babcf6354fb58a262fb333ccc"
+    },
+    {
+      "path": "lib/company-profile.mjs",
+      "sha256": "eebbb60e9e7e363f044ebe9386897a1dfa923cdb58d32efd2cc0626429be78f6"
+    },
+    {
+      "path": "lib/daily-pool-scheduler.mjs",
+      "sha256": "4e888e0d99f957eb5189f434ca429a0625b0f89c4c60ece203be065eeb9f67af"
+    },
+    {
+      "path": "lib/demo-candidate-data.mjs",
+      "sha256": "73e9291bed9c4cc4bbe8633222876a3a9b4f84f7b2f40dea280874a15fbbc936"
+    },
+    {
+      "path": "lib/demo-candidates.mjs",
+      "sha256": "9d6c352f9b7e2433ef6cd69b2341f4a47088f3027bfd6b531924872e84726b67"
+    },
+    {
+      "path": "lib/demo-jobs.mjs",
+      "sha256": "1b627f7dd961a73cd881ee5e2fcef50f7464fca01cbb10eae44e00a01894b947"
+    },
+    {
+      "path": "lib/demo-memory.mjs",
+      "sha256": "58dc76c075e0ca5f9263f8d8e7f8e5804077b3a6dc958c12544a712c62c51c77"
+    },
+    {
+      "path": "lib/domain.mjs",
+      "sha256": "8b112fec79803aa09ededb9efc4fff78f8ba083e2d4c67c73931b094b7a07442"
+    },
+    {
+      "path": "lib/email-auth.mjs",
+      "sha256": "34da53377ccdefccdec7560cd8368ab180c9df7ad640d2f9a43e71194a46459e"
+    },
+    {
+      "path": "lib/extended-coding-bank.mjs",
+      "sha256": "82eade095849f23e59fabab467c1402868a4fd26b260fe177e144610eacf5988"
+    },
+    {
+      "path": "lib/fsp.mjs",
+      "sha256": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b"
+    },
+    {
+      "path": "lib/http.mjs",
+      "sha256": "9d6b598ed46b5056f3b88c084819a894bebfb47d9e24b1b32fd7b8fe5ca3d941"
+    },
+    {
+      "path": "lib/mail-worker.mjs",
+      "sha256": "ae21335b01c39197f2117fc8fa1733661d8dfa7eac9aaea0df9c8ddc4757d84e"
+    },
+    {
+      "path": "lib/mail.mjs",
+      "sha256": "45905010f32844bb025339b29e3d0fbfdfdf88875db2f36851f6eacc54fd7e88"
+    },
+    {
+      "path": "lib/markup-checks.mjs",
+      "sha256": "6d23145e2be1cff4f243e001322f94984389cc699117fbaf9eb2fd263015975f"
+    },
+    {
+      "path": "lib/matching.mjs",
+      "sha256": "e2e5dec5f173b62f6e6bec4aecb7e6c61ad1c8beaecab9bd37a3387b1fb40e7d"
+    },
+    {
+      "path": "lib/mixed-coding-bank.mjs",
+      "sha256": "72f2c75b67db00f8df2f48b859a4e28b0ad791e327ff05752cc59e1bd0443d9d"
+    },
+    {
+      "path": "lib/mixed-coding-contracts.mjs",
+      "sha256": "479db679322aae39c39782cfdd1ea0e92b6723c50799655de7680c471fbffce3"
+    },
+    {
+      "path": "lib/periodic-tasks.mjs",
+      "sha256": "62dcc6ea2e3838d6ff508b122ffc390440f0cc7a6b3cccb21b9219a4f11179ff"
+    },
+    {
+      "path": "lib/postgres.mjs",
+      "sha256": "361a6543a913b1be42a1f9c31a943c738cb4b3aafc157f133f96f6a7a2bf6313"
+    },
+    {
+      "path": "lib/public-api.mjs",
+      "sha256": "9c43ce7acca9b2571f681d1d3bb3f12f51e5bfc9b756c2fada3bcab3e634dead"
+    },
+    {
+      "path": "lib/question-bank-100.mjs",
+      "sha256": "3d69889153ee87fd5938fdeb56ade345ac3c69ff2a4d16fff9d1c445dd88090c"
+    },
+    {
+      "path": "lib/question-bank-expansion.mjs",
+      "sha256": "3e5db57495e9e965f11e2db97f4c9826df0552ae22f908092bb915fa9551f6c7"
+    },
+    {
+      "path": "lib/question-bank-quality.mjs",
+      "sha256": "12357aa840f0b7e48c1fa46b56fa34e8a5dcda06f19b66815a9aff2af4089afc"
+    },
+    {
+      "path": "lib/question-bank-review.mjs",
+      "sha256": "c911e27fc9a3d387241c3d88a1ed6f5fb47040834411526428892306e4ec5407"
+    },
+    {
+      "path": "lib/question-bank.mjs",
+      "sha256": "d1b97d07f4d25c6578e951ffeed055651257cf3e6e65fedddc546d714b9fcc57"
+    },
+    {
+      "path": "lib/resume-fit.mjs",
+      "sha256": "63ce720c41a2375d1694ed1504e4e4f954fa16d319b76d00c4be3dec3dae6002"
+    },
+    {
+      "path": "lib/resume-pdf.mjs",
+      "sha256": "9b4343ba99e95a3181bfece2daba21b877c47486377ad433f216cb4662cf492b"
+    },
+    {
+      "path": "lib/role-grade.mjs",
+      "sha256": "c1ecb157fed57abb8c6db3f8d24fbf1dcf987c226f9be8da649de75f63332941"
+    },
+    {
+      "path": "lib/salary-range.mjs",
+      "sha256": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791"
+    },
+    {
+      "path": "lib/scoped-coding-tasks.mjs",
+      "sha256": "fa178fcfbb8d2e2903e0e905765bc528c49736a1674a5ee68d62a1c8d9ce90b8"
+    },
+    {
+      "path": "lib/seed.mjs",
+      "sha256": "d2a9c129efbfccbfe5ee0d4aaade5b83931371203ce839d0c50b478418d8867e"
+    },
+    {
+      "path": "lib/service.mjs",
+      "sha256": "4b493105ffea189d2bb5dd4e0d6482dc125b2f95700191bfd48a69772f510e7b"
+    },
+    {
+      "path": "lib/taxonomy.mjs",
+      "sha256": "3dbea7a04f992cab9373bdabffa597705b0b2665af92ffc49ab30d6e017c8d47"
+    },
+    {
+      "path": "lib/technology-catalog.mjs",
+      "sha256": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d"
+    },
+    {
+      "path": "lib/test-maintainer.mjs",
+      "sha256": "e074e864659bcb85abeed6109494e6265bb37c34e775ab7a81b0ce12862a209a"
+    }
+  ],
+  "runtime": "v24.19.0",
+  "checks": {
+    "development": true,
+    "freshHoldout": true,
+    "theoryOnly": true,
+    "codingOnly": true,
+    "randomChoice": true
+  },
+  "limitations": [
+    "Synthetic rubric and response probabilities are authored hypotheses, not real candidate/expert labels.",
+    "Virtual profiles are repeated seeds of four ability prototypes across six roles, not independent expert assessments.",
+    "Answer generation uses independent probability tables, not the product Rasch model.",
+    "Retests use independent answer draws and different variants; variants can overlap in question families across attempts.",
+    "Holdout separates specialization/scenario families and forms; it shares the same authored response model and is not an independent human population.",
+    "No source code is executed; coding responses simulate trusted judge snapshots.",
+    "Item discrimination here measures the simulator, not empirical question-bank validity."
+  ],
+  "fresh": {
+    "seedNamespace": "2026-10-10:fresh-grades-v2:locked",
+    "peoplePerGrade": 100,
+    "formsPerModule": 20,
+    "formHash": "bde9ad4e6c0e31ab4097aa6494e91b25da0e74161cbfdc66b504f1e2be4510e2",
+    "summary": {
+      "n": 4800,
+      "labels": [
+        "BelowJunior",
+        "Junior",
+        "Middle",
+        "Senior"
+      ],
+      "matrix": [
+        [
+          1200,
+          0,
+          0,
+          0
+        ],
+        [
+          103,
+          1089,
+          8,
+          0
+        ],
+        [
+          0,
+          144,
+          1038,
+          18
+        ],
+        [
+          0,
+          9,
+          62,
+          1129
+        ]
+      ],
+      "accuracy": 0.9283333333333333,
+      "balancedAccuracy": 0.9283333333333333,
+      "kappa": 0.9044444444444445,
+      "overgraded": 0.005416666666666667,
+      "undergraded": 0.06625,
+      "byGrade": [
+        {
+          "label": "BelowJunior",
+          "n": 1200,
+          "recall": 1
+        },
+        {
+          "label": "Junior",
+          "n": 1200,
+          "recall": 0.9075
+        },
+        {
+          "label": "Middle",
+          "n": 1200,
+          "recall": 0.865
+        },
+        {
+          "label": "Senior",
+          "n": 1200,
+          "recall": 0.9408333333333333
+        }
+      ],
+      "people": 2400,
+      "testRetestAgreement": 0.8658333333333333,
+      "testRetestInterval": {
+        "low": 0.8516112351910842,
+        "high": 0.8788861915657867
+      },
+      "testRetestKappa": 0.8208712776550828,
+      "meanAbsoluteScoreDifference": 5.417125000000007,
+      "scoreByGrade": {
+        "BelowJunior": 18.84049999999993,
+        "Junior": 53.82858333333279,
+        "Middle": 76.84908333333341,
+        "Senior": 94.25224999999942
+      }
+    },
+    "bySplit": {
+      "development": {
+        "n": 2400,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            600,
+            0,
+            0,
+            0
+          ],
+          [
+            57,
+            538,
+            5,
+            0
+          ],
+          [
+            0,
+            76,
+            519,
+            5
+          ],
+          [
+            0,
+            3,
+            34,
+            563
+          ]
+        ],
+        "accuracy": 0.925,
+        "balancedAccuracy": 0.925,
+        "kappa": 0.9,
+        "overgraded": 0.004166666666666667,
+        "undergraded": 0.07083333333333333,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 600,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 600,
+            "recall": 0.8966666666666666
+          },
+          {
+            "label": "Middle",
+            "n": 600,
+            "recall": 0.865
+          },
+          {
+            "label": "Senior",
+            "n": 600,
+            "recall": 0.9383333333333334
+          }
+        ],
+        "people": 1200,
+        "testRetestAgreement": 0.8591666666666666,
+        "testRetestInterval": {
+          "low": 0.8383375169562732,
+          "high": 0.8777036142774288
+        },
+        "testRetestKappa": 0.8119532108432896,
+        "meanAbsoluteScoreDifference": 5.302833333333336,
+        "scoreByGrade": {
+          "BelowJunior": 18.61383333333334,
+          "Junior": 53.294666666666934,
+          "Middle": 76.42649999999993,
+          "Senior": 94.08266666666675
+        }
+      },
+      "holdout": {
+        "n": 2400,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            600,
+            0,
+            0,
+            0
+          ],
+          [
+            46,
+            551,
+            3,
+            0
+          ],
+          [
+            0,
+            68,
+            519,
+            13
+          ],
+          [
+            0,
+            6,
+            28,
+            566
+          ]
+        ],
+        "accuracy": 0.9316666666666666,
+        "balancedAccuracy": 0.9316666666666666,
+        "kappa": 0.9088888888888889,
+        "overgraded": 0.006666666666666667,
+        "undergraded": 0.06166666666666667,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 600,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 600,
+            "recall": 0.9183333333333333
+          },
+          {
+            "label": "Middle",
+            "n": 600,
+            "recall": 0.865
+          },
+          {
+            "label": "Senior",
+            "n": 600,
+            "recall": 0.9433333333333334
+          }
+        ],
+        "people": 1200,
+        "testRetestAgreement": 0.8725,
+        "testRetestInterval": {
+          "low": 0.852433011333717,
+          "high": 0.8901896932172456
+        },
+        "testRetestKappa": 0.8297810795550945,
+        "meanAbsoluteScoreDifference": 5.53141666666667,
+        "scoreByGrade": {
+          "BelowJunior": 19.067166666666644,
+          "Junior": 54.36250000000027,
+          "Middle": 77.27166666666662,
+          "Senior": 94.42183333333347
+        }
+      }
+    },
+    "byRole": {
+      "backend-developer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            200,
+            0,
+            0,
+            0
+          ],
+          [
+            18,
+            180,
+            2,
+            0
+          ],
+          [
+            0,
+            16,
+            181,
+            3
+          ],
+          [
+            0,
+            2,
+            13,
+            185
+          ]
+        ],
+        "accuracy": 0.9325,
+        "balancedAccuracy": 0.9324999999999999,
+        "kappa": 0.91,
+        "overgraded": 0.00625,
+        "undergraded": 0.06125,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 200,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 200,
+            "recall": 0.9
+          },
+          {
+            "label": "Middle",
+            "n": 200,
+            "recall": 0.905
+          },
+          {
+            "label": "Senior",
+            "n": 200,
+            "recall": 0.925
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.865,
+        "testRetestInterval": {
+          "low": 0.8280190157519688,
+          "high": 0.8950370093839947
+        },
+        "testRetestKappa": 0.8198618941188244,
+        "meanAbsoluteScoreDifference": 5.453750000000001,
+        "scoreByGrade": {
+          "BelowJunior": 18.677500000000002,
+          "Junior": 54.10450000000004,
+          "Middle": 76.982,
+          "Senior": 93.92350000000005
+        }
+      },
+      "frontend-developer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            200,
+            0,
+            0,
+            0
+          ],
+          [
+            21,
+            179,
+            0,
+            0
+          ],
+          [
+            0,
+            31,
+            169,
+            0
+          ],
+          [
+            0,
+            4,
+            13,
+            183
+          ]
+        ],
+        "accuracy": 0.91375,
+        "balancedAccuracy": 0.9137500000000001,
+        "kappa": 0.8849999999999999,
+        "overgraded": 0,
+        "undergraded": 0.08625,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 200,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 200,
+            "recall": 0.895
+          },
+          {
+            "label": "Middle",
+            "n": 200,
+            "recall": 0.845
+          },
+          {
+            "label": "Senior",
+            "n": 200,
+            "recall": 0.915
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.8425,
+        "testRetestInterval": {
+          "low": 0.8035652075632727,
+          "high": 0.8749188708177342
+        },
+        "testRetestKappa": 0.7895527996993612,
+        "meanAbsoluteScoreDifference": 5.709000000000004,
+        "scoreByGrade": {
+          "BelowJunior": 18.001000000000012,
+          "Junior": 53.14800000000003,
+          "Middle": 76.52550000000001,
+          "Senior": 94.12550000000003
+        }
+      },
+      "qa-engineer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            200,
+            0,
+            0,
+            0
+          ],
+          [
+            18,
+            179,
+            3,
+            0
+          ],
+          [
+            0,
+            24,
+            174,
+            2
+          ],
+          [
+            0,
+            0,
+            8,
+            192
+          ]
+        ],
+        "accuracy": 0.93125,
+        "balancedAccuracy": 0.93125,
+        "kappa": 0.9083333333333333,
+        "overgraded": 0.00625,
+        "undergraded": 0.0625,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 200,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 200,
+            "recall": 0.895
+          },
+          {
+            "label": "Middle",
+            "n": 200,
+            "recall": 0.87
+          },
+          {
+            "label": "Senior",
+            "n": 200,
+            "recall": 0.96
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.87,
+        "testRetestInterval": {
+          "low": 0.8334921544792615,
+          "high": 0.8994687477133592
+        },
+        "testRetestKappa": 0.8264859228362876,
+        "meanAbsoluteScoreDifference": 5.252499999999998,
+        "scoreByGrade": {
+          "BelowJunior": 19.055999999999997,
+          "Junior": 53.756500000000024,
+          "Middle": 76.62799999999997,
+          "Senior": 94.62150000000005
+        }
+      },
+      "devops-engineer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            200,
+            0,
+            0,
+            0
+          ],
+          [
+            10,
+            189,
+            1,
+            0
+          ],
+          [
+            0,
+            16,
+            174,
+            10
+          ],
+          [
+            0,
+            1,
+            8,
+            191
+          ]
+        ],
+        "accuracy": 0.9425,
+        "balancedAccuracy": 0.9425,
+        "kappa": 0.9233333333333333,
+        "overgraded": 0.01375,
+        "undergraded": 0.04375,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 200,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 200,
+            "recall": 0.945
+          },
+          {
+            "label": "Middle",
+            "n": 200,
+            "recall": 0.87
+          },
+          {
+            "label": "Senior",
+            "n": 200,
+            "recall": 0.955
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.8925,
+        "testRetestInterval": {
+          "low": 0.8583265694191717,
+          "high": 0.9192062795284055
+        },
+        "testRetestKappa": 0.8565423366917997,
+        "meanAbsoluteScoreDifference": 5.538750000000001,
+        "scoreByGrade": {
+          "BelowJunior": 20.79200000000001,
+          "Junior": 56.056500000000035,
+          "Middle": 78.686,
+          "Senior": 94.87900000000003
+        }
+      },
+      "data-scientist": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            200,
+            0,
+            0,
+            0
+          ],
+          [
+            21,
+            179,
+            0,
+            0
+          ],
+          [
+            0,
+            36,
+            164,
+            0
+          ],
+          [
+            0,
+            1,
+            13,
+            186
+          ]
+        ],
+        "accuracy": 0.91125,
+        "balancedAccuracy": 0.91125,
+        "kappa": 0.8816666666666667,
+        "overgraded": 0,
+        "undergraded": 0.08875,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 200,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 200,
+            "recall": 0.895
+          },
+          {
+            "label": "Middle",
+            "n": 200,
+            "recall": 0.82
+          },
+          {
+            "label": "Senior",
+            "n": 200,
+            "recall": 0.93
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.8425,
+        "testRetestInterval": {
+          "low": 0.8035652075632727,
+          "high": 0.8749188708177342
+        },
+        "testRetestKappa": 0.7894085891211152,
+        "meanAbsoluteScoreDifference": 5.202249999999999,
+        "scoreByGrade": {
+          "BelowJunior": 18.108000000000004,
+          "Junior": 52.02300000000003,
+          "Middle": 75.66950000000001,
+          "Senior": 93.70300000000003
+        }
+      },
+      "ml-engineer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            200,
+            0,
+            0,
+            0
+          ],
+          [
+            15,
+            183,
+            2,
+            0
+          ],
+          [
+            0,
+            21,
+            176,
+            3
+          ],
+          [
+            0,
+            1,
+            7,
+            192
+          ]
+        ],
+        "accuracy": 0.93875,
+        "balancedAccuracy": 0.93875,
+        "kappa": 0.9183333333333333,
+        "overgraded": 0.00625,
+        "undergraded": 0.055,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 200,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 200,
+            "recall": 0.915
+          },
+          {
+            "label": "Middle",
+            "n": 200,
+            "recall": 0.88
+          },
+          {
+            "label": "Senior",
+            "n": 200,
+            "recall": 0.96
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.8825,
+        "testRetestInterval": {
+          "low": 0.8472450357843669,
+          "high": 0.9104780590498961
+        },
+        "testRetestKappa": 0.843186974509542,
+        "meanAbsoluteScoreDifference": 5.346499999999996,
+        "scoreByGrade": {
+          "BelowJunior": 18.408500000000018,
+          "Junior": 53.883,
+          "Middle": 76.60350000000003,
+          "Senior": 94.26100000000001
+        }
+      }
+    }
+  },
+  "matching": {
+    "scenarios": 24,
+    "pairs": 480,
+    "weights": {
+      "spec": 25,
+      "grade": 15,
+      "stack": 12,
+      "resume": 20,
+      "test": 12,
+      "fsp": 6,
+      "format": 4,
+      "salary": 4,
+      "domain": 2
+    },
+    "summary": {
+      "precisionAtK": 0.975,
+      "recallAtK": 0.7539682539682538,
+      "ndcgAtK": 0.9829800622971921,
+      "reciprocalRank": 1,
+      "randomPrecisionAtK": 0.32499999999999984,
+      "randomNdcgAtK": 0.32499999999999984,
+      "gradedNdcgAt5": 0.9886533748647947,
+      "tiedPrecisionAt5": 0.975,
+      "eligibilityAccuracy": 1,
+      "invalidTop5": 0,
+      "scoreExplanationAccuracy": 1
+    },
+    "bySplit": {
+      "development": {
+        "precisionAtK": 0.9499999999999998,
+        "recallAtK": 0.7341269841269842,
+        "ndcgAtK": 0.9659601245943842,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.32499999999999996,
+        "randomNdcgAtK": 0.32499999999999996,
+        "gradedNdcgAt5": 0.9773067497295894,
+        "tiedPrecisionAt5": 0.9499999999999998,
+        "eligibilityAccuracy": 1,
+        "invalidTop5": 0,
+        "scoreExplanationAccuracy": 1
+      },
+      "holdout": {
+        "precisionAtK": 1,
+        "recallAtK": 0.7738095238095238,
+        "ndcgAtK": 1,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.32499999999999996,
+        "randomNdcgAtK": 0.32499999999999996,
+        "gradedNdcgAt5": 1,
+        "tiedPrecisionAt5": 1,
+        "eligibilityAccuracy": 1,
+        "invalidTop5": 0,
+        "scoreExplanationAccuracy": 1
+      }
+    },
+    "pairwise": {
+      "higherVsIrrelevant": 1,
+      "relevantVsDenied": 0.9166666666666666,
+      "relevantVsTags": 1
+    }
+  },
+  "safety": {
+    "seedNamespace": "2026-10-10:grade-safety-v2:locked",
+    "peoplePerGrade": 100,
+    "formsPerModule": 20,
+    "formHash": "bdb33659375ab44ee5caad4324dcc101e744388d8d61ace19844b9f45fed3abd",
+    "summary": {
+      "n": 4800,
+      "labels": [
+        "BelowJunior",
+        "Junior",
+        "Middle",
+        "Senior"
+      ],
+      "matrix": [
+        [
+          4799,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "accuracy": 0.9997916666666666,
+      "balancedAccuracy": 0.9997916666666666,
+      "kappa": 0,
+      "overgraded": 0.00020833333333333335,
+      "undergraded": 0,
+      "byGrade": [
+        {
+          "label": "BelowJunior",
+          "n": 4800,
+          "recall": 0.9997916666666666
+        },
+        {
+          "label": "Junior",
+          "n": 0,
+          "recall": null
+        },
+        {
+          "label": "Middle",
+          "n": 0,
+          "recall": null
+        },
+        {
+          "label": "Senior",
+          "n": 0,
+          "recall": null
+        }
+      ],
+      "people": 2400,
+      "testRetestAgreement": 0.9995833333333334,
+      "testRetestInterval": {
+        "low": 0.9976435040691644,
+        "high": 0.9999264443152188
+      },
+      "testRetestKappa": 0,
+      "meanAbsoluteScoreDifference": 3.080708333333339,
+      "scoreByGrade": {
+        "BelowJunior": 44.39118750000026,
+        "Junior": null,
+        "Middle": null,
+        "Senior": null
+      }
+    },
+    "bySplit": {
+      "development": {
+        "n": 2400,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            2400,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 1,
+        "balancedAccuracy": 1,
+        "kappa": null,
+        "overgraded": 0,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 2400,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 1200,
+        "testRetestAgreement": 1,
+        "testRetestInterval": {
+          "low": 0.9968089993972651,
+          "high": 1
+        },
+        "testRetestKappa": null,
+        "meanAbsoluteScoreDifference": 2.9339999999999975,
+        "scoreByGrade": {
+          "BelowJunior": 44.35600000000018,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      },
+      "holdout": {
+        "n": 2400,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            2399,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 0.9995833333333334,
+        "balancedAccuracy": 0.9995833333333334,
+        "kappa": 0,
+        "overgraded": 0.0004166666666666667,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 2400,
+            "recall": 0.9995833333333334
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 1200,
+        "testRetestAgreement": 0.9991666666666666,
+        "testRetestInterval": {
+          "low": 0.9952947700098665,
+          "high": 0.9998528810550694
+        },
+        "testRetestKappa": 0,
+        "meanAbsoluteScoreDifference": 3.2274166666666644,
+        "scoreByGrade": {
+          "BelowJunior": 44.426375000000114,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      }
+    },
+    "byRole": {
+      "backend-developer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            800,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 1,
+        "balancedAccuracy": 1,
+        "kappa": null,
+        "overgraded": 0,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 800,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 1,
+        "testRetestInterval": {
+          "low": 0.9904877056657034,
+          "high": 0.9999999999999999
+        },
+        "testRetestKappa": null,
+        "meanAbsoluteScoreDifference": 3.049999999999999,
+        "scoreByGrade": {
+          "BelowJunior": 44.66249999999981,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      },
+      "frontend-developer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            800,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 1,
+        "balancedAccuracy": 1,
+        "kappa": null,
+        "overgraded": 0,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 800,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 1,
+        "testRetestInterval": {
+          "low": 0.9904877056657034,
+          "high": 0.9999999999999999
+        },
+        "testRetestKappa": null,
+        "meanAbsoluteScoreDifference": 3.272,
+        "scoreByGrade": {
+          "BelowJunior": 43.52724999999981,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      },
+      "qa-engineer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            800,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 1,
+        "balancedAccuracy": 1,
+        "kappa": null,
+        "overgraded": 0,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 800,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 1,
+        "testRetestInterval": {
+          "low": 0.9904877056657034,
+          "high": 0.9999999999999999
+        },
+        "testRetestKappa": null,
+        "meanAbsoluteScoreDifference": 3.1679999999999997,
+        "scoreByGrade": {
+          "BelowJunior": 44.57849999999985,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      },
+      "devops-engineer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            799,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 0.99875,
+        "balancedAccuracy": 0.99875,
+        "kappa": 0,
+        "overgraded": 0.00125,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 800,
+            "recall": 0.99875
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 0.9975,
+        "testRetestInterval": {
+          "low": 0.9859767149241766,
+          "high": 0.9995585522131983
+        },
+        "testRetestKappa": 0,
+        "meanAbsoluteScoreDifference": 3.3524999999999987,
+        "scoreByGrade": {
+          "BelowJunior": 45.396499999999904,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      },
+      "data-scientist": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            800,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 1,
+        "balancedAccuracy": 1,
+        "kappa": null,
+        "overgraded": 0,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 800,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 1,
+        "testRetestInterval": {
+          "low": 0.9904877056657034,
+          "high": 0.9999999999999999
+        },
+        "testRetestKappa": null,
+        "meanAbsoluteScoreDifference": 2.5840000000000014,
+        "scoreByGrade": {
+          "BelowJunior": 43.826999999999835,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      },
+      "ml-engineer": {
+        "n": 800,
+        "labels": [
+          "BelowJunior",
+          "Junior",
+          "Middle",
+          "Senior"
+        ],
+        "matrix": [
+          [
+            800,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "accuracy": 1,
+        "balancedAccuracy": 1,
+        "kappa": null,
+        "overgraded": 0,
+        "undergraded": 0,
+        "byGrade": [
+          {
+            "label": "BelowJunior",
+            "n": 800,
+            "recall": 1
+          },
+          {
+            "label": "Junior",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Middle",
+            "n": 0,
+            "recall": null
+          },
+          {
+            "label": "Senior",
+            "n": 0,
+            "recall": null
+          }
+        ],
+        "people": 400,
+        "testRetestAgreement": 1,
+        "testRetestInterval": {
+          "low": 0.9904877056657034,
+          "high": 0.9999999999999999
+        },
+        "testRetestKappa": null,
+        "meanAbsoluteScoreDifference": 3.0577500000000004,
+        "scoreByGrade": {
+          "BelowJunior": 44.35537499999987,
+          "Junior": null,
+          "Middle": null,
+          "Senior": null
+        }
+      }
+    },
+    "discrimination": {
+      "items": 2298,
+      "coveredItems": 0,
+      "meanDifference": null,
+      "negativeItems": [],
+      "byDifficulty": {
+        "1": null,
+        "2": null,
+        "3": null
+      }
+    },
+    "byPersona": {
+      "theory-only": {
+        "n": 1200,
+        "qualified": 0
+      },
+      "coding-only": {
+        "n": 1200,
+        "qualified": 0
+      },
+      "random-choice": {
+        "n": 1200,
+        "qualified": 0
+      },
+      "weak-practice": {
+        "n": 1200,
+        "qualified": 1
+      }
+    }
+  },
+  "localVerification": {
+    "testSuite": {
+      "total": 400,
+      "passed": 372,
+      "failed": 0,
+      "skipped": 28,
+      "skipReason": "PostgreSQL, Docker sandbox and environment-dependent checks require configured services; not claimed as locally passed."
+    },
+    "productionBuild": {
+      "status": "passed",
+      "command": "node scripts/run-framework.mjs build --webpack",
+      "note": "Local node_modules is a symlink outside the worktree; default Turbopack must also be verified by CI with npm ci."
+    },
+    "lint": {
+      "errors": 0,
+      "existingWarnings": 23
+    },
+    "bankStructure": {
+      "questions": 2359,
+      "ordinary": 1800,
+      "choice": 1301,
+      "numeric": 499,
+      "coding": 559,
+      "retired": 10,
+      "checks": 2881,
+      "scope": "Structural validation; reference executions require Docker."
+    },
+    "browser": {
+      "environment": "Local disposable demo at 127.0.0.1:3103, not production",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "horizontalOverflow": false
+      },
+      "flow": [
+        "Publish employer task",
+        "See specialization-matched weekly suggestion",
+        "Submit candidate answer",
+        "Edit employer task",
+        "Review original answer instructions",
+        "Send feedback",
+        "Candidate retains original instructions and sees feedback"
+      ]
+    }
+  },
+  "reproduce": [
+    "npm test",
+    "npm run lint",
+    "node scripts/run-framework.mjs build --webpack",
+    "node scripts/benchmarks/harden-grades.mjs --assert --output output/validation/tz-current"
+  ],
+  "continuousIntegration": {
+    "revision": "72ffb4c82bd7e52ea2e97fb22e192cb6ea627623",
+    "run": "https://github.com/m1kkon/fsp-career/actions/runs/38166753173",
+    "status": "success",
+    "tests": {
+      "total": 427,
+      "passed": 427,
+      "failed": 0,
+      "skipped": 0
+    },
+    "checks": [
+      "npm ci",
+      "default production build",
+      "Docker sandbox image",
+      "PostgreSQL 17 integration",
+      "real sandbox execution",
+      "TypeScript",
+      "ESLint"
+    ],
+    "fiftyAccountConcurrency": {
+      "accounts": 50,
+      "serviceActions": 100,
+      "elapsedMs": 206,
+      "result": "committed before controlled judge release; judged answer committed afterward",
+      "scope": "CI service transactions against PostgreSQL; not HTTP production latency or SLA"
+    }
+  }
+}
