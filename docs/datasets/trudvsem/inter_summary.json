@@ -1,0 +1,44 @@
+{
+ "response": {
+  "distinct_idVacancy": 279053,
+  "distinct_idCv": 534612,
+  "distinct_candidateId": 510695,
+  "distinct_idCompany": 81942,
+  "distinct_pairs": 876603,
+  "modify_eq_creation_by_type": {
+   "Отказ": [
+    496019,
+    512320
+   ],
+   "Приглашение": [
+    104786,
+    514084
+   ],
+   "Принятие": [
+    12853,
+    13169
+   ]
+  },
+  "median_delay_days_when_modified": {
+   "Приглашение": 32.13,
+   "Отказ": 0.0,
+   "Принятие": 0.0
+  }
+ },
+ "invitation": {
+  "distinct_idVacancy": 1072910,
+  "distinct_idCv": 1285362,
+  "distinct_candidateId": 1153309,
+  "distinct_idCompany": 179550,
+  "distinct_pairs": 3078641,
+  "modify_eq_creation_by_type": {
+   "Отклик": [
+    398933,
+    3639201
+   ]
+  },
+  "median_delay_days_when_modified": {
+   "Отклик": 46.06
+  }
+ }
+}
