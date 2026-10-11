@@ -19,10 +19,20 @@ test('ordinal filters accept a stronger grade and language level',()=>{
 test('required and preferred technologies have different consequences',()=>{
  const required=selectedNeed('Backend',{spec:'Backend',grade:'Middle',requiredStack:'Kubernetes',preferredStack:'Kafka',confirmed:true});
  const checked=evaluateHardFilters(candidate(),required);
- assert.equal(checked.status,'fail');
- assert.deepEqual(checked.failed.map(x=>x.expected),['Kubernetes']);
+ assert.equal(checked.status,'unknown');
+ assert.deepEqual(checked.unknown.map(x=>x.expected),['Kubernetes']);
  assert.equal(required.preferredStack.includes('Kafka'),true);
  assert.equal(checked.checks.some(x=>x.expected==='Kafka'),false);
+});
+
+test('explicit relocation consent works without a current city, while a refusal cannot establish the missing location',()=>{
+ const need={city:'Москва',locationRequired:true};
+ const relocated={...candidate({relocation:'Готов к переезду'}),city:''};
+ assert.equal(evaluateHardFilters(relocated,need).status,'pass');
+ assert.equal(evaluateHardFilters({...relocated,ats:{relocation:'Не рассматриваю'}},need).status,'unknown');
+ assert.equal(evaluateHardFilters({...relocated,ats:{}},need).status,'unknown');
+ assert.equal(evaluateHardFilters({...relocated,city:'Москва',ats:{relocation:'Не рассматриваю'}},need).status,'pass');
+ assert.equal(evaluateHardFilters({...relocated,city:'Казань',ats:{relocation:'Не рассматриваю'}},need).status,'fail');
 });
 
 test('missing values require clarification instead of becoming a false match',()=>{
@@ -30,6 +40,16 @@ test('missing values require clarification instead of becoming a false match',()
  const checked=evaluateHardFilters(candidate({languages:[]}),need);
  assert.equal(checked.status,'unknown');
  assert.equal(checked.unknown[0].label,'Английский язык');
+});
+
+test('missing, prospective and contradictory skills remain unknown; an explicit denial fails',()=>{
+ const need={requiredStack:['Python']};
+ const undeclared={...candidate(),stack:[],ats:{},work:''};
+ assert.equal(evaluateHardFilters(undeclared,need).status,'unknown');
+ assert.equal(evaluateHardFilters({...undeclared,work:'Планирую разрабатывать API на Python.'},need).status,'unknown');
+ assert.equal(evaluateHardFilters({...undeclared,work:'Не работал с Python.'},need).status,'fail');
+ assert.equal(evaluateHardFilters({...undeclared,stack:['Python'],work:'Не работал с Python.'},need).status,'unknown');
+ assert.equal(evaluateHardFilters({...undeclared,work:'Разрабатывал API на Python.'},need).status,'pass');
 });
 
 test('explicit soft salary mode remains available; confirmed mandatory conditions are checked',()=>{

@@ -47,6 +47,10 @@ jobs:
       - run: npm run build
       - name: Build isolated code execution image
         run: docker build -t fsp-code-sandbox:local sandbox
+      - name: Execute every reference solution against the question bank
+        run: npm run bank:audit
+        env:
+          CODE_SANDBOX_TESTS: '1'
       - run: npm test
         env:
           CODE_SANDBOX_TESTS: '1'

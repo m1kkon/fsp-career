@@ -1,0 +1,16 @@
+{
+  "version": "domain-stress-authored-v1",
+  "asOf": "2026-10-11T18:00:00Z",
+  "productSnapshot": "21bec5adf8fc90fb7cd2802e9dd3543ed448e129",
+  "scenarioCount": 12,
+  "profileCount": 120,
+  "expandedFixtureSha256": "0475014094e6a9aeb4b58740392f9e2be832daf9c876a53a8fe17411ef6a45a0",
+  "files": {
+    "scripts/benchmarks/fixtures/domain-stress-v1.mjs": "d7064baca553b54665283725d5751febf8d3aa9c133cb491ff6af032f55d6705",
+    "docs/domain-stress-rubric.md": "d6d14535bd3de149a54970672225bac14bde32a5d6b6f59134f1e979b45d27d8"
+  },
+  "evaluated": false,
+  "labelsAuthoredBeforeEvaluation": true,
+  "externalHoldout": false,
+  "protocol": "Freeze and independently review labels before evaluating unchanged product. Do not alter labels or code after results."
+}

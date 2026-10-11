@@ -1,0 +1,325 @@
+{
+  "version": "blended-external-validation-v1",
+  "sourceFreeze": {
+    "version": 1,
+    "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c",
+    "frozenAt": "2026-10-11T19:59:33.150654+00:00",
+    "implementation": {
+      "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+      "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+      "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
+      "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
+      "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+      "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+      "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791"
+    },
+    "challengeFreezeCommit": "4d550e4",
+    "evaluationStarted": false,
+    "selection": "Two bounded variants evaluated only on TalentMatch development and previously known stress diagnostic; A selected before fresh challenge evaluation.",
+    "limits": [
+      "No fresh challenge results were used to tune implementation, weights or labels.",
+      "TalentMatch holdout has been seen historically; its final reproduction is not a new blind experiment."
+    ]
+  },
+  "source": {
+    "repository": "https://github.com/MALINAYAGODA/Talent-Match",
+    "commit": "a892ad12f2a84f92b9619ee05fbba5fbbf99fd56",
+    "sha256": "bfa8e4b1f1080b6decba654daf8379356145df80a8ffceeda2577195646da32a",
+    "url": "https://raw.githubusercontent.com/MALINAYAGODA/Talent-Match/a892ad12f2a84f92b9619ee05fbba5fbbf99fd56/case_2_data_for_members.json",
+    "bytes": 4533882
+  },
+  "dataset": {
+    "vacancies": 29,
+    "pairs": 656,
+    "uniqueResumes": 656,
+    "confirmed": 193,
+    "supportedVacancies": 13
+  },
+  "referenceDate": "2024-03-01",
+  "splitSeed": "fsp-talentmatch-baseline-v1",
+  "weights": {
+    "spec": 25,
+    "grade": 15,
+    "stack": 12,
+    "resume": 20,
+    "test": 12,
+    "fsp": 6,
+    "format": 4,
+    "salary": 4,
+    "domain": 2
+  },
+  "summaries": {
+    "supported/development": {
+      "product": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.4222222222222223,
+        "recallAtK": 0.35793650793650794,
+        "ndcgAtK": 0.4430207126249905,
+        "reciprocalRank": 0.5777777777777777,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.41851851851851846
+      },
+      "lexical": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.3333333333333333,
+        "recallAtK": 0.3067019400352734,
+        "ndcgAtK": 0.36215262521137725,
+        "reciprocalRank": 0.5436507936507936,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.3333333333333333
+      },
+      "stack": {
+        "vacancies": 9,
+        "pairs": 246,
+        "precisionAtK": 0.3111111111111111,
+        "recallAtK": 0.2873015873015872,
+        "ndcgAtK": 0.3510109532204011,
+        "reciprocalRank": 0.49158249158249157,
+        "randomPrecisionAtK": 0.3159016101211502,
+        "randomNdcgAtK": 0.33359600380338666,
+        "tieAdjustedPrecisionAtK": 0.2923685573685573
+      }
+    },
+    "supported/holdout": {
+      "product": {
+        "vacancies": 4,
+        "pairs": 102,
+        "precisionAtK": 0.3,
+        "recallAtK": 0.3958333333333333,
+        "ndcgAtK": 0.47041299648850443,
+        "reciprocalRank": 0.875,
+        "randomPrecisionAtK": 0.23357371794871795,
+        "randomNdcgAtK": 0.2822688655542725,
+        "tieAdjustedPrecisionAtK": 0.3416666666666667
+      },
+      "lexical": {
+        "vacancies": 4,
+        "pairs": 102,
+        "precisionAtK": 0.25,
+        "recallAtK": 0.3125,
+        "ndcgAtK": 0.33655241080596404,
+        "reciprocalRank": 0.5634920634920635,
+        "randomPrecisionAtK": 0.23357371794871795,
+        "randomNdcgAtK": 0.2822688655542725,
+        "tieAdjustedPrecisionAtK": 0.25
+      },
+      "stack": {
+        "vacancies": 4,
+        "pairs": 102,
+        "precisionAtK": 0.3,
+        "recallAtK": 0.3958333333333333,
+        "ndcgAtK": 0.4538720923116531,
+        "reciprocalRank": 0.7631578947368421,
+        "randomPrecisionAtK": 0.23357371794871795,
+        "randomNdcgAtK": 0.2822688655542725,
+        "tieAdjustedPrecisionAtK": 0.26666666666666666
+      }
+    },
+    "supported/combined": {
+      "product": {
+        "vacancies": 13,
+        "pairs": 348,
+        "precisionAtK": 0.3846153846153847,
+        "recallAtK": 0.36959706959706956,
+        "ndcgAtK": 0.45144910765991786,
+        "reciprocalRank": 0.6692307692307693,
+        "randomPrecisionAtK": 0.2905699509911711,
+        "randomNdcgAtK": 0.3178030381882745,
+        "tieAdjustedPrecisionAtK": 0.3948717948717949
+      },
+      "lexical": {
+        "vacancies": 13,
+        "pairs": 348,
+        "precisionAtK": 0.30769230769230765,
+        "recallAtK": 0.3084859584859585,
+        "ndcgAtK": 0.35427563616355784,
+        "reciprocalRank": 0.5497557997557998,
+        "randomPrecisionAtK": 0.2905699509911711,
+        "randomNdcgAtK": 0.3178030381882745,
+        "tieAdjustedPrecisionAtK": 0.30769230769230765
+      },
+      "stack": {
+        "vacancies": 13,
+        "pairs": 348,
+        "precisionAtK": 0.30769230769230776,
+        "recallAtK": 0.3206959706959707,
+        "ndcgAtK": 0.38266053447924786,
+        "reciprocalRank": 0.5751441540915224,
+        "randomPrecisionAtK": 0.2905699509911711,
+        "randomNdcgAtK": 0.3178030381882745,
+        "tieAdjustedPrecisionAtK": 0.2844602833064372
+      }
+    },
+    "all/development": {
+      "product": {
+        "vacancies": 20,
+        "pairs": 457,
+        "precisionAtK": 0.41000000000000003,
+        "recallAtK": 0.36156676656676656,
+        "ndcgAtK": 0.4366594490172793,
+        "reciprocalRank": 0.5838095238095238,
+        "randomPrecisionAtK": 0.3368239408528946,
+        "randomNdcgAtK": 0.3717863245529315,
+        "tieAdjustedPrecisionAtK": 0.4156666666666668
+      },
+      "lexical": {
+        "vacancies": 20,
+        "pairs": 457,
+        "precisionAtK": 0.32000000000000006,
+        "recallAtK": 0.30373556998556994,
+        "ndcgAtK": 0.34583373541140844,
+        "reciprocalRank": 0.5229761904761905,
+        "randomPrecisionAtK": 0.3368239408528946,
+        "randomNdcgAtK": 0.3717863245529315,
+        "tieAdjustedPrecisionAtK": 0.32000000000000006
+      },
+      "stack": {
+        "vacancies": 20,
+        "pairs": 457,
+        "precisionAtK": 0.3500000000000001,
+        "recallAtK": 0.3134348984348984,
+        "ndcgAtK": 0.39799225571766106,
+        "reciprocalRank": 0.5503787878787878,
+        "randomPrecisionAtK": 0.3368239408528946,
+        "randomNdcgAtK": 0.3717863245529315,
+        "tieAdjustedPrecisionAtK": 0.3446204508052334
+      }
+    },
+    "all/holdout": {
+      "product": {
+        "vacancies": 9,
+        "pairs": 199,
+        "precisionAtK": 0.2666666666666667,
+        "recallAtK": 0.28743961352657005,
+        "ndcgAtK": 0.33428558445579387,
+        "reciprocalRank": 0.5925925925925927,
+        "randomPrecisionAtK": 0.31083687036067986,
+        "randomNdcgAtK": 0.36213883487859766,
+        "tieAdjustedPrecisionAtK": 0.30370370370370375
+      },
+      "lexical": {
+        "vacancies": 9,
+        "pairs": 199,
+        "precisionAtK": 0.2888888888888889,
+        "recallAtK": 0.35185185185185186,
+        "ndcgAtK": 0.3652824415253039,
+        "reciprocalRank": 0.5652557319223985,
+        "randomPrecisionAtK": 0.31083687036067986,
+        "randomNdcgAtK": 0.36213883487859766,
+        "tieAdjustedPrecisionAtK": 0.2888888888888889
+      },
+      "stack": {
+        "vacancies": 9,
+        "pairs": 199,
+        "precisionAtK": 0.26666666666666666,
+        "recallAtK": 0.3059581320450886,
+        "ndcgAtK": 0.3564974781544001,
+        "reciprocalRank": 0.6114035087719298,
+        "randomPrecisionAtK": 0.31083687036067986,
+        "randomNdcgAtK": 0.36213883487859766,
+        "tieAdjustedPrecisionAtK": 0.2925925925925926
+      }
+    },
+    "all/combined": {
+      "product": {
+        "vacancies": 29,
+        "pairs": 656,
+        "precisionAtK": 0.36551724137931035,
+        "recallAtK": 0.33856178803705045,
+        "ndcgAtK": 0.40488824967061143,
+        "reciprocalRank": 0.5865353037766831,
+        "randomPrecisionAtK": 0.3287589879415176,
+        "randomNdcgAtK": 0.36879227603331066,
+        "tieAdjustedPrecisionAtK": 0.38091954022988506
+      },
+      "lexical": {
+        "vacancies": 29,
+        "pairs": 656,
+        "precisionAtK": 0.31034482758620696,
+        "recallAtK": 0.3186682091854505,
+        "ndcgAtK": 0.35186954075710014,
+        "reciprocalRank": 0.5360974274767378,
+        "randomPrecisionAtK": 0.3287589879415176,
+        "randomNdcgAtK": 0.36879227603331066,
+        "tieAdjustedPrecisionAtK": 0.31034482758620696
+      },
+      "stack": {
+        "vacancies": 29,
+        "pairs": 656,
+        "precisionAtK": 0.3241379310344828,
+        "recallAtK": 0.3111145226587506,
+        "ndcgAtK": 0.3851145661290628,
+        "reciprocalRank": 0.5693174943628663,
+        "randomPrecisionAtK": 0.3287589879415176,
+        "randomNdcgAtK": 0.36879227603331066,
+        "tieAdjustedPrecisionAtK": 0.3284738741185518
+      }
+    }
+  },
+  "holdoutManifest": [
+    {
+      "id": "vacancy-0c8f565729c9588b",
+      "supported": false,
+      "pairs": 49
+    },
+    {
+      "id": "vacancy-f0af44cc15ad4320",
+      "supported": true,
+      "pairs": 13
+    },
+    {
+      "id": "vacancy-8a78270ae1494fa9",
+      "supported": true,
+      "pairs": 12
+    },
+    {
+      "id": "vacancy-b40f0924c2c231ae",
+      "supported": false,
+      "pairs": 16
+    },
+    {
+      "id": "vacancy-1196907d29047882",
+      "supported": false,
+      "pairs": 9
+    },
+    {
+      "id": "vacancy-867bb2723ada03b0",
+      "supported": false,
+      "pairs": 14
+    },
+    {
+      "id": "vacancy-e5ac5262fe93fe89",
+      "supported": false,
+      "pairs": 9
+    },
+    {
+      "id": "vacancy-56d30bd2f5d1f57e",
+      "supported": true,
+      "pairs": 13
+    },
+    {
+      "id": "vacancy-58836fb19b169550",
+      "supported": true,
+      "pairs": 64
+    }
+  ],
+  "limitations": [
+    "В исходных данных нет результатов тестов, подтверждённых грейдов или истории ФСП. Они остаются неизвестными.",
+    "Проверяется ранжирование по текстам и доступным полям, а не полный сценарий каталога с подтверждёнными категориями.",
+    "Навыки вакансии — предложения парсера, не обязательные требования, подтверждённые работодателем. Шаблоны ролей не добавляются.",
+    "Confirmed/failed — неточный сигнал соответствия после скрининга. Это не факты найма и не вероятности.",
+    "К каждой вакансии заранее отобран свой пул резюме. Метрики не оценивают поиск по всему рынку.",
+    "Специализация и грейд из текста резюме не подтверждены тестом: баллы за подтверждённую категорию не начисляются.",
+    "Development и holdout не пересекаются по вакансиям и резюме. Ошибки отдельных вакансий анализируются только на development.",
+    "TF-IDF по полному профессиональному тексту — отдельный baseline. Рабочий бленд использует ограниченное лексическое дополнение только по описаниям выполненной работы внутри компонента резюме; это не семантические embeddings.",
+    "Веса в этом прогоне не подбираются. Веса ФСП и тестов нельзя калибровать по этому датасету.",
+    "При равных баллах используется порядок анонимных идентификаторов. Tie P@5 показывает результат без влияния этой случайности.",
+    "The same external holdout was seen before this blend. This is a final reproduction after development-only selection, not a newly blind validation.",
+    "The blended method lowered deterministic P@5 on the previously seen external holdout from 35% to 30%; MRR remains 87.5%. The development selection tradeoff is retained in matching-blend-experiment.json."
+  ],
+  "reproduce": "node scripts/benchmarks/talentmatch.mjs --input /local/talentmatch/source.json --output output/benchmarks/blend-final"
+}

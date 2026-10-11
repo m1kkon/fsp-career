@@ -1,0 +1,2066 @@
+{
+  "version": "domain-challenge-authored-v1",
+  "asOf": "2026-10-11T19:00:00Z",
+  "weights": {
+    "spec": 25,
+    "grade": 15,
+    "stack": 12,
+    "resume": 20,
+    "test": 12,
+    "fsp": 6,
+    "format": 4,
+    "salary": 4,
+    "domain": 2
+  },
+  "dataset": {
+    "scenarios": 8,
+    "pairs": 96,
+    "type": "Fresh authored semantic transfer challenge; not external holdout or real-user qualification ground truth"
+  },
+  "metricDefinitions": {
+    "primary": "Binary relevant iff authored professional relevance>=2 and authored eligibility=pass. P@5, Recall@5, binary nDCG@5 and full-pool MRR use this label.",
+    "gradedNdcgAtFive": "Linear graded gains 0–3, with unknown/fail eligibility set to zero; ideal order is computed over the same pool.",
+    "textOnlyPrecisionAtFive": "Professional relevance>=2 without eligibility; separate diagnostic, not the primary ranking metric.",
+    "precisionAtFiveCeiling": "Maximum possible P@5 in each pool given its relevant eligible count; fewer than five positives lowers the ceiling.",
+    "fractionOfAvailableTopFiveRelevant": "Hits in top five divided by min(5,relevant eligible count). This is not market accuracy.",
+    "ties": "Expected binary P@5 under random ID order within identical actual non-ID sorting signals.",
+    "averaging": "Macro average over the 8 needs. Baselines have the same complete professional text/technologies; filtered baselines use product eligibility, never authored truth."
+  },
+  "summary": {
+    "full": {
+      "precisionAtK": 0.425,
+      "recallAtK": 0.49375,
+      "ndcgAtK": 0.41165999104897294,
+      "reciprocalRank": 0.4625,
+      "randomPrecisionAtK": 0.3541666666666667,
+      "randomNdcgAtK": 0.3919215712236179,
+      "tieAdjustedPrecisionAtK": 0.425,
+      "gradedNdcgAtFive": 0.5770414201991152,
+      "textOnlyPrecisionAtFive": 0.425,
+      "precisionAtFiveCeiling": 0.8499999999999999,
+      "fractionOfAvailableTopFiveRelevant": 0.49375,
+      "invalidTopFive": 0
+    },
+    "tfidf": {
+      "precisionAtK": 0.4,
+      "recallAtK": 0.46875,
+      "ndcgAtK": 0.41489339431236527,
+      "reciprocalRank": 0.53125,
+      "randomPrecisionAtK": 0.3541666666666667,
+      "randomNdcgAtK": 0.3919215712236179,
+      "tieAdjustedPrecisionAtK": 0.4,
+      "gradedNdcgAtFive": 0.400688369111943,
+      "textOnlyPrecisionAtFive": 0.75,
+      "precisionAtFiveCeiling": 0.8499999999999999,
+      "fractionOfAvailableTopFiveRelevant": 0.46875,
+      "invalidTopFive": 1.75
+    },
+    "stack": {
+      "precisionAtK": 0.4,
+      "recallAtK": 0.475,
+      "ndcgAtK": 0.46977294808900105,
+      "reciprocalRank": 0.6666666666666667,
+      "randomPrecisionAtK": 0.3541666666666667,
+      "randomNdcgAtK": 0.3919215712236179,
+      "tieAdjustedPrecisionAtK": 0.35890151515151525,
+      "gradedNdcgAtFive": 0.5386402907364791,
+      "textOnlyPrecisionAtFive": 0.525,
+      "precisionAtFiveCeiling": 0.8499999999999999,
+      "fractionOfAvailableTopFiveRelevant": 0.475,
+      "invalidTopFive": 0.625
+    },
+    "hard_filters_tfidf": {
+      "precisionAtK": 0.47500000000000003,
+      "recallAtK": 0.5625,
+      "ndcgAtK": 0.5845932231940578,
+      "reciprocalRank": 0.8125,
+      "randomPrecisionAtK": 0.3541666666666667,
+      "randomNdcgAtK": 0.3919215712236179,
+      "tieAdjustedPrecisionAtK": 0.47500000000000003,
+      "gradedNdcgAtFive": 0.6186148233938876,
+      "textOnlyPrecisionAtFive": 0.47500000000000003,
+      "precisionAtFiveCeiling": 0.8499999999999999,
+      "fractionOfAvailableTopFiveRelevant": 0.5625,
+      "invalidTopFive": 0
+    },
+    "hard_filters_stack": {
+      "precisionAtK": 0.5,
+      "recallAtK": 0.6,
+      "ndcgAtK": 0.5474212469583178,
+      "reciprocalRank": 0.6666666666666667,
+      "randomPrecisionAtK": 0.3541666666666667,
+      "randomNdcgAtK": 0.3919215712236179,
+      "tieAdjustedPrecisionAtK": 0.4722222222222223,
+      "gradedNdcgAtFive": 0.6187449357924217,
+      "textOnlyPrecisionAtFive": 0.5,
+      "precisionAtFiveCeiling": 0.8499999999999999,
+      "fractionOfAvailableTopFiveRelevant": 0.6,
+      "invalidTopFive": 0
+    }
+  },
+  "bySpecialization": {
+    "Backend": {
+      "full": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.45,
+        "ndcgAtK": 0.3933418779918251,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.375,
+        "randomNdcgAtK": 0.4001699363713009,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.46299655609175694,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.9,
+        "fractionOfAvailableTopFiveRelevant": 0.45,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.45,
+        "ndcgAtK": 0.42427305819174543,
+        "reciprocalRank": 0.6666666666666666,
+        "randomPrecisionAtK": 0.375,
+        "randomNdcgAtK": 0.4001699363713009,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.3862291575509901,
+        "textOnlyPrecisionAtFive": 0.8,
+        "precisionAtFiveCeiling": 0.9,
+        "fractionOfAvailableTopFiveRelevant": 0.45,
+        "invalidTopFive": 2
+      },
+      "stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.45,
+        "ndcgAtK": 0.5471551914492883,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.375,
+        "randomNdcgAtK": 0.4001699363713009,
+        "tieAdjustedPrecisionAtK": 0.375,
+        "gradedNdcgAtFive": 0.5645936394773972,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.9,
+        "fractionOfAvailableTopFiveRelevant": 0.45,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.575,
+        "ndcgAtK": 0.5728292509863648,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.375,
+        "randomNdcgAtK": 0.4001699363713009,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.5549001812126498,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.9,
+        "fractionOfAvailableTopFiveRelevant": 0.575,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.575,
+        "ndcgAtK": 0.622665000563191,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.375,
+        "randomNdcgAtK": 0.4001699363713009,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.6674986242235728,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.9,
+        "fractionOfAvailableTopFiveRelevant": 0.575,
+        "invalidTopFive": 0
+      }
+    },
+    "Frontend": {
+      "full": {
+        "precisionAtK": 0.8,
+        "recallAtK": 0.8,
+        "ndcgAtK": 0.6608397947263839,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.4166666666666667,
+        "randomNdcgAtK": 0.4166666666666667,
+        "tieAdjustedPrecisionAtK": 0.8,
+        "gradedNdcgAtFive": 0.7591077303431206,
+        "textOnlyPrecisionAtFive": 0.8,
+        "precisionAtFiveCeiling": 1,
+        "fractionOfAvailableTopFiveRelevant": 0.8,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.6,
+        "ndcgAtK": 0.5147714448836774,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.4166666666666667,
+        "randomNdcgAtK": 0.4166666666666667,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.5442686193950151,
+        "textOnlyPrecisionAtFive": 0.8,
+        "precisionAtFiveCeiling": 1,
+        "fractionOfAvailableTopFiveRelevant": 0.6,
+        "invalidTopFive": 1
+      },
+      "stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.4,
+        "ndcgAtK": 0.38356636737133565,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.4166666666666667,
+        "randomNdcgAtK": 0.4166666666666667,
+        "tieAdjustedPrecisionAtK": 0.4545454545454546,
+        "gradedNdcgAtFive": 0.4754863377386474,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 1,
+        "fractionOfAvailableTopFiveRelevant": 0.4,
+        "invalidTopFive": 0
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.6,
+        "ndcgAtK": 0.6992148198508501,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.4166666666666667,
+        "randomNdcgAtK": 0.4166666666666667,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.7983776289646104,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 1,
+        "fractionOfAvailableTopFiveRelevant": 0.6,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.4,
+        "ndcgAtK": 0.38356636737133565,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.4166666666666667,
+        "randomNdcgAtK": 0.4166666666666667,
+        "tieAdjustedPrecisionAtK": 0.5555555555555556,
+        "gradedNdcgAtFive": 0.4754863377386474,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 1,
+        "fractionOfAvailableTopFiveRelevant": 0.4,
+        "invalidTopFive": 0
+      }
+    },
+    "QA": {
+      "full": {
+        "precisionAtK": 0.2,
+        "recallAtK": 0.25,
+        "ndcgAtK": 0.15101961822780524,
+        "reciprocalRank": 0.2,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.2,
+        "gradedNdcgAtFive": 0.46706542157349196,
+        "textOnlyPrecisionAtFive": 0.2,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.25,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.2,
+        "recallAtK": 0.25,
+        "ndcgAtK": 0.16812753627111746,
+        "reciprocalRank": 0.25,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.2,
+        "gradedNdcgAtFive": 0.235104833174219,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.25,
+        "invalidTopFive": 2
+      },
+      "stack": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.8318724637288826,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.33333333333333337,
+        "gradedNdcgAtFive": 0.7210076721301507,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.2,
+        "recallAtK": 0.25,
+        "ndcgAtK": 0.24630238874073,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.2,
+        "gradedNdcgAtFive": 0.449561796816818,
+        "textOnlyPrecisionAtFive": 0.2,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.25,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.8318724637288826,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4444444444444445,
+        "gradedNdcgAtFive": 0.7210076721301507,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      }
+    },
+    "DevOps": {
+      "full": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.6096199500078984,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.7120462528130149,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.34620964322385606,
+        "reciprocalRank": 0.3333333333333333,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.28275877286255924,
+        "textOnlyPrecisionAtFive": 0.8,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 2
+      },
+      "stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.36331756126716835,
+        "reciprocalRank": 0.3333333333333333,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.33333333333333337,
+        "gradedNdcgAtFive": 0.4308378156123372,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.5855700749881525,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.5650480416863275,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.5143371794949736,
+        "reciprocalRank": 0.3333333333333333,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4444444444444445,
+        "gradedNdcgAtFive": 0.5827235835970183,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      }
+    },
+    "Data Science": {
+      "full": {
+        "precisionAtK": 0.30000000000000004,
+        "recallAtK": 0.375,
+        "ndcgAtK": 0.3438974012387554,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.30000000000000004,
+        "gradedNdcgAtFive": 0.5712633557765721,
+        "textOnlyPrecisionAtFive": 0.30000000000000004,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.375,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.30000000000000004,
+        "recallAtK": 0.375,
+        "ndcgAtK": 0.3048099750039492,
+        "reciprocalRank": 0.41666666666666663,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.30000000000000004,
+        "gradedNdcgAtFive": 0.3249543701158099,
+        "textOnlyPrecisionAtFive": 0.7,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.375,
+        "invalidTopFive": 2
+      },
+      "stack": {
+        "precisionAtK": 0.30000000000000004,
+        "recallAtK": 0.375,
+        "ndcgAtK": 0.3218121978546326,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.33333333333333337,
+        "gradedNdcgAtFive": 0.4815024603658662,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.375,
+        "invalidTopFive": 1
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.625,
+        "ndcgAtK": 0.5840637681355587,
+        "reciprocalRank": 0.75,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.5,
+        "gradedNdcgAtFive": 0.6224063228102227,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.625,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.5,
+        "recallAtK": 0.625,
+        "ndcgAtK": 0.48138577510409397,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4444444444444445,
+        "gradedNdcgAtFive": 0.6230731718511209,
+        "textOnlyPrecisionAtFive": 0.5,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.625,
+        "invalidTopFive": 0
+      }
+    },
+    "ML Engineering": {
+      "full": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.3973220069685352,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4,
+        "gradedNdcgAtFive": 0.609592133126636,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 0
+      },
+      "tfidf": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.8318724637288826,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.7210076721301507,
+        "textOnlyPrecisionAtFive": 0.8,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 1
+      },
+      "stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.44149241373678083,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.33333333333333337,
+        "gradedNdcgAtFive": 0.5895983007241701,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 0
+      },
+      "hard_filters_tfidf": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.75,
+        "ndcgAtK": 0.8318724637288826,
+        "reciprocalRank": 1,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.6,
+        "gradedNdcgAtFive": 0.7813181116376003,
+        "textOnlyPrecisionAtFive": 0.6,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.75,
+        "invalidTopFive": 0
+      },
+      "hard_filters_stack": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.5,
+        "ndcgAtK": 0.44149241373678083,
+        "reciprocalRank": 0.5,
+        "randomPrecisionAtK": 0.3333333333333333,
+        "randomNdcgAtK": 0.3836732060759351,
+        "tieAdjustedPrecisionAtK": 0.4444444444444445,
+        "gradedNdcgAtFive": 0.5895983007241701,
+        "textOnlyPrecisionAtFive": 0.4,
+        "precisionAtFiveCeiling": 0.8,
+        "fractionOfAvailableTopFiveRelevant": 0.5,
+        "invalidTopFive": 0
+      }
+    }
+  },
+  "checks": {
+    "eligibilityCorrect": 96,
+    "explanationsCorrect": 96,
+    "pairs": 96
+  },
+  "cases": [
+    {
+      "id": "tenant-boundary",
+      "spec": "Backend",
+      "pairs": 12,
+      "relevantEligible": 5,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.34519134224686937,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.4404125645416143,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.48522855511632257,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.356428412600355,
+          "textOnlyPrecisionAtFive": 1,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 3
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.5087403079104241,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.4166666666666667,
+          "gradedNdcgAtFive": 0.4896301676761155,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.5531464700081437,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.508154723016234,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.5087403079104241,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.5555555555555556,
+          "gradedNdcgAtFive": 0.5378190232264857,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "tenant-boundary-login-only",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "tenant-boundary-api-only",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "tenant-boundary-vocabulary",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 71,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "tenant-boundary-direct-denial",
+          "professionalRelevance": 0,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 71,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "tenant-boundary-ui-and-server",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 71,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [
+        "tenant-boundary-server-scope",
+        "tenant-boundary-english-paraphrase",
+        "tenant-boundary-row-policy"
+      ],
+      "nonRelevantTopFive": [
+        "tenant-boundary-login-only",
+        "tenant-boundary-vocabulary",
+        "tenant-boundary-direct-denial"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "query-amplification",
+      "spec": "Backend",
+      "pairs": 12,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.44149241373678083,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.48558054764189956,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.36331756126716835,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.41602990250162514,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.5855700749881525,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.6395571112786788,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.592512031964586,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.6016456394090657,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.7365896932159578,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.7971782252206597,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "query-amplification-unrelated-mixed",
+          "professionalRelevance": 0,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 87,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 14,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "query-amplification-orm",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 83,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 14,
+            "test": 7,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "query-amplification-small-batch",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 76,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 3,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "query-amplification-memory-shortcut",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "query-amplification-terms",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "query-amplification-bounded-fetch",
+        "query-amplification-english-batch"
+      ],
+      "nonRelevantTopFive": [
+        "query-amplification-unrelated-mixed",
+        "query-amplification-memory-shortcut",
+        "query-amplification-terms"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "locale-layout",
+      "spec": "Frontend",
+      "pairs": 12,
+      "relevantEligible": 5,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.8,
+          "recallAtK": 0.8,
+          "ndcgAtK": 0.6608397947263839,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.8,
+          "gradedNdcgAtFive": 0.7591077303431206,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.8,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.6,
+          "ndcgAtK": 0.5147714448836774,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.5442686193950151,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.6,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.38356636737133565,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.4545454545454546,
+          "gradedNdcgAtFive": 0.4754863377386474,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 0
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.6,
+          "ndcgAtK": 0.6992148198508501,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.7983776289646104,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.6,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.4,
+          "ndcgAtK": 0.38356636737133565,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.4166666666666667,
+          "randomNdcgAtK": 0.4166666666666667,
+          "tieAdjustedPrecisionAtK": 0.5555555555555556,
+          "gradedNdcgAtFive": 0.4754863377386474,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 1,
+          "fractionOfAvailableTopFiveRelevant": 0.4,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "locale-layout-separate-projects",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 93,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "locale-layout-direction-only",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 92,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "locale-layout-senior-transfer",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 91,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 9,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "locale-layout-english-paraphrase",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 91,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 9,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "locale-layout-semantic-directions",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 90,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "locale-layout-translation-plurals"
+      ],
+      "nonRelevantTopFive": [
+        "locale-layout-separate-projects"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "flaky-test-isolation",
+      "spec": "QA",
+      "pairs": 12,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.15101961822780524,
+          "reciprocalRank": 0.2,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.46706542157349196,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.16812753627111746,
+          "reciprocalRank": 0.25,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.235104833174219,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.8318724637288826,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.7210076721301507,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.24630238874073,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.449561796816818,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.8318724637288826,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.7210076721301507,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "flaky-test-isolation-manual",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "flaky-test-isolation-terms",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "flaky-test-isolation-future",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "flaky-test-isolation-retry",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "flaky-test-isolation-clock-only",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "flaky-test-isolation-reproduced-order",
+        "flaky-test-isolation-english-paraphrase",
+        "flaky-test-isolation-data-isolation"
+      ],
+      "nonRelevantTopFive": [
+        "flaky-test-isolation-manual",
+        "flaky-test-isolation-terms",
+        "flaky-test-isolation-future",
+        "flaky-test-isolation-retry"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "image-provenance",
+      "spec": "DevOps",
+      "pairs": 12,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.6096199500078984,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.7120462528130149,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.34620964322385606,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.28275877286255924,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.36331756126716835,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.4308378156123372,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 1
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.5855700749881525,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.5650480416863275,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.5143371794949736,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.5827235835970183,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "image-provenance-scan-only",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 93,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "image-provenance-digest-only",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 92,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "image-provenance-english-paraphrase",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 91,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 9,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "image-provenance-policy",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 89,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 7,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "image-provenance-context-mix",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 84,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 11,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "image-provenance-verified-digest"
+      ],
+      "nonRelevantTopFive": [
+        "image-provenance-scan-only",
+        "image-provenance-context-mix"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "entity-resolution",
+      "spec": "Data Science",
+      "pairs": 12,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.44149241373678083,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.6412816077302482,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.19519002499605084,
+          "reciprocalRank": 0.3333333333333333,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.26422827051289816,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.3973220069685352,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.6279270780742341,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.4144299250118475,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.5098722363242677,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.3973220069685352,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.6279270780742341,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "entity-resolution-all-pairs",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 87,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "entity-resolution-fuzzy-only",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 85,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 13,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "entity-resolution-blocking-threshold",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 84,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 14,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "entity-resolution-mixed",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        },
+        {
+          "id": "entity-resolution-future",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 73,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 2
+          }
+        }
+      ],
+      "missedRelevant": [
+        "entity-resolution-english-paraphrase",
+        "entity-resolution-phone-exact"
+      ],
+      "nonRelevantTopFive": [
+        "entity-resolution-all-pairs",
+        "entity-resolution-mixed",
+        "entity-resolution-future"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "seasonal-alarms",
+      "spec": "Data Science",
+      "pairs": 12,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.24630238874073,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.2,
+          "gradedNdcgAtFive": 0.501245103822896,
+          "textOnlyPrecisionAtFive": 0.2,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.4144299250118475,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.38568046971872166,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 2
+        },
+        "stack": {
+          "precisionAtK": 0.2,
+          "recallAtK": 0.25,
+          "ndcgAtK": 0.24630238874073,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.33507784265749835,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.25,
+          "invalidTopFive": 2
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.75369761125927,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.7349404092961777,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.5654495432396527,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.6182192656280078,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "seasonal-alarms-threshold",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "seasonal-alarms-quality-only",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 2,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "seasonal-alarms-terms",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 71,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "seasonal-alarms-future",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 71,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "seasonal-alarms-regression",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 71,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [
+        "seasonal-alarms-regime-residual",
+        "seasonal-alarms-english-paraphrase",
+        "seasonal-alarms-seasonality-only"
+      ],
+      "nonRelevantTopFive": [
+        "seasonal-alarms-threshold",
+        "seasonal-alarms-terms",
+        "seasonal-alarms-future",
+        "seasonal-alarms-regression"
+      ],
+      "eligibilityErrors": []
+    },
+    {
+      "id": "training-resume",
+      "spec": "ML Engineering",
+      "pairs": 12,
+      "relevantEligible": 4,
+      "metrics": {
+        "full": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.3973220069685352,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4,
+          "gradedNdcgAtFive": 0.609592133126636,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.8318724637288826,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.7210076721301507,
+          "textOnlyPrecisionAtFive": 0.8,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 1
+        },
+        "stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.44149241373678083,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.33333333333333337,
+          "gradedNdcgAtFive": 0.5895983007241701,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.6,
+          "recallAtK": 0.75,
+          "ndcgAtK": 0.8318724637288826,
+          "reciprocalRank": 1,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.6,
+          "gradedNdcgAtFive": 0.7813181116376003,
+          "textOnlyPrecisionAtFive": 0.6,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.75,
+          "invalidTopFive": 0
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4,
+          "recallAtK": 0.5,
+          "ndcgAtK": 0.44149241373678083,
+          "reciprocalRank": 0.5,
+          "randomPrecisionAtK": 0.3333333333333333,
+          "randomNdcgAtK": 0.3836732060759351,
+          "tieAdjustedPrecisionAtK": 0.4444444444444445,
+          "gradedNdcgAtFive": 0.5895983007241701,
+          "textOnlyPrecisionAtFive": 0.4,
+          "precisionAtFiveCeiling": 0.8,
+          "fractionOfAvailableTopFiveRelevant": 0.5,
+          "invalidTopFive": 0
+        }
+      },
+      "eligibilityCorrect": 12,
+      "explanationsCorrect": 12,
+      "topFive": [
+        {
+          "id": "training-resume-keywords",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 91,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 20,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "training-resume-single-worker",
+          "professionalRelevance": 2,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 75,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 5,
+            "test": 10,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "training-resume-weight-only",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 74,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 3,
+            "test": 11,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "training-resume-serving-context",
+          "professionalRelevance": 1,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 0,
+            "test": 12,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        },
+        {
+          "id": "training-resume-full-state",
+          "professionalRelevance": 3,
+          "truthEligibility": "pass",
+          "productEligibility": "pass",
+          "score": 72,
+          "parts": {
+            "spec": 25,
+            "grade": 15,
+            "stack": 12,
+            "resume": 4,
+            "test": 8,
+            "fsp": 0,
+            "format": 4,
+            "salary": 4,
+            "domain": 0
+          }
+        }
+      ],
+      "missedRelevant": [
+        "training-resume-english-paraphrase",
+        "training-resume-model-optimizer"
+      ],
+      "nonRelevantTopFive": [
+        "training-resume-keywords",
+        "training-resume-weight-only",
+        "training-resume-serving-context"
+      ],
+      "eligibilityErrors": []
+    }
+  ],
+  "limitations": [
+    "Authored labels are independent of the scoring formula but are not human participant/external expert ground truth. Ambiguous labels must be identified in the independent review.",
+    "This deliberately challenging authored sample is not a prevalence estimate of real market profiles, a training target, a 90-point objective, or a new external holdout.",
+    "Five returned profiles can include non-relevant people when fewer than five relevant eligible people exist. Ceiling and Recall@5 prevent hiding that denominator.",
+    "Live employer need-to-selection and end-to-end testing with jury/users remain separate criterion 6.1 evidence.",
+    "The earlier 120-pair stress diagnostic was used as development evidence. This distinct 96-pair challenge was frozen before its first evaluation and is not a new market/user dataset.",
+    "The fresh challenge uses explicit mandatory facts and separately authored professional labels. Its six-year experience field denotes general professional experience, not an inferred commercial history for a particular language.",
+    "Matching changes must be selected without reading this challenge and committed before this evaluation. This report is not a training target, a jury score, or evidence of market-wide matching accuracy."
+  ],
+  "freezeCommit": "4d550e4",
+  "freeze": {
+    "version": "domain-challenge-authored-v1",
+    "asOf": "2026-10-11T19:00:00Z",
+    "scenarioCount": 8,
+    "profileCount": 96,
+    "specializationCount": 6,
+    "expandedFixtureSha256": "ca7bcd703bbb1b28cfb7e5579572e98c524f21d1dde6bc9a70b7e24ef32f89d0",
+    "files": {
+      "scripts/benchmarks/fixtures/domain-challenge-v1.mjs": "126f4b4736094b3389b5b0ad2044810b13bf4a26a514f60bbae4fd94ad95bd9b",
+      "docs/domain-challenge-rubric.md": "e9d7efdf9300a6f86ce49967830bc629e6f8eb77559abb9a9b681f636255b477"
+    },
+    "evaluated": false,
+    "labelsAuthoredBeforeEvaluation": true,
+    "externalHoldout": false,
+    "candidateImplementationFrozen": false,
+    "structuralValidation": {
+      "uniqueIds": true,
+      "completeReasons": true,
+      "eligibilityMatchesExplicitMandatoryFacts": true,
+      "algorithmImported": false
+    },
+    "protocol": "Dataset freeze before evaluation. Matching agent must freeze candidate before reading texts/labels. Challenge is not used to select a fix. Single final evaluation with baseline and identical mandatory filters."
+  },
+  "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c",
+  "implementation": {
+    "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+    "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+    "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
+    "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
+    "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+    "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+    "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791"
+  },
+  "sourceFreeze": {
+    "file": "docs/matching-blend-freeze.json",
+    "sha256": "eb407bb236672e24ca3f636d6ae0d82733551998f2d66e795507acf05239c8c5",
+    "snapshot": {
+      "version": 1,
+      "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c",
+      "frozenAt": "2026-10-11T19:59:33.150654+00:00",
+      "implementation": {
+        "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+        "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+        "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
+        "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
+        "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+        "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+        "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791"
+      },
+      "challengeFreezeCommit": "4d550e4",
+      "evaluationStarted": false,
+      "selection": "Two bounded variants evaluated only on TalentMatch development and previously known stress diagnostic; A selected before fresh challenge evaluation.",
+      "limits": [
+        "No fresh challenge results were used to tune implementation, weights or labels.",
+        "TalentMatch holdout has been seen historically; its final reproduction is not a new blind experiment."
+      ]
+    }
+  }
+}

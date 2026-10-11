@@ -26,8 +26,13 @@
 
 | Отчёт | Статус |
 |---|---|
-| [Текущая проверка продукта](current-product-validation.json) | 427/427 в CI с PostgreSQL/Docker; локальные проверки, синтетический holdout и хеши реализации |
-| [Текущая проверка matching](matching-current-validation.json) | Точные хеши реализации, 35% на ранее известном holdout; ограничения и 69 языковых/matching тестов |
+| [Текущая проверка продукта](current-product-validation.json) | 526/526 в CI с PostgreSQL/Docker, все 559 эталонов/2881 проверка; локальные проверки, синтетический holdout и хеши реализации |
+| [Текущий blend и внешние baseline](matching-blend-validation.json) | Одна текущая реализация на TalentMatch: P@5 30%, nDCG@5 0,4704; метрики и provenance |
+| [Новая авторская диагностика](domain-challenge-validation.json) | 8 потребностей/96 пар, freeze до первого измерения; сильные baseline выше продукта |
+| [Исторический H2](matching-selected-validation.json) | Сохранённый snapshot до blend; его 35% не относятся к текущему методу |
+| [Доменные регрессии и абляции](domain-matching-comparison.json) | 24 простых авторских потребности/480 пар; соответствие заданным правилам, не доказательство качества на рынке |
+| [Функциональные guards подбора](full-product-matching-guards.json) | 20/20 авторских проверок подтверждения категории, тестов, ФСП, пустой истории и приватности |
+| [Предыдущая проверка matching](matching-current-validation.json) | Исторический snapshot до H2, точные хеши, 69 языковых/matching тестов |
 | [Улучшение v2 → v3](grade-hardening.md) · [JSON](grade-hardening-results.json) | Последний эксперимент: Middle, повторяемость, сложность кодинга, языковые регрессии |
 | [Первый этап исходная модель → v2](synthetic-validation.md) · [JSON](synthetic-validation-results.json) | Исторический эксперимент; его численные результаты не пересчитаны под v3 |
 | [Архив проверок 5–7 октября](history/validation-2026-10-05-to-07.md) | Прежние Sites/D1/Vinext и переход на PostgreSQL; не инструкция текущего запуска |
