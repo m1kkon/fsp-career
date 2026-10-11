@@ -307,6 +307,6 @@ test('coding editor has editable example input, separate output and bounded subm
  vm.runInContext('assessmentDraftKey=()=>"code-ui";',context);
  const editor=vm.runInContext('assessmentCodingMarkup(q,null)',context),actions=vm.runInContext('assessmentCodingActions(q,true)',context);
  assert.match(editor,/name="assessmentStdin"/);assert.match(editor,/>\[1,2\]<\/textarea>/);assert.ok(editor.indexOf('coding-editor-wrap')<editor.indexOf('coding-io'));
- assert.match(actions,/Отправить/);assert.match(actions,/Далее/);assert.match(actions,/1 из 3/);assert.equal((actions.match(/<circle /g)||[]).length,4);assert.equal((actions.match(/stroke="#60c84c"/g)||[]).length,2);assert.match(actions,/Пройдено тестов: 2 из 4/);
+ assert.match(actions,/Отправить/);assert.match(actions,/Далее/);assert.match(actions,/1 из 3/);assert.equal((actions.match(/<circle /g)||[]).length,4);assert.equal((actions.match(/stroke="#60c84c"/g)||[]).length,2);assert.match(actions,/Последняя отправка: пройдено тестов 2 из 4/);
  vm.runInContext('q.coding.submission.used=3;',context);assert.match(vm.runInContext('assessmentCodingActions(q,true)',context),/data-action="assessment-code-submit" disabled/);
 });

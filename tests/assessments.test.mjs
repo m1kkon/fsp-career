@@ -434,6 +434,16 @@ test('a correct coding response can change the second-part route without affecti
 });
 
 async function codingAttempt(){const repo=memory(),a=candidate();let {assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});for(let i=0;i<4;i++){const t=await repo.record(view.id),q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);view=await answer(repo,a,view.id,q,correctTestAnswer(q));}const t=await repo.record(view.id),q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);return {repo,a,view,q};}
+test('candidate coding feedback separates best graded credit from the last submission and an unsent draft',async()=>{
+ const {repo,view,q}=await codingAttempt(),stored=await repo.record(view.id),m=stored.modules[0],total=q.coding.tests.length;
+ m.answers[q.id]={value:{source:'checked best source',judged:true,correct:true,passed:total,total},savedAt:Date.now()};
+ m.codingDrafts={[q.id]:'edited unsent draft'};
+ m.codingSubmissions={[q.id]:[{id:'best',source:'checked best source',passed:total,total,results:Array(total).fill(true)},{id:'last',source:'last checked source',passed:1,total,results:Array.from({length:total},(_,i)=>i===0)}]};
+ const publicView=assessmentView(stored),feedback=publicView.currentModule.questions[publicView.currentModule.questionIndex].coding.submission;
+ assert.equal(feedback.used,2);assert.equal(feedback.lastSource,'last checked source');assert.equal(feedback.passed,1);assert.deepEqual(feedback.best,{passed:total,total});
+ assert.equal(publicView.currentModule.answers[q.id],'edited unsent draft');assert.ok(!('source' in feedback.best));
+ assert.ok(!('correct' in feedback));assert.equal(m.answers[q.id].value.source,'checked best source');
+});
 test('coding run uses editable stdin without grading; submission limit, idempotency and best result survive drafts and Next',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
  const {repo,a,q,view:initial}=await codingAttempt();let view=initial;
  const request=(action,extra={})=>assessmentAction(repo,a,{action,id:view.id,revision:view.revision,questionId:q.id,...extra});
@@ -452,6 +462,7 @@ test('coding run uses editable stdin without grading; submission limit, idempote
  assert.equal(view.currentModule.questions[4].coding.submission.passed,q.coding.tests.length);
  const concurrent=await Promise.allSettled(['third-submit','competing-submit'].map(submissionId=>request('assessment-submit-code',{source:'print("wrong")',submissionId})));assert.equal(concurrent.filter(r=>r.status==='fulfilled').length,1);assert.equal(concurrent.find(r=>r.status==='rejected').reason.status,409);view=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;
  assert.equal(view.currentModule.questions[4].coding.submission.used,3);assert.equal(view.currentModule.questions[4].coding.submission.passed,0);
+ assert.deepEqual(view.currentModule.questions[4].coding.submission.best,{passed:q.coding.tests.length,total:q.coding.tests.length},'credit retains the best checked solution even after a worse submission');
  await assert.rejects(request('assessment-submit-code',{source:'print(1)',submissionId:'fourth-submit'}),/3 попытки/);
  await assert.rejects(request('assessment-answer',{answer:MIXED_CODING_SOLUTIONS.get(q.id)}),/Отправить/);
  view=(await request('assessment-draft',{answer:'print("draft")',stdin:'changed input'})).assessment;

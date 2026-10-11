@@ -189,7 +189,7 @@ test('coding Next requires explicit confirmation without a submission, and a sta
 test('coding Next proceeds after a judged submission without another interruption',async()=>{
  const {context}=render(base);let advanced=0;context.clearTimeout=()=>{};
  context.modal=()=>assert.fail('judged code should not show an unsubmitted warning');context.assessmentRun=async()=>advanced++;
- context.assessmentAccept({id:'a',status:'active',currentModule:{id:'python',questionIndex:0,answers:{},questions:[{id:'q',format:'coding',coding:{submission:{used:1,passed:4,total:4}}}]}});
+ context.assessmentAccept({id:'a',status:'active',currentModule:{id:'python',questionIndex:0,answers:{q:'print(1)'},questions:[{id:'q',format:'coding',coding:{starter:'',submission:{used:1,passed:4,total:4,lastSource:'print(1)'}}}]}});
  await context.assessmentHandleAction({dataset:{action:'assessment-code-next'}});assert.equal(advanced,1);
 });
 
@@ -217,4 +217,137 @@ test('switching mobile coding panes changes presentation without replacing edito
  context.assessmentAccept({id:'a',status:'active',currentModule:{id:'python',questionIndex:0,answers:{q:'print(2)'},questions:[{id:'q',format:'coding'}]}});
  context.assessmentSwitchCodingPanel('solution');assert.equal(pane,'solution');assert.equal(tabs[1].selected,'true');assert.equal(tabs[0].selected,'false');
  context.assessmentSwitchCodingPanel('invalid');assert.equal(pane,'solution');
+});
+
+test('reset keeps edited code until confirmed, and an expired reset cannot affect the next question',async()=>{
+ const {context}=render(base);let dialog,saves=0,renders=0;
+ context.clearTimeout=()=>{};context.render=()=>renders++;context.close=()=>{};
+ context.assessmentQueueDraft=()=>saves++;
+ context.button=(label,action,attrs)=>`<button data-action="${action}" ${attrs||''}>${label}</button>`;
+ context.modal=(title,description,body)=>{dialog={title,description,body};};
+ const attempt=(id,answer)=>({id:'a',status:'active',currentModule:{id:'python',questionIndex:Number(id.slice(1))-1,answers:{[id]:answer},questions:[...Array.from({length:Number(id.slice(1))-1},(_,i)=>({id:'closed'+i})),{id,format:'coding',coding:{starter:'print(0)'}}]}});
+ context.assessmentAccept(attempt('q1','print(42)'));
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-reset'}});
+ assert.equal(saves,0);assert.equal(renders,0);assert.equal(runInNewContext('assessmentDraft',context),'print(42)');assert.match(dialog.body,/data-id="q1"/);
+ context.assessmentAccept(attempt('q2','print(7)'));
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-reset-confirmed',attemptId:'a',id:'q1'}});
+ assert.equal(saves,0);assert.equal(runInNewContext('assessmentDraft',context),'print(7)');
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-reset-confirmed',attemptId:'a',id:'q2'}});
+ assert.equal(saves,1);assert.equal(runInNewContext('assessmentDraft',context),'print(0)');
+ context.assessmentResetCode();assert.equal(saves,1,'unchanged starter code needs neither confirmation nor a save');
+});
+
+test('skip protects a selected or numeric answer, allows empty skips, and rejects stale confirmation',async()=>{
+ const {context}=render(base),calls=[];let dialog;
+ context.clearTimeout=()=>{};context.close=()=>{};context.assessmentRun=async(action,body)=>calls.push({action,body});
+ context.button=(label,action,attrs)=>`<button data-action="${action}" ${attrs||''}>${label}</button>`;
+ context.modal=(title,description,body)=>{dialog={title,description,body};};
+ const attempt=(id,format,answer)=>({id:'a',status:'active',currentModule:{id:'sql',questionIndex:Number(id.slice(1))-1,answers:{[id]:answer},questions:[...Array.from({length:Number(id.slice(1))-1},(_,i)=>({id:'closed'+i})),{id,format}]}});
+ context.assessmentAccept(attempt('q1','choice',0));
+ await context.assessmentHandleAction({dataset:{action:'assessment-question-next'}});
+ assert.equal(calls.length,0);assert.match(dialog.description,/ответ будет удалён/);
+ context.assessmentAccept(attempt('q2','numeric','0'));
+ await context.assessmentHandleAction({dataset:{action:'assessment-question-skip-confirmed',id:'q1',attemptId:'a'}});
+ assert.equal(calls.length,0);
+ await context.assessmentSkipQuestion();assert.match(dialog.body,/data-id="q2"/);assert.equal(calls.length,0);
+ await context.assessmentHandleAction({dataset:{action:'assessment-question-skip-confirmed',id:'q2',attemptId:'a'}});
+ assert.deepEqual(JSON.parse(JSON.stringify(calls)),[{action:'assessment-answer',body:{questionId:'q2',answer:null}}]);
+ context.assessmentAccept(attempt('q3','numeric','  '));await context.assessmentSkipQuestion();assert.equal(calls.length,2);
+});
+
+test('failed coding draft can be retried without grading or spending submissions, with quiet success',async()=>{
+ const {context}=render(base),calls=[];context.clearTimeout=()=>{};
+ const attempt={id:'a',status:'active',revision:0,currentModule:{id:'python',questionIndex:0,answers:{q:'print(42)'},questions:[{id:'q',format:'coding',coding:{starter:'',submission:{used:1,limit:3}}}]}};
+ context.assessmentAccept(attempt);let offline=true;
+ context.api=async body=>{calls.push(body);if(offline)throw new Error('offline');return {assessment:{...attempt,revision:1}};};
+ context.assessmentQueueDraft();await context.assessmentFlushDraft();
+ assert.match(context.assessmentDraftStatus(),/черновик/);assert.match(context.assessmentDraftStatusMarkup(),/Повторить сохранение/);assert.ok(!context.assessmentDraftStatus().includes('Ответить'));
+ offline=false;await context.assessmentHandleAction({dataset:{action:'assessment-draft-retry'}});
+ assert.equal(calls.at(-1).action,'assessment-draft');assert.equal(calls.at(-1).answer,'print(42)');
+ assert.ok(calls.every(c=>['assessment-draft','assessment-resume'].includes(c.action)));assert.equal(attempt.currentModule.questions[0].coding.submission.used,1);
+ assert.equal(context.assessmentDraftStatusMarkup(),'');
+});
+
+test('coding feedback distinguishes the last submission from the best credited result',()=>{
+ const {context}=render(base),html=context.assessmentCodingActions({coding:{submission:{used:3,limit:3,passed:1,total:4,results:[true,false,false,false],best:{passed:4,total:4}}}},true);
+ assert.match(html,/Последняя отправка: пройдено тестов 1 из 4/);assert.match(html,/В зачёт: 4\/4/);assert.match(html,/0 из 3 попыток осталось/);
+});
+
+test('public testing explanation matches adaptive daily-pool exams and defers variable limits to preparation',()=>{
+ const client=readFileSync(new URL('../public/mvp.js',import.meta.url),'utf8');
+ const method=client.slice(client.indexOf('function methodPage()'),client.indexOf('function ',client.indexOf('function methodPage()')+9));
+ assert.ok(!method.includes('Шесть вопросов'));assert.ok(!method.includes('20 минут'));assert.ok(!method.includes('67 баллов'));
+ assert.match(method,/на каждые 24 часа/);assert.match(method,/задания второй подбираются по ответам первой/);assert.match(method,/Кодинг включён в обе части/);
+});
+
+
+test('Next protects unjudged edits after resume, preserves the best result and rejects an expired warning',async()=>{
+ const {context}=render(base),calls=[];let dialog;
+ context.clearTimeout=()=>{};context.close=()=>{};
+ context.button=(label,action,attrs)=>`<button data-action="${action}" ${attrs||''}>${label}</button>`;
+ context.modal=(title,description,body)=>{dialog={title,description,body};};
+ context.assessmentRun=async(action,body)=>calls.push({action,body});
+ const attempt=(index,source)=>({id:'a',status:'active',currentModule:{id:'python',questionIndex:index,answers:{['q'+index]:source},questions:[...Array.from({length:index},(_,i)=>({id:'q'+i})),{id:'q'+index,format:'coding',coding:{starter:'print(0)',submission:{used:1,limit:3,lastSource:'print(1)',best:{passed:4,total:4}}}}]}});
+ context.assessmentAccept(attempt(0,'print(2)'));
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-next'}});
+ assert.equal(calls.length,0);assert.match(dialog.description,/предыдущий лучший результат/);assert.match(dialog.body,/Перейти с предыдущим результатом/);
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-leave',attemptId:'a',id:'q0'}});
+ assert.equal(calls.length,1);assert.equal(calls[0].body.questionId,'q0');
+ context.assessmentAccept(attempt(1,'print(3)'));
+ await context.assessmentHandleAction({dataset:{action:'assessment-code-leave',attemptId:'a',id:'q0'}});assert.equal(calls.length,1);
+ // Latest local editor value wins over the last autosaved draft.
+ context.app.querySelector=selector=>selector==='[name="assessmentCode"]'?{value:'print(1)'}:null;
+ await context.assessmentCodeNext();assert.equal(calls.length,2,'unchanged judged code closes without another warning');
+});
+
+test('exam preserves timer and elimination focus, while a new question gets its heading without the old cursor',()=>{
+ const {context}=render(base);let focused,selection;
+ context.document.activeElement={dataset:{action:'assessment-toggle-timer'}};
+ const elements=new Map();context.app.querySelector=selector=>elements.get(selector)||null;
+ const target=selector=>elements.set(selector,{focus:()=>{focused=selector;},setSelectionRange:(...range)=>{selection=range;}});
+ target('[data-action="assessment-toggle-timer"]');target('[data-action="assessment-eliminate"][data-index="2"]');target('[name="assessmentCode"]');target('#assessment-question-title');
+ context.assessmentRestoreExamFocus(context.assessmentExamFocusSnapshot(),false);assert.equal(focused,'[data-action="assessment-toggle-timer"]');
+ context.document.activeElement={dataset:{action:'assessment-eliminate',index:'2'}};
+ context.assessmentRestoreExamFocus(context.assessmentExamFocusSnapshot(),false);assert.equal(focused,'[data-action="assessment-eliminate"][data-index="2"]');
+ context.document.activeElement={name:'assessmentCode',selectionStart:8,selectionEnd:12};const snapshot=context.assessmentExamFocusSnapshot();
+ context.assessmentRestoreExamFocus(snapshot,false);assert.deepEqual(selection,[8,12]);selection=null;
+ context.assessmentRestoreExamFocus(snapshot,true);assert.equal(focused,'#assessment-question-title');assert.equal(selection,null,'cursor offsets belong only to the previous question');
+ context.overlay={firstElementChild:{}};focused=null;context.assessmentRestoreExamFocus(snapshot,true);assert.equal(focused,null,'an open dialog keeps focus');
+ const html=context.assessmentQuestionMarkup({prompt:'Сколько строк?'},'sql');assert.match(html,/aria-describedby="assessment-question-position"/);
+});
+
+test('submission budget and best-result policy are disclosed before accepting the test rules',async()=>{
+ const {context}=render(base);context.location.hash='#tests/start/backend';context.title=()=>'';context.render=()=>{};
+ context.api=async()=>({preparation:{targetId:'backend',day:{moduleConfigs:{}}}});
+ await context.assessmentLoadPreparation({id:'backend'});const html=context.assessmentTestsPage();
+ assert.ok(html.indexOf('3 отправки')<html.indexOf('name="accepted"'));assert.match(html,/лучший результат/);assert.match(html,/не расходуют отправки/);
+});
+
+test('coding grading announces the latest and retained best result once, without announcing saves or stale questions',async()=>{
+ const {context}=render(base),announcements=[];let restored=0;
+ const status={set textContent(value){announcements.push(value);}};
+ const submit={dataset:{action:'assessment-code-submit'},focus(){restored++;context.document.activeElement=submit;}};
+ context.document.activeElement=submit;
+ context.clearTimeout=()=>{};context.render=()=>{context.document.activeElement=null;};context.toast=()=>{};
+ context.app={querySelector:selector=>selector==='#assessment-submission-status'?status:selector==='[data-action="assessment-code-submit"]'?submit:null};
+ const attempt=(submission,id='code')=>({id:'attempt',status:'active',revision:submission.used,currentModule:{id:'python',questionIndex:0,answers:{},questions:[{id,format:'coding',coding:{submission}}]}});
+ context.assessmentAccept(attempt({used:0,limit:3}));
+ context.api=async()=>({assessment:attempt({used:1,limit:3,passed:3,total:4,best:{passed:3,total:4}})});
+ await context.assessmentRun('assessment-submit-code',{questionId:'code'});
+ assert.equal(restored,1);assert.equal(context.document.activeElement,submit);
+ assert.equal(announcements.length,1);assert.match(announcements[0],/Последняя отправка: 3 из 4\. В зачёт: 3 из 4\. Осталось отправок: 2/);
+ context.api=async()=>({assessment:attempt({used:2,limit:3,passed:1,total:4,best:{passed:3,total:4}})});
+ await context.assessmentRun('assessment-submit-code',{questionId:'code'});
+ assert.equal(announcements.length,2);assert.match(announcements[1],/Последняя отправка: 1 из 4\. В зачёт: 3 из 4\. Осталось отправок: 1/);
+ // Resume/re-render does not repeat the grading announcement, and normal autosave remains silent.
+ await context.assessmentRun('assessment-resume');assert.equal(announcements.length,2);
+ context.assessmentQueueDraft();await context.assessmentFlushDraft();assert.equal(announcements.length,2);
+ assert.equal(context.assessmentDraftStatus(),'');
+ // A late result for the closed question cannot announce feedback on its successor.
+ context.api=async()=>({assessment:attempt({used:0,limit:3},'next-code')});
+ const beforeRestore=restored;
+ await context.assessmentRun('assessment-submit-code',{questionId:'code'});assert.equal(announcements.length,2);
+ assert.equal(restored,beforeRestore);
+ const html=context.assessmentCodingRing({used:2,limit:3,passed:1,total:4,results:[true,false,false,false]});
+ assert.ok(html.includes('Последняя:'));assert.ok(html.includes('1/4'));
 });

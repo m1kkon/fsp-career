@@ -21,7 +21,7 @@ function assessmentGradeGap(r){
  if(rule.solved<rule.solvedMin)missing.push(`полностью решённая задача сложности ${rule.difficultyMin}+`);
  return missing.length?`<small class="assessment-grade-gap">Для ${esc(grade)}: ${missing.map(esc).join('; ')}.</small>`:'';
 }
-function assessmentResultRows(rows){if(!rows.length)return '';return `<div class="assessment-result-grid">${rows.map(r=>`<article class="assessment-result-card"><div class="eyebrow">${esc(r.name)}</div><strong>${r.score}<small>/100</small></strong><p>${esc(r.level)}</p>${r.gradeRequirements?`<small>Теория ${r.theoryScore}/100 · Кодинг ${r.codingScore}${r.codingScoreModel?'/100':'%'}</small>${r.codingScoreModel?`<small>Средний зачёт задач: ${r.codingCompletion}%. Балл кодинга учитывает сложность.</small>`:''}${assessmentGradeGap(r)}`:''}<small>${r.gradeRequirements?'Полностью выполнено: ':''}${r.correct} из ${r.total} зачётных · спецификация v${r.specVersion}</small></article>`).join('')}</div>`;}
+function assessmentResultRows(rows){if(!rows.length)return '';return `<div class="assessment-result-grid">${rows.map(r=>`<article class="assessment-result-card"><div class="eyebrow">${esc(r.name)}</div><strong>${r.score}<small>/100</small></strong><p>${esc(r.level)}</p>${r.gradeRequirements?`<small>Теория ${r.theoryScore}/100 · Кодинг ${r.codingScore}${r.codingScoreModel?'/100':'%'}</small>${r.codingScoreModel?`<small>Средний зачёт задач: ${r.codingCompletion}%. Балл кодинга учитывает сложность.</small>`:''}${assessmentGradeGap(r)}`:''}<small>${r.gradeRequirements?'Полностью выполнено: ':''}${r.correct} из ${r.total} зачётных</small><details class="assessment-result-details"><summary>Сведения о тесте</summary><p>Версия теста: ${esc(r.specVersion)}</p></details></article>`).join('')}</div>`;}
 // Called by mvp.js, which shares this module in the generated client bundle.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function assessmentProfileResults(){const histories=assessmentConfig().history,skills=histories.flatMap(h=>h.results.filter(r=>!assessmentConfig().modules.find(m=>m.id===r.moduleId)?.integration).map(r=>({...r,date:h.created,attempt:h.name}))),roles=histories.filter(h=>h.targetKind==='role');return `<article class="panel resume-section"><h2>Результаты навыков</h2>${skills.length?skills.map(r=>`<div class="assessment-profile-result"><div><strong>${esc(r.name)}</strong><small>${date(r.date)} · v${r.specVersion} · ${esc(r.attempt)}</small></div><span>${r.score}/100 · ${esc(r.level)}</span></div>`).join(''):'<p>Результаты отдельных навыков и модулей ролевых тестов появятся здесь.</p>'}<h2>Ролевые тесты</h2>${roles.length?roles.map(h=>`<div class="assessment-profile-result"><div><strong>${esc(h.name)}</strong><small>${date(h.created)} · пул v${h.dayVersion}</small></div><span>${h.status==='active'?'В процессе':h.roleResult?.completed?assessmentRoleOutcome(h.roleResult):'Не завершён'}</span></div>`).join(''):'<p>Комплексные тесты ещё не проходились.</p>'}</article>`;}
@@ -88,7 +88,7 @@ function assessmentStartPage(target){
  const structure=adaptive?`Каждый модуль — две части по ${partSize} заданий. Вторая часть зависит от ответов первой.`:'Состав каждого модуля зафиксирован до начала теста.';
  const coding=first.codingPerPart?`В каждой части — ${partSize-first.codingPerPart} обычных вопросов и ${first.codingPerPart} задания на кодинг.`:'';
  const selectedRules=target.kind==='role'?assessmentScoringDetails(configs,ids,grade,true):'';
- return `${title(target.name,target.kind==='role'?'Тест на роль':'Тест навыка')}<section class="panel assessment-start-panel"><form id="assessment-start-form" data-target-id="${esc(target.id)}"><div class="assessment-start-summary"><span>Время теста</span><strong>${prep.loading?'Уточняем…':assessmentMinutes(assessmentDuration(target,day))}</strong></div>${target.kind==='role'?assessmentGradePicker(grade):''}<ul class="assessment-essential-rules"><li>${esc(structure)}</li><li>Обычный вопрос — ${esc(timeRange('questionSeconds'))}, кодинг — ${esc(timeRange('codingSeconds'))}.</li><li>Выбор ответа сохраняется автоматически. Код нужно отправить на проверку.</li><li><strong>Вернуться к закрытому вопросу нельзя.</strong>${target.kind==='role'?' Результаты — после всех модулей.':''}</li></ul><label class="check-row"><input type="checkbox" name="accepted" required ${prep.accepted?'checked':''}>Понимаю правила и согласен начать тестирование</label><div class="assessment-actions"><button type="submit" class="button" ${prep.loading||prep.error?'disabled':''}>${prep.loading?'Подготовка теста…':'Начать тест'}</button>${button('Назад','assessment-selection-back','',true)}</div><p class="form-error" data-error role="alert">${esc(prep.error||'')}</p>${prep.error?button('Повторить','assessment-prepare-retry','',true):''}<details class="assessment-method"><summary>${target.kind==='role'?`Состав теста и требования к ${esc(grade)}`:'Состав теста и оценивание'}</summary>${selectedRules}<div class="assessment-rules-list">${ids.map(id=>`<div><strong>${esc(assessmentModuleName(id))}</strong><span>${assessmentMinutes(configs[id]?.seconds||0)}</span></div>`).join('')}</div>${coding?`<p>${esc(coding)}</p>`:''}${assessmentScoringDetails(configs,ids)}<p>Возможны дополнительные незачётные вопросы: они не влияют на балл и учитываются в длительности. Перерывы между модулями включены во время теста.</p></details></form></section>`;
+ return `${title(target.name,target.kind==='role'?'Тест на роль':'Тест навыка')}<section class="panel assessment-start-panel"><form id="assessment-start-form" data-target-id="${esc(target.id)}"><div class="assessment-start-summary"><span>Время теста</span><strong>${prep.loading?'Уточняем…':assessmentMinutes(assessmentDuration(target,day))}</strong></div>${target.kind==='role'?assessmentGradePicker(grade):''}<ul class="assessment-essential-rules"><li>${esc(structure)}</li><li>Обычный вопрос — ${esc(timeRange('questionSeconds'))}, кодинг — ${esc(timeRange('codingSeconds'))}.</li><li>Выбор ответа сохраняется автоматически. Код нужно отправить на проверку: на каждую задачу — 3 отправки, в зачёт идёт лучший результат. Запуски на своём вводе не расходуют отправки.</li><li><strong>Вернуться к закрытому вопросу нельзя.</strong>${target.kind==='role'?' Результаты — после всех модулей.':''}</li></ul><label class="check-row"><input type="checkbox" name="accepted" required ${prep.accepted?'checked':''}>Понимаю правила и согласен начать тестирование</label><div class="assessment-actions"><button type="submit" class="button" ${prep.loading||prep.error?'disabled':''}>${prep.loading?'Подготовка теста…':'Начать тест'}</button>${button('Назад','assessment-selection-back','',true)}</div><p class="form-error" data-error role="alert">${esc(prep.error||'')}</p>${prep.error?button('Повторить','assessment-prepare-retry','',true):''}<details class="assessment-method"><summary>${target.kind==='role'?`Состав теста и требования к ${esc(grade)}`:'Состав теста и оценивание'}</summary>${selectedRules}<div class="assessment-rules-list">${ids.map(id=>`<div><strong>${esc(assessmentModuleName(id))}</strong><span>${assessmentMinutes(configs[id]?.seconds||0)}</span></div>`).join('')}</div>${coding?`<p>${esc(coding)}</p>`:''}${assessmentScoringDetails(configs,ids)}<p>Возможны дополнительные незачётные вопросы: они не влияют на балл и учитываются в длительности. Перерывы между модулями включены во время теста.</p></details></form></section>`;
 }
 
 function assessmentScoringDetails(configs,ids,grade=null,compact=false){
@@ -189,7 +189,7 @@ function assessmentInlineCode(text,language){
 
 function assessmentQuestionMarkup(q,moduleId){
  const parts=assessmentPromptParts(q.prompt,moduleId);
- const heading=`<h1 id="assessment-question-title" tabindex="-1">${assessmentInlineCode(parts.heading,parts.language)}</h1>`;
+ const heading=`<h1 id="assessment-question-title" tabindex="-1" aria-describedby="assessment-question-position">${assessmentInlineCode(parts.heading,parts.language)}</h1>`;
  if(parts.code===null)return heading;
  const numbers=Array.from({length:parts.code.split('\n').length},(_,i)=>i+1).join('\n');
  return heading+`<section class="exam-code" aria-label="Фрагмент кода"><div class="exam-code-toolbar"><span>${esc(parts.label)}</span><span>Фрагмент кода</span></div><div class="exam-code-body" tabindex="0" role="region" aria-label="Код: ${esc(parts.label)}"><pre class="exam-code-lines" aria-hidden="true">${numbers}</pre><pre class="exam-code-source"><code>${assessmentHighlightCode(parts.code,parts.language)}</code></pre></div></section>`;
@@ -205,9 +205,9 @@ function assessmentExamMarkup(){
    <button class="exam-back" data-action="assessment-exit" aria-label="Выйти из теста"><span aria-hidden="true">‹</span> Выйти из теста</button>
    <div class="exam-timer" id="assessment-countdown">${icon('clock','small-icon')}<strong role="timer" aria-label="Осталось времени">--:--</strong><button class="exam-timer-toggle" data-action="assessment-toggle-timer" aria-label="${timerHidden?'Показать':'Скрыть'} таймер">${icon(timerHidden?'eye':'eyeOff','small-icon')}</button></div>
   </header>
-  <div class="exam-progress" role="progressbar" aria-label="Осталось времени на вопрос" aria-valuemin="0" aria-valuemax="${m.questionSeconds}" aria-valuenow="${m.questionSeconds}"><span></span></div>
+  <div class="exam-progress" title="Время на текущий вопрос" role="progressbar" aria-label="Осталось времени на вопрос" aria-valuemin="0" aria-valuemax="${m.questionSeconds}" aria-valuenow="${m.questionSeconds}"><span></span></div>
   <main class="exam-content">
-   <div class="exam-meta"><div class="exam-course"><strong>${esc(m.name)}</strong>${t.modules.length>1?`<span>Модуль ${t.moduleIndex+1} из ${t.modules.length}</span>`:''}</div><span class="exam-position">${position}</span></div>${q.format==='coding'?`<div class="coding-mobile-tabs" role="tablist" aria-label="Рабочая область">${[['task','Условие'],['solution','Решение']].map(([panel,label])=>`<button type="button" id="coding-${panel}-tab" role="tab" tabindex="${assessmentCodingPanel===panel?0:-1}" aria-selected="${assessmentCodingPanel===panel}" aria-controls="coding-${panel}" data-action="assessment-code-panel" data-id="${panel}">${label}</button>`).join('')}</div>`:''}
+   <div class="exam-meta"><div class="exam-course"><strong>${esc(m.name)}</strong>${t.modules.length>1?`<span>Модуль ${t.moduleIndex+1} из ${t.modules.length}</span>`:''}</div><span class="exam-position" id="assessment-question-position">${position}</span></div>${q.format==='coding'?`<div class="coding-mobile-tabs" role="tablist" aria-label="Рабочая область">${[['task','Условие'],['solution','Решение']].map(([panel,label])=>`<button type="button" id="coding-${panel}-tab" role="tab" tabindex="${assessmentCodingPanel===panel?0:-1}" aria-selected="${assessmentCodingPanel===panel}" aria-controls="coding-${panel}" data-action="assessment-code-panel" data-id="${panel}">${label}</button>`).join('')}</div>`:''}
    <form id="assessment-answer-form" class="exam-question">
     ${q.format==='coding'?`<div class="exam-coding-columns" data-panel="${assessmentCodingPanel}"><section class="coding-task" id="coding-task" role="tabpanel" aria-labelledby="coding-task-tab" aria-label="Условие задачи">`:''}
     ${assessmentQuestionMarkup(q,m.id)}
@@ -221,17 +221,59 @@ function assessmentExamMarkup(){
     ${q.format==='coding'?'</section></div>':''}
    </form>
   </main>
-  <div class="exam-save-status" role="status">${assessmentDraftStatus()}</div>
+  <div class="exam-save-status" role="status">${assessmentDraftStatusMarkup()}</div>
+  <div id="assessment-submission-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
  </section>`;
+}
+function assessmentExamFocusSnapshot(){
+ const active=document.activeElement;
+ if(['assessmentCode','assessmentStdin','assessmentNumeric','assessmentAnswer'].includes(active?.name)){
+  const selector=active.name==='assessmentAnswer'?`[name="assessmentAnswer"][value="${Number(active.value)}"]`:`[name="${active.name}"]`;
+  return {selector,...(active.name!=='assessmentAnswer'?{selection:[active.selectionStart,active.selectionEnd]}:{})};
+ }
+ const action=active?.dataset?.action;
+ if(['assessment-toggle-timer','assessment-eliminate','assessment-question-next','assessment-code-run','assessment-code-submit','assessment-code-next','assessment-code-reset','assessment-code-preview','assessment-code-panel','assessment-exit'].includes(action)){
+  const index=action==='assessment-eliminate'?`[data-index="${Number(active.dataset.index)}"]`:'';
+  const pane=action==='assessment-code-panel'?`[data-id="${active.dataset.id==='solution'?'solution':'task'}"]`:'';
+  return {selector:`[data-action="${action}"]${index}${pane}`};
+ }
+ if(active?.id==='assessment-question-title')return {selector:'#assessment-question-title'};
+ if(active?.type==='submit'&&active.form?.id==='assessment-answer-form')return {selector:'#assessment-answer-form [type="submit"]'};
+ return null;
+}
+function assessmentRestoreExamFocus(snapshot,questionChanged){
+ // A confirmation dialog owns focus until it closes; do not steal it on expiry.
+ if(typeof overlay!=='undefined'&&overlay.firstElementChild)return;
+ const target=app.querySelector(questionChanged?'#assessment-question-title':snapshot?.selector||'#assessment-question-title');
+ if(!questionChanged&&!snapshot)return;
+ target?.focus({preventScroll:true});
+ if(!questionChanged&&snapshot?.selection&&target?.setSelectionRange)target.setSelectionRange(...snapshot.selection);
 }
 // Called by mvp.js, which shares this module in the generated client bundle.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function assessmentRenderExam(){const codingFocus=['assessmentCode','assessmentStdin'].includes(document.activeElement?.name)?document.activeElement.name:null;const codeBefore=codingFocus?app.querySelector(`[name=${codingFocus}]`):null;const codeSelection=codingFocus?[codeBefore.selectionStart,codeBefore.selectionEnd]:null;const radioFocus=document.activeElement?.name==='assessmentAnswer'?document.activeElement.value:null;const numericFocus=document.activeElement?.id==='assessment-numeric';const inputBefore=app.querySelector('#assessment-numeric');const selection=numericFocus?[inputBefore.selectionStart,inputBefore.selectionEnd]:null;const key=assessmentAttempt.id+':'+assessmentAttempt.currentModule.id+':'+assessmentQuestion;document.body.classList.add('exam-active');const scrollPositions=assessmentRenderKey===key?['.coding-task','.coding-solution','.coding-editor','.coding-stdin','.coding-console'].map(selector=>{const element=app.querySelector(selector);return {selector,top:element?.scrollTop||0,left:element?.scrollLeft||0};}):[];const markup=assessmentExamMarkup();if(assessmentRenderKey===key&&app.querySelector('.assessment-exam')){const next=document.createElement('template');next.innerHTML=markup;for(const selector of ['.exam-header','.exam-content','.exam-save-status'])app.querySelector(selector).replaceWith(next.content.querySelector(selector));}else{app.innerHTML=markup;assessmentRenderKey=key;}for(const position of scrollPositions){const element=app.querySelector(position.selector);if(element){element.scrollTop=position.top;element.scrollLeft=position.left;}}document.title=assessmentAttempt.currentModule.name+' — Тестирование';if(codingFocus){const input=app.querySelector(`[name=${codingFocus}]`);input?.focus({preventScroll:true});if(input&&codeSelection)input.setSelectionRange(...codeSelection);}else if(numericFocus){const input=app.querySelector('#assessment-numeric');input?.focus({preventScroll:true});if(input&&selection)input.setSelectionRange(...selection);}else if(radioFocus!==null){app.querySelector(`[name="assessmentAnswer"][value="${radioFocus}"]`)?.focus({preventScroll:true});}assessmentClock();}
+function assessmentRenderExam(){
+ const focus=assessmentExamFocusSnapshot(),key=assessmentAttempt.id+':'+assessmentAttempt.currentModule.id+':'+assessmentQuestion;
+ const questionChanged=assessmentRenderKey!==key;
+ document.body.classList.add('exam-active');
+ const scrollPositions=questionChanged?[]:['.coding-task','.coding-solution','.coding-editor','.coding-stdin','.coding-console'].map(selector=>{
+  const element=app.querySelector(selector);return {selector,top:element?.scrollTop||0,left:element?.scrollLeft||0};
+ });
+ const markup=assessmentExamMarkup();
+ if(!questionChanged&&app.querySelector('.assessment-exam')){
+  const next=document.createElement('template');next.innerHTML=markup;
+  for(const selector of ['.exam-header','.exam-content','.exam-save-status'])app.querySelector(selector).replaceWith(next.content.querySelector(selector));
+ }else{app.innerHTML=markup;assessmentRenderKey=key;}
+ for(const position of scrollPositions){const element=app.querySelector(position.selector);if(element){element.scrollTop=position.top;element.scrollLeft=position.left;}}
+ document.title=assessmentAttempt.currentModule.name+' — Тестирование';
+ assessmentRestoreExamFocus(focus,questionChanged);assessmentClock();
+}
 function assessmentClock(){if(!assessmentExamActive())return;const m=assessmentAttempt.currentModule,remaining=Math.max(0,m.expiresAt-Date.now()-serverOffset),seconds=Math.ceil(remaining/1000),timer=app.querySelector('#assessment-countdown');if(timer){timer.querySelector('strong').textContent=timerHidden?'--:--':`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;timer.classList.toggle('time-low',!timerHidden&&seconds<=5);}const bar=app.querySelector('.exam-progress');if(bar){bar.querySelector('span').style.transform=`scaleX(${Math.min(1,remaining/(m.questionSeconds*1000))})`;bar.setAttribute('aria-valuenow',String(seconds));}if(!remaining&&!assessmentSaving&&Date.now()>=assessmentRetryAt)assessmentRun('assessment-resume').catch(()=>{});}
 setInterval(assessmentClock,200);
 function assessmentDraftKey(){const m=assessmentAttempt?.currentModule;return m?assessmentAttempt.id+':'+m.id+':'+m.questions[assessmentQuestion]?.id:null;}
-function assessmentDraftStatus(){return assessmentDraftSaveState==='error'?'Не удалось сохранить выбор. Нажмите «Ответить» или проверьте соединение.':'';}
-function assessmentShowDraftStatus(){const status=app.querySelector('.exam-save-status');if(status)status.textContent=assessmentDraftStatus();}
+function assessmentDraftStatus(){if(assessmentDraftSaveState!=='error')return '';const q=assessmentAttempt?.currentModule?.questions[assessmentQuestion];return q?.format==='coding'?'Не удалось сохранить черновик. Проверьте соединение и повторите сохранение. Это не расходует попытку отправки.':'Не удалось сохранить ответ. Проверьте соединение и повторите сохранение.';}
+function assessmentDraftStatusMarkup(){const message=assessmentDraftStatus();return message?`<span>${esc(message)}</span><button type="button" class="exam-save-retry" data-action="assessment-draft-retry">Повторить сохранение</button>`:'';}
+function assessmentShowDraftStatus(){const status=app.querySelector('.exam-save-status');if(status)status.innerHTML=assessmentDraftStatusMarkup();}
+async function assessmentRetryDraft(){if(assessmentSaving||!assessmentExamActive())return;const key=assessmentDraftKey(),q=assessmentAttempt.currentModule.questions[assessmentQuestion];assessmentQueueDraft();await assessmentFlushDraft();if(key===assessmentDraftKey())app.querySelector(q.format==='coding'?'[name=assessmentCode]':q.format==='numeric'?'[name=assessmentNumeric]':'[name=assessmentAnswer]:checked')?.focus({preventScroll:true});}
 function assessmentQueueDraft(delay=0){
  if(!assessmentExamActive()||assessmentSaving)return;
  const m=assessmentAttempt.currentModule,q=m.questions[assessmentQuestion];let value=assessmentDraft;if(q.format==='coding'&&typeof value!=='string'){value=q.coding.starter;assessmentDraft=value;}
@@ -273,6 +315,9 @@ function assessmentFlushDraft(){
 }
 async function assessmentRun(actionName,extra={}){
  if(!assessmentAttempt||assessmentSaving)return;
+ const focus=assessmentExamFocusSnapshot(),questionKey=assessmentDraftKey();
+ const submissionQuestion=actionName==='assessment-submit-code'?assessmentAttempt.currentModule?.questions[assessmentQuestion]:null;
+ const submissionsBefore=submissionQuestion?.coding?.submission?.used||0;
  assessmentSaving=true;render();
  try{
   // Selection and confirmation share one revision stream; a click never advances twice.
@@ -286,11 +331,24 @@ async function assessmentRun(actionName,extra={}){
   assessmentRetryAt=Date.now()+3000;
   try{const r=await api({action:'assessment-resume',id:assessmentAttempt.id});assessmentAccept(r.assessment);}catch{}
   toast(e.message);throw e;
- }finally{assessmentSaving=false;render();}
+ }finally{
+  assessmentSaving=false;render();
+  // Temporarily disabled controls lose focus; restore it only on the same question.
+  if(questionKey===assessmentDraftKey())assessmentRestoreExamFocus(focus,false);
+  if(submissionQuestion)assessmentAnnounceCodingResult(submissionQuestion.id,submissionsBefore);
+ }
+}
+function assessmentAnnounceCodingResult(questionId,submissionsBefore){
+ const q=assessmentAttempt?.currentModule?.questions[assessmentQuestion],submission=q?.coding?.submission;
+ if(q?.id!==questionId||!submission?.total||submission.used<=submissionsBefore)return;
+ const status=app.querySelector('#assessment-submission-status');
+ if(!status)return;
+ const best=submission.best||submission;
+ status.textContent=`Проверка завершена. Последняя отправка: ${submission.passed} из ${submission.total}. В зачёт: ${best.passed} из ${best.total}. Осталось отправок: ${Math.max(0,submission.limit-submission.used)}.`;
 }
 function assessmentQueue(actionName,extra={}){return assessmentRun(actionName,extra);}
 function assessmentSaveAnswer(value){if(assessmentSaving)return;assessmentDraft=value;render();assessmentQueueDraft();}
-async function assessmentConfirm(skip=false){if(assessmentSaving||!assessmentExamActive())return;const m=assessmentAttempt.currentModule,q=m.questions[assessmentQuestion];if(!skip&&q.format==='coding')return assessmentCodeSubmit();if(!skip&&q.format==='numeric'){const input=app.querySelector('[name="assessmentNumeric"]'),numeric=input.value.trim().replace(',','.').replace(/\u2212/g,'-');if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(numeric)||!Number.isFinite(Number(numeric))){app.querySelector('[data-error]').textContent='Введите число, например 12,5.';return;}assessmentDraft=input.value.trim();}if(!skip&&assessmentDraft===null)return;await assessmentRun('assessment-answer',{questionId:q.id,answer:skip?null:assessmentDraft});app.querySelector('#assessment-question-title')?.focus({preventScroll:true});}
+async function assessmentConfirm(skip=false){if(assessmentSaving||!assessmentExamActive())return;const m=assessmentAttempt.currentModule,q=m.questions[assessmentQuestion];if(!skip&&q.format==='coding')return assessmentCodeSubmit();if(!skip&&q.format==='numeric'){const input=app.querySelector('[name="assessmentNumeric"]'),numeric=input.value.trim().replace(',','.').replace(/\u2212/g,'-');if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(numeric)||!Number.isFinite(Number(numeric))){app.querySelector('[data-error]').textContent='Введите число, например 12,5.';return;}assessmentDraft=input.value.trim();}if(!skip&&assessmentDraft===null)return;await assessmentRun('assessment-answer',{questionId:q.id,answer:skip?null:assessmentDraft});}
 
 // Called by mvp.js, which shares this module in the generated client bundle.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -324,7 +382,9 @@ async function assessmentHandleAction(el){const actionName=el.dataset.action;if(
  case 'assessment-selection-back':assessmentPreparation=null;go('tests');break;
  case 'assessment-prepare-retry':assessmentPreparation=null;render();break;
  case 'assessment-cancel-registration':await mutate({action:'assessment-cancel-registration',id});break;
- case 'assessment-question-next':await assessmentConfirm(true);break;
+ case 'assessment-question-next':await assessmentSkipQuestion();break;
+ case 'assessment-question-skip-confirmed':if(assessmentDialogIsCurrent(el)){close();await assessmentConfirm(true);}else close();break;
+ case 'assessment-draft-retry':await assessmentRetryDraft();break;
  case 'assessment-toggle-timer':timerHidden=!timerHidden;render();break;
  case 'assessment-eliminate':{const i=Number(el.dataset.index);if(assessmentSaving)break;if(eliminatedAnswers.has(i))eliminatedAnswers.delete(i);else{eliminatedAnswers.add(i);if(assessmentDraft===i){assessmentDraft=null;assessmentQueueDraft();}}render();break;}
  case 'assessment-next-module':await assessmentQueue('assessment-next-module');break;
@@ -338,7 +398,8 @@ async function assessmentHandleAction(el){const actionName=el.dataset.action;if(
  case 'assessment-code-leave':{const q=assessmentAttempt?.currentModule?.questions[assessmentQuestion];close();if(assessmentExamActive()&&assessmentAttempt.id===el.dataset.attemptId&&q?.id===id)await assessmentConfirm(true);break;}
  case 'assessment-code-panel':assessmentSwitchCodingPanel(id);break;
  case 'assessment-code-run':await assessmentCodeRun();break;
- case 'assessment-code-reset':{const q=assessmentAttempt.currentModule.questions[assessmentQuestion];assessmentDraft=q.coding.starter;assessmentQueueDraft();render();break;}
+ case 'assessment-code-reset':assessmentResetCode();break;
+ case 'assessment-code-reset-confirmed':if(assessmentDialogIsCurrent(el)){close();assessmentResetCode(true);}else close();break;
  case 'assessment-code-preview':assessmentCodePreview();break;
  case 'assessment-question-new':assessmentQuestionForm();break;
  case 'assessment-question-detail':assessmentQuestionDetail(id);break;
@@ -379,11 +440,37 @@ function assessmentSwitchCodingPanel(panel){
  app.querySelector('.exam-coding-columns')?.setAttribute('data-panel',panel);
  for(const tab of app.querySelectorAll('[data-action="assessment-code-panel"]')){tab.setAttribute('aria-selected',String(tab.dataset.id===panel));tab.setAttribute('tabindex',tab.dataset.id===panel?'0':'-1');}
 }
+function assessmentDialogIsCurrent(el){return assessmentExamActive()&&assessmentAttempt.id===el.dataset.attemptId&&assessmentAttempt.currentModule.questions[assessmentQuestion]?.id===el.dataset.id;}
+function assessmentQuestionDialogAttrs(q){return `data-id="${esc(q.id)}" data-attempt-id="${esc(assessmentAttempt.id)}"`;}
+async function assessmentSkipQuestion(){
+ if(assessmentSaving||!assessmentExamActive())return;
+ const q=assessmentAttempt.currentModule.questions[assessmentQuestion];
+ if(q.format==='coding')return assessmentCodeNext();
+ const answered=q.format==='choice'?Number.isInteger(assessmentDraft):String(app.querySelector('[name=assessmentNumeric]')?.value??assessmentDraft??'').trim().length>0;
+ if(!answered){await assessmentConfirm(true);return;}
+ modal('Пропустить вопрос?','Текущий ответ будет удалён и не получит баллы. Вернуться к этому вопросу нельзя.',`<div class="modal-actions">${button('Вернуться к ответу','close','',true)}${button('Пропустить без ответа','assessment-question-skip-confirmed',assessmentQuestionDialogAttrs(q))}</div>`);
+}
+function assessmentResetCode(confirmed=false){
+ if(assessmentSaving||assessmentCodeRunning||!assessmentExamActive())return;
+ const q=assessmentAttempt.currentModule.questions[assessmentQuestion];if(q.format!=='coding')return;
+ const current=app.querySelector('[name=assessmentCode]')?.value??assessmentDraft??q.coding.starter;
+ if(current===q.coding.starter)return;
+ if(!confirmed){modal('Сбросить код?','Написанный код будет заменён стартовым. Отправленные результаты сохранятся.',`<div class="modal-actions">${button('Оставить код','close','',true)}${button('Сбросить код','assessment-code-reset-confirmed',assessmentQuestionDialogAttrs(q))}</div>`);return;}
+ assessmentDraft=q.coding.starter;assessmentQueueDraft();render();app.querySelector('[name=assessmentCode]')?.focus({preventScroll:true});
+}
 async function assessmentCodeNext(){
  if(assessmentSaving||assessmentCodeRunning||!assessmentExamActive())return;
  const q=assessmentAttempt.currentModule.questions[assessmentQuestion];
  if(q.format!=='coding')return;
- if(q.coding.submission?.used){await assessmentConfirm(true);return;}
+ const submission=q.coding.submission;
+ if(submission?.used){
+  const source=app.querySelector('[name="assessmentCode"]')?.value??assessmentDraft??q.coding.starter;
+  if(typeof submission.lastSource==='string'&&source!==submission.lastSource&&submission.used<(submission.limit||3)){
+   modal('Изменения не проверены','В зачёт пойдёт предыдущий лучший результат. Чтобы проверить изменения, отправьте код до перехода.',`<div class="modal-actions">${button('Вернуться к решению','close','',true)}${button('Перейти с предыдущим результатом','assessment-code-leave',assessmentQuestionDialogAttrs(q))}</div>`);
+   return;
+  }
+  await assessmentConfirm(true);return;
+ }
  modal('Перейти без отправки?','Решение не проверено и не получит баллы. Вернуться к этому заданию нельзя.',`<p>Черновик сохранится в попытке. Чтобы получить результат, отправьте код на проверку до перехода.</p><div class="modal-actions">${button('Вернуться к решению','close','',true)}${button('Перейти без отправки','assessment-code-leave',`data-id="${esc(q.id)}" data-attempt-id="${esc(assessmentAttempt.id)}"`)}</div>`);
 }
 
@@ -392,16 +479,16 @@ const assessmentCodeInputs=new Map();
 function assessmentCodingInput(q){return assessmentCodeInputs.get(assessmentDraftKey())??q.coding.input??q.coding.tests?.[0]?.stdin??'';}
 function assessmentCodingMarkup(q,answer){
  const code=typeof answer==='string'?answer:q.coding.starter;
- return `<p class="coding-run-note">Запуск — только ваш ввод. Отправка — все проверки.</p><div class="coding-workspace"><p id="coding-keyboard-hint" class="sr-only">Tab — вставить отступ. Shift+Tab — перейти в поле ввода программы.</p>
-  <div class="coding-toolbar"><span>${esc(q.coding.language)}</span><div><button type="button" data-action="assessment-code-reset" ${assessmentSaving?'disabled':''}>Сбросить</button><button type="button" data-action="assessment-code-run" ${assessmentSaving||assessmentCodeRunning?'disabled':''}>${assessmentCodeRunning?'Запускаем…':'Запустить'}</button>${['html','css','react'].includes(q.coding.language)?'<button type="button" data-action="assessment-code-preview">Предпросмотр</button>':''}</div></div>
+ return `<p class="coding-run-note">Запуск — только ваш ввод. Отправка — все проверки.</p><div class="coding-workspace">
+  <div class="coding-toolbar"><div class="coding-toolbar-info"><span>${esc(q.coding.language)}</span><p id="coding-keyboard-hint" class="coding-keyboard-hint">Tab — отступ · Shift+Tab — к вводу</p></div><div><button type="button" data-action="assessment-code-reset" ${assessmentSaving?'disabled':''}>Сбросить</button><button type="button" data-action="assessment-code-run" ${assessmentSaving||assessmentCodeRunning?'disabled':''}>${assessmentCodeRunning?'Запускаем…':'Запустить'}</button>${['html','css','react'].includes(q.coding.language)?'<button type="button" data-action="assessment-code-preview">Предпросмотр</button>':''}</div></div>
   <div class="coding-layout">
    <div class="coding-editor-wrap"><pre class="coding-line-numbers" aria-hidden="true">${String(code).split('\n').map((_,i)=>i+1).join('\n')}</pre><textarea class="coding-editor" name="assessmentCode" aria-label="Редактор кода" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="coding-keyboard-hint" ${assessmentSaving?'disabled':''}>${esc(code)}</textarea></div>
-   <div class="coding-io"><section class="coding-input-panel"><label for="assessment-stdin">Ввод</label><textarea id="assessment-stdin" name="assessmentStdin" class="coding-stdin" aria-label="Ввод программы" spellcheck="false" autocapitalize="off" maxlength="8000" ${assessmentSaving?'disabled':''}>${esc(assessmentCodingInput(q))}</textarea></section><section class="coding-output-panel"><h2>Вывод</h2><pre class="coding-console" role="status" aria-live="polite">${assessmentCodeOutput?.key===assessmentDraftKey()?esc(assessmentCodeOutput.text):'Вывод программы появится здесь.'}</pre></section></div>
+   <div class="coding-io"><section class="coding-input-panel"><label for="assessment-stdin">Ввод</label><textarea id="assessment-stdin" name="assessmentStdin" class="coding-stdin" aria-label="Ввод программы" spellcheck="false" autocapitalize="off" maxlength="8000" ${assessmentSaving?'disabled':''}>${esc(assessmentCodingInput(q))}</textarea></section><section class="coding-output-panel"><h2>Вывод</h2><pre class="coding-console" role="status" aria-live="polite">${assessmentCodeOutput?.key===assessmentDraftKey()?esc(assessmentCodeOutput.text):'Здесь появится вывод.'}</pre></section></div>
   </div>
  </div>`;
 }
-function assessmentCodingRing(submission){if(!submission?.total)return '';const circumference=2*Math.PI*19,size=circumference/submission.total,gap=Math.min(6,size/4);return `<span class="coding-test-result"><svg class="coding-test-ring" viewBox="0 0 48 48" role="img" aria-label="Пройдено тестов: ${submission.passed} из ${submission.total}"><title>Пройдено тестов: ${submission.passed} из ${submission.total}</title><g transform="rotate(-90 24 24)">${submission.results.map((passed,i)=>`<circle cx="24" cy="24" r="19" fill="none" stroke="${passed?'#60c84c':'#ff3157'}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${size-gap} ${circumference-size+gap}" stroke-dashoffset="${-i*size-gap/2}"/>`).join('')}</g></svg><span>${submission.passed}/${submission.total}</span></span>`;}
-function assessmentCodingActions(q,canAnswer){const submission=q.coding.submission||{used:0,limit:3};return `<div class="coding-actions"><div class="coding-submit-group"><button class="exam-check" type="button" data-action="assessment-code-submit" ${assessmentSaving||assessmentCodeRunning||!canAnswer||submission.used>=submission.limit?'disabled':''}>${assessmentSaving?'Отправляем…':'Отправить на проверку'}</button>${assessmentCodingRing(submission)}<span class="coding-attempts">${submission.limit-submission.used} из ${submission.limit} попыток осталось</span></div><button class="exam-check coding-next" type="button" data-action="assessment-code-next" ${assessmentSaving||assessmentCodeRunning?'disabled':''}>Далее</button></div>`;}
+function assessmentCodingRing(submission){if(!submission?.total)return '';const circumference=2*Math.PI*19,size=circumference/submission.total,gap=Math.min(6,size/4);return `<span class="coding-test-result" title="Последняя отправка"><svg class="coding-test-ring" viewBox="0 0 48 48" role="img" aria-label="Последняя отправка: пройдено тестов ${submission.passed} из ${submission.total}"><title>Последняя отправка: пройдено тестов ${submission.passed} из ${submission.total}</title><g transform="rotate(-90 24 24)">${submission.results.map((passed,i)=>`<circle cx="24" cy="24" r="19" fill="none" stroke="${passed?'#60c84c':'#ff3157'}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${size-gap} ${circumference-size+gap}" stroke-dashoffset="${-i*size-gap/2}"/>`).join('')}</g></svg><span class="coding-test-caption" aria-hidden="true"><span>Последняя:</span><strong>${submission.passed}/${submission.total}</strong></span></span>`;}
+function assessmentCodingActions(q,canAnswer){const submission=q.coding.submission||{used:0,limit:3};return `<div class="coding-actions"><div class="coding-submit-group"><button class="exam-check" type="button" data-action="assessment-code-submit" ${assessmentSaving||assessmentCodeRunning||!canAnswer||submission.used>=submission.limit?'disabled':''}>${assessmentSaving?'Отправляем…':'Отправить на проверку'}</button>${assessmentCodingRing(submission)}<span class="coding-attempts">${submission.limit-submission.used} из ${submission.limit} попыток осталось${submission.best?` · В зачёт: ${submission.best.passed}/${submission.best.total}`:''}</span></div><button class="exam-check coding-next" type="button" data-action="assessment-code-next" ${assessmentSaving||assessmentCodeRunning?'disabled':''}>Далее</button></div>`;}
 function assessmentCodingBusy(){for(const selector of ['assessment-code-run','assessment-code-submit','assessment-code-next']){const button=app.querySelector(`[data-action=${selector}]`);if(button){const q=assessmentAttempt.currentModule.questions[assessmentQuestion];button.disabled=assessmentSaving||assessmentCodeRunning||(selector==='assessment-code-submit'&&(!String(assessmentDraft??'').trim()||q.coding.submission?.used>=3));if(selector==='assessment-code-run')button.textContent=assessmentCodeRunning?'Запускаем…':'Запустить';}}}
 async function assessmentCodeRun(){if(assessmentSaving||assessmentCodeRunning)return;const q=assessmentAttempt.currentModule.questions[assessmentQuestion],key=assessmentDraftKey(),source=app.querySelector('[name=assessmentCode]').value,stdin=app.querySelector('[name=assessmentStdin]').value;assessmentDraft=source;assessmentCodeInputs.set(key,stdin);assessmentQueueDraft(600);assessmentCodeRunning=true;assessmentCodingBusy();assessmentCodeOutput={key,text:'Запускаем…'};app.querySelector('.coding-console').textContent=assessmentCodeOutput.text;try{await assessmentFlushDraft();if(key!==assessmentDraftKey())return;const r=await api({action:'assessment-run-code',id:assessmentAttempt.id,revision:assessmentAttempt.revision,questionId:q.id,source,stdin});if(key!==assessmentDraftKey())return;const text=(r.run.stdout||'')+(r.run.stderr?'\n'+r.run.stderr:'')+(r.run.exitCode?`\nКод завершения: ${r.run.exitCode}`:'');assessmentCodeOutput={key,text:text||'Программа завершилась без вывода.',html:r.run.stdout};app.querySelector('.coding-console').textContent=assessmentCodeOutput.text;}catch(e){if(key===assessmentDraftKey()){assessmentCodeOutput={key,text:e.message};app.querySelector('.coding-console').textContent=e.message;}}finally{assessmentCodeRunning=false;if(assessmentExamActive())assessmentCodingBusy();}}
 async function assessmentCodeSubmit(){if(assessmentSaving||assessmentCodeRunning||!assessmentExamActive())return;const q=assessmentAttempt.currentModule.questions[assessmentQuestion];if(q.format!=='coding'||q.coding.submission?.used>=3)return;const source=app.querySelector('[name=assessmentCode]').value;if(!source.trim())return;assessmentDraft=source;assessmentCodeInputs.set(assessmentDraftKey(),app.querySelector('[name=assessmentStdin]').value);assessmentQueueDraft(600);await assessmentRun('assessment-submit-code',{questionId:q.id,source,submissionId:crypto.randomUUID()});}
