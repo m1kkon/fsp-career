@@ -17,7 +17,12 @@ test('comparison reuses all frozen domain cases without changing their labels or
 test('the full comparison agrees with the existing product evaluation on identical domain inputs',()=>{
  const existing=evaluateMatching('all').summary;
  for(const key of ['precisionAtK','recallAtK','ndcgAtK','reciprocalRank'])assert.equal(report.summary.full[key],existing[key]);
- assert.equal(report.invariants.eligibilityCorrect,480);
+ // The unchanged v1 fixture has 24 legacy fail labels for unreported skills;
+ // the current product correctly asks for clarification instead.
+ assert.equal(report.invariants.eligibilityCorrect,456);
+ const disagreements=evaluateMatching('all').cases.flatMap(row=>row.failures);
+ assert.equal(disagreements.length,24);
+ assert.ok(disagreements.every(row=>row.id.endsWith('-missing-skill')&&row.expected==='fail'&&row.actual==='unknown'));
  assert.equal(report.invariants.explanationCorrect,480);
  assert.equal(report.summary.full.invalidTopFive,0);
 });

@@ -29,9 +29,9 @@ guard('missing verification never awards a confirmed grade or confirmed-category
  }
  const confirmed=ranked([person('confirmed',{verified:true})],need())[0];assert.equal(check(confirmed,'grade').status,'pass');assert.ok(confirmed.match.parts.find(p=>p.key==='test').points>0);assert.equal(publicCandidate({id:'account',profile:confirmed,privacy:{}},false).verified,true);
 });
-guard('required missing technology fails, optional missing technology remains eligible',()=>{
+guard('required unreported technology needs clarification, optional missing technology remains eligible',()=>{
  const p=person('candidate',{stack:[],work:'Разрабатывал API на Java.'});
- assert.equal(ranked([p],need())[0].match.eligibility.status,'fail');
+ assert.equal(ranked([p],need())[0].match.eligibility.status,'unknown');
  const optional=ranked([p],need({requiredStack:[],preferredStack:['Python']}))[0];assert.equal(optional.match.eligibility.status,'pass');assert.equal(optional.match.eligibility.checks.some(c=>c.id.startsWith('skill-')),false);
 });
 guard('employer clearing inferred language and tenure removes the hard conditions',()=>{
@@ -49,7 +49,8 @@ guard('missing relocation is unknown, refusal is failure, consent is eligible',(
 guard('denial and learning do not become practical evidence or mandatory skills',()=>{
  const negative=['Не работал с Python и не разрабатывал API.','Учусь разрабатывать API на Python.','I have not yet worked on Python APIs.','I am learning to build Python APIs.','I plan to develop Python APIs.'];
  const rows=ranked([person('real',{work:'Разрабатывал API на Python и внедрил платежные интеграции.'}),...negative.map((work,i)=>person('negative-'+i,{stack:[],ats:{},work}))],need());
- assert.equal(rows[0].id,'real');for(const r of rows.filter(r=>r.id!=='real')){assert.equal(r.match.eligibility.status,'fail',r.id);assert.equal(r.match.resumeEvidence.share,0,r.id);}
+ const statuses=['fail','unknown','fail','unknown','unknown'];
+ assert.equal(rows[0].id,'real');for(const r of rows.filter(r=>r.id!=='real')){assert.equal(r.match.eligibility.status,statuses[Number(r.id.split('-').at(-1))],r.id);assert.equal(r.match.resumeEvidence.share,0,r.id);}
 });
 guard('affirmative clause next to denial is kept without transferring denied skills',()=>{
  const rows=ranked([person('mixed',{stack:[],ats:{},work:'Не работал с Java, но разрабатывал API на Python.'})],need());

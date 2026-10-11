@@ -26,7 +26,11 @@ test('development/holdout cases have disjoint scenario families and candidate ID
 });
 
 test('development search meets the frozen relevance rubric without invalid top-five candidates',()=>{
- const m=evaluateMatching();assert.ok(m.summary.precisionAtK>=.9);assert.equal(m.summary.eligibilityAccuracy,1);assert.equal(m.summary.invalidTop5,0);assert.equal(m.summary.scoreExplanationAccuracy,1);
+ const m=evaluateMatching();assert.ok(m.summary.precisionAtK>=.9);assert.equal(m.summary.invalidTop5,0);assert.equal(m.summary.scoreExplanationAccuracy,1);
+ // Frozen v1 labelled an unreported required skill as a failure. Keep those
+ // labels intact, and expose the deliberate current clarification policy.
+ assert.ok(Math.abs(m.summary.eligibilityAccuracy-.95)<1e-12);
+ assert.ok(m.cases.every(row=>row.failures.length===1&&row.failures[0].id.endsWith('-missing-skill')&&row.failures[0].expected==='fail'&&row.failures[0].actual==='unknown'));
  assert.equal(m.pairwise.higherVsIrrelevant,1);
  assert.ok(m.summary.tiedPrecisionAt5>=.9);
 });
