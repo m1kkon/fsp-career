@@ -407,9 +407,9 @@ test('a role begun just before midnight keeps the old pool and can open its next
 
 test('mixed coding bank and all module parts have distinct families, fixed counts and exact difficulty quotas',async()=>{
  const repo=memory(),day=await ensureDailyPool(repo);
- assert.equal(MIXED_CODING_QUESTIONS.length,108);
+ assert.equal(MIXED_CODING_QUESTIONS.length,540);
  for(const spec of day.specs){
-  const tasks=MIXED_CODING_QUESTIONS.filter(q=>q.moduleId===spec.moduleId);assert.equal(tasks.length,6);
+  const tasks=MIXED_CODING_QUESTIONS.filter(q=>q.moduleId===spec.moduleId);assert.equal(tasks.length,30);
   for(const q of tasks){assert.equal(validateQuestion(q).format,'coding');assert.equal(q.questionSeconds,300);}
   const tree=assembleAdaptiveVariant(day.pool.filter(q=>q.moduleId===spec.moduleId),spec);
   assert.equal(spec.codingPerPart,2);assert.equal(spec.seconds,1760);
@@ -434,6 +434,16 @@ test('a correct coding response can change the second-part route without affecti
 });
 
 async function codingAttempt(){const repo=memory(),a=candidate();let {assessment:view}=await assessmentAction(repo,a,{action:'assessment-start',targetId:'python',rulesAccepted:true});for(let i=0;i<4;i++){const t=await repo.record(view.id),q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);view=await answer(repo,a,view.id,q,correctTestAnswer(q));}const t=await repo.record(view.id),q=t.modules[0].questions.find(q=>q.id===t.modules[0].activeQuestionId);return {repo,a,view,q};}
+test('candidate coding feedback separates best graded credit from the last submission and an unsent draft',async()=>{
+ const {repo,view,q}=await codingAttempt(),stored=await repo.record(view.id),m=stored.modules[0],total=q.coding.tests.length;
+ m.answers[q.id]={value:{source:'checked best source',judged:true,correct:true,passed:total,total},savedAt:Date.now()};
+ m.codingDrafts={[q.id]:'edited unsent draft'};
+ m.codingSubmissions={[q.id]:[{id:'best',source:'checked best source',passed:total,total,results:Array(total).fill(true)},{id:'last',source:'last checked source',passed:1,total,results:Array.from({length:total},(_,i)=>i===0)}]};
+ const publicView=assessmentView(stored),feedback=publicView.currentModule.questions[publicView.currentModule.questionIndex].coding.submission;
+ assert.equal(feedback.used,2);assert.equal(feedback.lastSource,'last checked source');assert.equal(feedback.passed,1);assert.deepEqual(feedback.best,{passed:total,total});
+ assert.equal(publicView.currentModule.answers[q.id],'edited unsent draft');assert.ok(!('source' in feedback.best));
+ assert.ok(!('correct' in feedback));assert.equal(m.answers[q.id].value.source,'checked best source');
+});
 test('coding run uses editable stdin without grading; submission limit, idempotency and best result survive drafts and Next',{skip:process.env.CODE_SANDBOX_TESTS!=='1'},async()=>{
  const {repo,a,q,view:initial}=await codingAttempt();let view=initial;
  const request=(action,extra={})=>assessmentAction(repo,a,{action,id:view.id,revision:view.revision,questionId:q.id,...extra});
@@ -452,6 +462,7 @@ test('coding run uses editable stdin without grading; submission limit, idempote
  assert.equal(view.currentModule.questions[4].coding.submission.passed,q.coding.tests.length);
  const concurrent=await Promise.allSettled(['third-submit','competing-submit'].map(submissionId=>request('assessment-submit-code',{source:'print("wrong")',submissionId})));assert.equal(concurrent.filter(r=>r.status==='fulfilled').length,1);assert.equal(concurrent.find(r=>r.status==='rejected').reason.status,409);view=(await assessmentAction(repo,a,{action:'assessment-resume',id:view.id})).assessment;
  assert.equal(view.currentModule.questions[4].coding.submission.used,3);assert.equal(view.currentModule.questions[4].coding.submission.passed,0);
+ assert.deepEqual(view.currentModule.questions[4].coding.submission.best,{passed:q.coding.tests.length,total:q.coding.tests.length},'credit retains the best checked solution even after a worse submission');
  await assert.rejects(request('assessment-submit-code',{source:'print(1)',submissionId:'fourth-submit'}),/3 попытки/);
  await assert.rejects(request('assessment-answer',{answer:MIXED_CODING_SOLUTIONS.get(q.id)}),/Отправить/);
  view=(await request('assessment-draft',{answer:'print("draft")',stdin:'changed input'})).assessment;
@@ -471,11 +482,23 @@ test('reviewed daily bank revision creates a new pool without rewriting previous
  const repo=memory(),at=Date.parse('2026-10-08T09:00:00Z'),oldId=dailyPoolWindow(at).id+'-mixed-v2';
  const old={id:oldId,kind:'test-day',owner:'platform',created:at,status:'published',version:1,pool:[{...INITIAL_QUESTIONS[0],version:1,options:['old','a','b','c'],correct:0}]};
  await repo.put('test-day',old);
- const reviewed=await ensureDailyPool(repo,at);assert.notEqual(reviewed.id,old.id);assert.equal(reviewed.bankRevision,'2026-10-08');
+ const reviewed=await ensureDailyPool(repo,at);assert.notEqual(reviewed.id,old.id);assert.equal(reviewed.bankRevision,'2026-10-10');
  assert.deepEqual(await repo.record(oldId),old);assert.ok(reviewed.pool.every(q=>q.status==='working'||q.status==='experimental'));
  assert.ok(!reviewed.pool.some(q=>q.id==='coding-integration-backend-v1'));
- assert.ok(reviewed.pool.filter(q=>q.format==='choice').every(q=>q.version===2));
+ assert.ok(reviewed.pool.filter(q=>q.format==='choice').every(q=>[2,3].includes(q.version)));
  assert.deepEqual(await ensureDailyPool(repo,at+1000),reviewed);
+});
+
+test('daily pools retain coding alternatives and unseen tasks outrank global exposure in every module',async()=>{
+ const day=await ensureDailyPool(memory());
+ for(const spec of day.specs){
+  const pool=day.pool.filter(q=>q.moduleId===spec.moduleId);
+  for(const d of [1,2,3])assert.equal(pool.filter(q=>q.format==='coding'&&q.difficulty===d).length,10,spec.moduleId);
+  const first=assembleAdaptiveVariant(pool,spec).first.filter(q=>q.format==='coding'),seen=new Set(first.map(q=>q.id));
+  const exposure=new Map(pool.filter(q=>!seen.has(q.id)).flatMap(q=>[[q.familyId,10000],['question:'+q.id,10000]]));
+  const next=assembleAdaptiveVariant(pool,spec,0,seen,exposure);
+  assert.ok(next.first.filter(q=>q.format==='coding').every(q=>!seen.has(q.id)),spec.moduleId+' repeated a seen coding task while alternatives existed');
+ }
 });
 
 
