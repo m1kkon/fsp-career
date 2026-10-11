@@ -49,8 +49,8 @@
 .product-ui .site-container { max-width: 1384px; padding: 0 32px; }
 .product-ui .site-header { position: sticky; top: 0; z-index: 35; border-color: var(--line); background: var(--color-surface); }
 .product-ui .header-inner { max-width: 1384px; min-height: 84px; padding: 16px 32px; gap: 24px; }
-.product-ui .brand { gap: 10px; font-size: 23px; letter-spacing: -.6px; }
-.product-ui .brand-icon { width: 42px; height: 42px; border-radius: 10px; font-size: 23px; }
+.product-ui .brand { padding:0;flex-shrink:0; }
+.product-ui .brand-logo { display:block;width:210px;max-width:100%;height:auto; }
 .product-ui .audience-switch { display: flex; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 9px; background: var(--color-surface-muted); flex-shrink: 0; }
 .product-ui .audience-switch button { padding: 8px 13px; border: 0; background: transparent; border-radius: 6px; color: var(--color-text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; }
 .product-ui .audience-switch button[aria-pressed="true"] { background: var(--color-surface); color: var(--text); box-shadow: 0 1px 4px var(--shadow-neutral); }
@@ -264,7 +264,8 @@
 .product-ui .site-footer { margin-top: 64px; padding: 36px 0; font-size: 14px; color: var(--color-text-muted); gap: 36px; }
 .product-ui .site-footer strong { font-size: 15px; }
 .product-ui .site-footer small { font-size: 12px; max-width: 290px; line-height: 1.7; }
-.product-ui .site-footer .footer-brand { font-size: 23px; }
+.product-ui .site-footer .footer-brand { display:inline-flex;max-width:100%; }
+.product-ui .site-footer .brand-logo { width:230px; }
 .product-ui .toast { font-size: 14px; border-radius: 10px; }
 @media (max-width: 1250px) {
   .product-ui .header-inner { flex-wrap:wrap;gap:8px 16px; }
@@ -292,8 +293,7 @@
 }
 @media (max-width: 680px) {
   .product-ui .header-inner { padding: 12px 16px; gap: 12px; min-height: 0; }
-  .product-ui .brand { font-size: 19px; gap: 8px; }
-  .product-ui .brand-icon { width: 35px; height: 35px; font-size: 20px; border-radius: 8px; }
+  .product-ui .brand-logo { width:168px; }
   .product-ui .audience-switch { order: 3; width: 100%; padding: 3px; }
   .product-ui .audience-switch button { flex: 1; font-size: 14px; padding: 9px 8px; }
   .product-ui .header-actions { gap: 8px; }
@@ -301,8 +301,9 @@
   .product-ui .header-desktop-label { display: none; }
   .product-ui .header-mobile-label { display: inline; }
   .product-ui .header-actions>.button:last-child { display: none; }
-  .product-ui .header-location { max-width: 106px; font-size: 12px; }
-  .product-ui .header-location .icon { display: none; }
+  .product-ui .header-location { width:44px;max-width:44px;min-height:44px;padding:0;justify-content:center; }
+  .product-ui .header-location span { display:none; }
+  .product-ui .header-location .icon { display:block; }
   .product-ui .account-switch { display: none; }
   .product-ui .site-container { padding: 0 16px; }
   .product-ui .public-main { padding-top: 22px; }
@@ -980,3 +981,5 @@
 .product-ui .method-documentation section>h2{margin-top:28px}
 .product-ui .method-documentation section>h2:first-child{margin-top:0}
 @media(max-width:700px){.product-ui .method-rules{font-size:14px}.product-ui .method-documentation{gap:24px}}
+
+@media(max-width:360px){.product-ui .brand .brand-logo{width:140px}}
