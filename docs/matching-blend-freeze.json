@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "productSnapshot": "2066de19d63becf66a79b4ec055fb8faf3ad994c",
+  "frozenAt": "2026-10-11T19:59:33.150654+00:00",
+  "implementation": {
+    "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+    "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+    "lib/ats.mjs": "11d7e1f17c4dbe6ada2b096ae59a0b5e95dca3b43c912f2c75b9ac127cec5a2e",
+    "lib/domain.mjs": "a40c4486847546e7fc1ee091905f4a3a7f8bf1cfed148d755b49b86a4b83c23a",
+    "lib/fsp.mjs": "0ec606f9e686ed787aa8749df21c60de5005a49c8f400dae66817e938fdac61b",
+    "lib/technology-catalog.mjs": "dc5de7f00798746c0933bb1bdb797af055d2c4f032182c45a8e1723c7917b92d",
+    "lib/salary-range.mjs": "b3de5174b3e2802d45a6700a7cd5657f6963738c673143cef07bc678b8fec791"
+  },
+  "challengeFreezeCommit": "4d550e4",
+  "evaluationStarted": false,
+  "selection": "Two bounded variants evaluated only on TalentMatch development and previously known stress diagnostic; A selected before fresh challenge evaluation.",
+  "limits": [
+    "No fresh challenge results were used to tune implementation, weights or labels.",
+    "TalentMatch holdout has been seen historically; its final reproduction is not a new blind experiment."
+  ]
+}
