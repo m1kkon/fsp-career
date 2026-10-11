@@ -37,7 +37,7 @@ test('a fresh mail link rerenders even when its page is already open',()=>{
  const location={hash:'#reset-password?token='+'c'.repeat(64),pathname:'/',search:''};
  const context=vm.createContext({page:'reset-password',routePage:route=>route,URLSearchParams,location,window:{history:{replaceState:(_state,_title,url)=>{location.hash=url.slice(url.indexOf('#'));}},addEventListener:(_event,fn)=>{handler=fn;},scrollTo(){}},close(){},render(){renders++;}});
  vm.runInContext(source.slice(source.indexOf('let emailLinkToken='),source.indexOf('function verificationModal(')),context);
- vm.runInContext(source.slice(source.indexOf("window.addEventListener('hashchange'"),source.indexOf("document.addEventListener('keydown'")),context);
+ vm.runInContext(source.slice(source.indexOf("window.addEventListener('hashchange'"),source.indexOf("document.addEventListener('keydown'",source.indexOf("window.addEventListener('hashchange'"))),context);
  handler();assert.equal(renders,1);assert.equal(location.hash,'#reset-password');
 });
 test('unverified login clears private data and opens confirmation instead of the workspace',async()=>{
