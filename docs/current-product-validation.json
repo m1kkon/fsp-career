@@ -1745,5 +1745,32 @@
     "npm run lint",
     "node scripts/run-framework.mjs build --webpack",
     "node scripts/benchmarks/harden-grades.mjs --assert --output output/validation/tz-current"
-  ]
+  ],
+  "continuousIntegration": {
+    "revision": "72ffb4c82bd7e52ea2e97fb22e192cb6ea627623",
+    "run": "https://github.com/m1kkon/fsp-career/actions/runs/38166753173",
+    "status": "success",
+    "tests": {
+      "total": 427,
+      "passed": 427,
+      "failed": 0,
+      "skipped": 0
+    },
+    "checks": [
+      "npm ci",
+      "default production build",
+      "Docker sandbox image",
+      "PostgreSQL 17 integration",
+      "real sandbox execution",
+      "TypeScript",
+      "ESLint"
+    ],
+    "fiftyAccountConcurrency": {
+      "accounts": 50,
+      "serviceActions": 100,
+      "elapsedMs": 206,
+      "result": "committed before controlled judge release; judged answer committed afterward",
+      "scope": "CI service transactions against PostgreSQL; not HTTP production latency or SLA"
+    }
+  }
 }

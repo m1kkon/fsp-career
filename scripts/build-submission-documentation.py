@@ -39,7 +39,7 @@ def font_path(explicit, bold=False):
 
 def inline(s):
     s = html.escape(s)
-    s = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'\1', s)
+    s = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2" color="#4934F8">\1</a>', s)
     s = re.sub(r'\*\*([^*]+)\*\*', r'<b>\1</b>', s)
     s = re.sub(r'`([^`]+)`', r'<font color="#4934F8">\1</font>', s)
     return s
@@ -125,6 +125,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,default=ROOT/'docs/submission-documentation.pdf')
     parser.add_argument('--font-regular'); parser.add_argument('--font-bold')
+    parser.add_argument('--include-compliance',action='store_true',help='Append the internal team compliance matrix; excluded from the jury document by default.')
     args=parser.parse_args()
     for name,path in [('FSP',font_path(args.font_regular)),('FSPBold',font_path(args.font_bold,True))]:
         if path is None or (isinstance(path,Path) and not path.exists()):
@@ -145,8 +146,9 @@ def main():
         title='ФСП Карьера - сопроводительная документация',author='Команда ФСП Карьеры',invariant=1)
     width=A4[0]-84
     story=parse(ROOT/'docs/submission-documentation.md',styles,width)
-    story.append(PageBreak())
-    story.extend(parse(ROOT/'docs/tz-compliance.md',styles,width))
+    if args.include_compliance:
+        story.append(PageBreak())
+        story.extend(parse(ROOT/'docs/tz-compliance.md',styles,width))
     args.output.parent.mkdir(parents=True,exist_ok=True)
     doc.build(story,canvasmaker=NumberedCanvas)
     print(args.output)
