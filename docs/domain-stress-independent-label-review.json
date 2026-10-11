@@ -1,0 +1,2314 @@
+{
+  "version": "domain-stress-independent-semantic-review-v1",
+  "reviewer": "tz_validation",
+  "fixtureFreezeRevision": "e9086835f4263929163b51f9fc237c78d03aea42",
+  "expandedFixtureSha256": "0475014094e6a9aeb4b58740392f9e2be832daf9c876a53a8fe17411ef6a45a0",
+  "reviewedBeforeEvaluation": true,
+  "algorithmCalled": false,
+  "metricsRead": false,
+  "authorLabelsVisible": true,
+  "scenarios": 12,
+  "pairs": 120,
+  "summary": {
+    "exactProfessionalAgreement": 95,
+    "authorProfessionalLabelWithinReviewerPlausibleRange": 105,
+    "professionalLabelNotSupportedByReviewerRange": 15,
+    "eligibilityClearAgreement": 119,
+    "eligibilityAmbiguities": 1
+  },
+  "findings": [
+    "All 120 pairs reviewed from need and profile facts, without ranking outputs. This is independent of algorithm results, but not blind to the author labels.",
+    "Many unknown/fail profiles receive professional label 3 without describing the required core method. They are not primary eligible positives, so this does not itself change the eligibility-aware binary labels. Do not headline text-only results as externally validated quality.",
+    "The boundary between professional labels 0 and 1 is ambiguous where unrelated work with the same stack or explicit denial overlaps the common-stack definition.",
+    "The six-year ATS field does not state six years of commercial Java work. The contradiction eligibility case therefore depends on an unstated interpretation of experience.",
+    "Missing required skills without denial may correctly remain unknown. Missing current city plus explicit willingness to relocate to the required city may correctly pass.",
+    "Frozen labels and algorithm were not edited. Keep this report attached to the single frozen evaluation; do not tune this fixture after seeing results."
+  ],
+  "rows": [
+    {
+      "id": "payments-retries-replay",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-billing",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-orders",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-images",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-keywords",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-denial",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-unproved",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "payments-retries-salary",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Разработка платёжного API сама по себе не доказывает обработку повторных webhook, идемпотентность или сверку."
+      }
+    },
+    {
+      "id": "payments-retries-language",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Та же общая формулировка платёжного API без ключевого способа решения."
+      }
+    },
+    {
+      "id": "migration-online-expand-contract",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-migration",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-release",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-batch",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-mixed",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-learner",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-missing-proof",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-middle",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "migration-online-contradiction",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0,
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass",
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "eligibility-ambiguity",
+        "reason": "experienceYears=6 не задаёт коммерческий стаж именно Java. Отсутствие коммерческой Java-разработки не противоречит шести годам другого Backend опыта."
+      }
+    },
+    {
+      "id": "migration-online-no-pay",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Совместимый API и безопасная миграция описаны, но отсутствие простоя, rollout и откат не раскрыты."
+      }
+    },
+    {
+      "id": "accessibility-keyboard-screen-reader",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-wcag",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-forms",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-animation",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-tags",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-denied",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-planned",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-senior",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "accessibility-keyboard-unverified",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Общее accessible interfaces не описывает клавиатуру, экранный диктор или способ управления фокусом."
+      }
+    },
+    {
+      "id": "accessibility-keyboard-format",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Доступные формы названы, но способ обеспечения доступности не описан."
+      }
+    },
+    {
+      "id": "frontend-finance-table-stream",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-table",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-dashboard",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-static",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-cli",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-negation",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0,
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": {
+        "kind": "rubric-boundary",
+        "reason": "Прямо отрицает streaming и virtualized tables. Рубрика 0 охватывает отрицание ключевой работы, рубрика 1 — лишь общий стек."
+      }
+    },
+    {
+      "id": "frontend-finance-table-mixed-plan",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-project",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-lower",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "frontend-finance-table-unknown-english",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Потоковая таблица не доказывает виртуализацию 100 тысяч строк и защиту от устаревшего состояния."
+      }
+    },
+    {
+      "id": "qa-contracts-compatibility",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-automation",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-manual-api",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-manual-ui",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-tags",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-denied",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          0,
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": {
+        "kind": "rubric-boundary",
+        "reason": "not yet developed отрицает опыт, но план также попадает в определение 1; граница denial/future неоднозначна."
+      }
+    },
+    {
+      "id": "qa-contracts-backend",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-contracts-unverified",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Общие API автотесты Java/SQL не описывают совместимость контрактов или воспроизводимость дефектов."
+      }
+    },
+    {
+      "id": "qa-contracts-missing-language",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "SQL-проверки API автотестов — существенная часть работы; не раскрыты версии контрактов и воспроизводимость."
+      }
+    },
+    {
+      "id": "qa-mobile-sync-offline",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-sync",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-api-retries",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-web",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-load",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-keywords",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-course",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-project",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-middle",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "qa-mobile-sync-no-skills",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Конфликты offline-first релевантны, но способы тестирования повторов, обрывов и сверки данных не описаны."
+      }
+    },
+    {
+      "id": "devops-disaster-recovery",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-sre",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-backup",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-deploy",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-local",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-denial",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-disaster-unverified",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Восстановление из копий релевантно, но потеря региона, RTO/RPO и регулярные учения не раскрыты."
+      }
+    },
+    {
+      "id": "devops-disaster-experience",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Просто настроенное восстановление не доказывает требуемый сценарий потери региона и измеренные показатели."
+      }
+    },
+    {
+      "id": "devops-disaster-salary-unknown",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Восстановление с измерением RTO — существенная часть, RPO и регулярные учения не описаны."
+      }
+    },
+    {
+      "id": "devops-drift-state",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-iac",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-linux",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-scripts",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-tags",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-denial",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-no-exp",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Drift проверки подходят, но безопасный apply и защита логов не раскрыты."
+      }
+    },
+    {
+      "id": "devops-drift-unknown-skill",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "devops-drift-onsite",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Drift и безопасный apply выполнены; защита секретов не описана."
+      }
+    },
+    {
+      "id": "ds-causal-counterfactual",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-causal-causal",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-causal-ab",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Рандомизированный A/B — допустимый способ причинной оценки; отсутствие квазиэкспериментов не нарушает потребность. При этом цена и интервалы не описаны."
+      }
+    },
+    {
+      "id": "ds-causal-forecast",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-causal-dashboard",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          0,
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": {
+        "kind": "rubric-boundary",
+        "reason": "Сравнение до/после без контроля нарушает ключевое методологическое условие; общий аналитический стек допускает трактовку 1."
+      }
+    },
+    {
+      "id": "ds-causal-tags",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-causal-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-causal-middle",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Общая причинная оценка цены не раскрывает контроль смешения и доверительные интервалы."
+      }
+    },
+    {
+      "id": "ds-causal-unverified",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Названы причинная модель и панели, но не способ контроля смешения и расчёта интервалов."
+      }
+    },
+    {
+      "id": "ds-causal-english",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Общее название причинной оценки, без способа решения."
+      }
+    },
+    {
+      "id": "ds-leakage-temporal",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-fraud",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-classification",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-sales",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-optimistic",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0,
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": {
+        "kind": "rubric-boundary",
+        "reason": "Явно использует будущий результат проверки как признак: это прямое нарушение ключевой задачи, но общий стек подходит."
+      }
+    },
+    {
+      "id": "ds-leakage-tags",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-project",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ds-leakage-unknown-english",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Временная валидация антифрода релевантна, но point-in-time признаки и стоимость ошибки не раскрыты."
+      }
+    },
+    {
+      "id": "ds-leakage-salary",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Антифрод с контролем leakage релевантен; временная валидация и стоимость блокировки не описаны."
+      }
+    },
+    {
+      "id": "ml-serving-versions",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-serving",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-batch",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-notebook",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-api",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-negation",
+      "author": {
+        "professionalRelevance": 0,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 0,
+        "plausibleProfessionalLabels": [
+          0
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-serving-middle",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2,
+          3
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "borderline",
+        "reason": "Serving и rollback — существенная часть; согласованность пакетного/онлайн пути и p99 не раскрыты."
+      }
+    },
+    {
+      "id": "ml-serving-unverified",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Production inference в Docker — лишь общее описание, без согласованности путей, закрепления версии или контроля latency."
+      }
+    },
+    {
+      "id": "ml-serving-salary",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Inference с rollback релевантен частично, но согласованность путей, версии и p99 не раскрыты."
+      }
+    },
+    {
+      "id": "ml-feature-store-point-time",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-feature",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-etl",
+      "author": {
+        "professionalRelevance": 2,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 2,
+        "plausibleProfessionalLabels": [
+          2
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-warehouse",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-tags",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-future",
+      "author": {
+        "professionalRelevance": 1,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-move-no-city",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "pass"
+      },
+      "reviewer": {
+        "professionalRelevance": 3,
+        "plausibleProfessionalLabels": [
+          3
+        ],
+        "eligibility": "pass",
+        "plausibleEligibilityLabels": [
+          "pass"
+        ]
+      },
+      "issue": null
+    },
+    {
+      "id": "ml-feature-store-move-unknown",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "unknown"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "unknown",
+        "plausibleEligibilityLabels": [
+          "unknown"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Название feature store без point-in-time join, свежести, backfill или способа исключения skew."
+      }
+    },
+    {
+      "id": "ml-feature-store-refuses",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Feature pipeline без требуемых способов построения/проверки признаков."
+      }
+    },
+    {
+      "id": "ml-feature-store-wrong-proof",
+      "author": {
+        "professionalRelevance": 3,
+        "eligibility": "fail"
+      },
+      "reviewer": {
+        "professionalRelevance": 1,
+        "plausibleProfessionalLabels": [
+          1,
+          2
+        ],
+        "eligibility": "fail",
+        "plausibleEligibilityLabels": [
+          "fail"
+        ]
+      },
+      "issue": {
+        "kind": "insufficient-evidence",
+        "reason": "Название feature store не описывает способ решения ключевой задачи."
+      }
+    }
+  ]
+}
