@@ -1,0 +1,586 @@
+{
+  "version": 1,
+  "protocol": "Two bounded candidates only. TalentMatch development and previously inspected authored stress are development/regression evidence. No TalentMatch holdout read/evaluation and no fresh challenge text/labels inspected before this code freeze.",
+  "baseProductRevision": "21bec5adf8fc90fb7cd2802e9dd3543ed448e129",
+  "source": {
+    "repository": "https://github.com/MALINAYAGODA/Talent-Match",
+    "commit": "a892ad12f2a84f92b9619ee05fbba5fbbf99fd56",
+    "sha256": "bfa8e4b1f1080b6decba654daf8379356145df80a8ffceeda2577195646da32a",
+    "url": "https://raw.githubusercontent.com/MALINAYAGODA/Talent-Match/a892ad12f2a84f92b9619ee05fbba5fbbf99fd56/case_2_data_for_members.json",
+    "bytes": 4533882
+  },
+  "splitSeed": "fsp-talentmatch-baseline-v1",
+  "referenceDate": "2024-03-01",
+  "selection": {
+    "candidate": "A",
+    "rationale": "Conservative maximum 10 of existing 20 resume points as lexical backfill; B adds almost no stress ranking benefit and worsens development tie-adjusted P@5. A improves known-stress P@5/nDCG/recall and development MRR, but development P@5 and recall regress. Acceptance requires separate fresh challenge evaluation; no blanket improvement claim.",
+    "formula": "canonical harmonic coverage + 0.5 * (1-canonical coverage) * sqrt(TF-IDF similarity of affirmative work/project task clauses)",
+    "globalWeightsUnchanged": true,
+    "technologyNamesExcludedFromLexicalText": true,
+    "aboutTagsPlansDenialsExcluded": true
+  },
+  "developmentBaselineH2": {
+    "vacancies": 9,
+    "pairs": 246,
+    "precisionAtK": 0.4444444444444444,
+    "recallAtK": 0.3702821869488536,
+    "ndcgAtK": 0.44040829564786804,
+    "reciprocalRank": 0.5037037037037037,
+    "randomPrecisionAtK": 0.3159016101211502,
+    "randomNdcgAtK": 0.33359600380338666,
+    "tieAdjustedPrecisionAtK": 0.41481481481481475
+  },
+  "candidates": [
+    {
+      "id": "A",
+      "maximumBackfillShare": 0.5,
+      "development": {
+        "supported/development": {
+          "product": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.4222222222222223,
+            "recallAtK": 0.35793650793650794,
+            "ndcgAtK": 0.4430207126249905,
+            "reciprocalRank": 0.5777777777777777,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.41851851851851846
+          },
+          "lexical": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3333333333333333,
+            "recallAtK": 0.3067019400352734,
+            "ndcgAtK": 0.36215262521137725,
+            "reciprocalRank": 0.5436507936507936,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.3333333333333333
+          },
+          "stack": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3111111111111111,
+            "recallAtK": 0.2873015873015872,
+            "ndcgAtK": 0.3510109532204011,
+            "reciprocalRank": 0.49158249158249157,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.2923685573685573
+          }
+        },
+        "supported/holdout": {
+          "product": null,
+          "lexical": null,
+          "stack": null
+        },
+        "supported/combined": {
+          "product": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.4222222222222223,
+            "recallAtK": 0.35793650793650794,
+            "ndcgAtK": 0.4430207126249905,
+            "reciprocalRank": 0.5777777777777777,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.41851851851851846
+          },
+          "lexical": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3333333333333333,
+            "recallAtK": 0.3067019400352734,
+            "ndcgAtK": 0.36215262521137725,
+            "reciprocalRank": 0.5436507936507936,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.3333333333333333
+          },
+          "stack": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3111111111111111,
+            "recallAtK": 0.2873015873015872,
+            "ndcgAtK": 0.3510109532204011,
+            "reciprocalRank": 0.49158249158249157,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.2923685573685573
+          }
+        },
+        "all/development": {
+          "product": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.41000000000000003,
+            "recallAtK": 0.36156676656676656,
+            "ndcgAtK": 0.4366594490172793,
+            "reciprocalRank": 0.5838095238095238,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.4156666666666668
+          },
+          "lexical": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.32000000000000006,
+            "recallAtK": 0.30373556998556994,
+            "ndcgAtK": 0.34583373541140844,
+            "reciprocalRank": 0.5229761904761905,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.32000000000000006
+          },
+          "stack": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.3500000000000001,
+            "recallAtK": 0.3134348984348984,
+            "ndcgAtK": 0.39799225571766106,
+            "reciprocalRank": 0.5503787878787878,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.3446204508052334
+          }
+        },
+        "all/holdout": {
+          "product": null,
+          "lexical": null,
+          "stack": null
+        },
+        "all/combined": {
+          "product": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.41000000000000003,
+            "recallAtK": 0.36156676656676656,
+            "ndcgAtK": 0.4366594490172793,
+            "reciprocalRank": 0.5838095238095238,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.4156666666666668
+          },
+          "lexical": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.32000000000000006,
+            "recallAtK": 0.30373556998556994,
+            "ndcgAtK": 0.34583373541140844,
+            "reciprocalRank": 0.5229761904761905,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.32000000000000006
+          },
+          "stack": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.3500000000000001,
+            "recallAtK": 0.3134348984348984,
+            "ndcgAtK": 0.39799225571766106,
+            "reciprocalRank": 0.5503787878787878,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.3446204508052334
+          }
+        }
+      },
+      "knownStress": {
+        "full": {
+          "precisionAtK": 0.5333333333333333,
+          "recallAtK": 0.7777777777777777,
+          "ndcgAtK": 0.6466420152740574,
+          "reciprocalRank": 0.6527777777777778,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.5513888888888888,
+          "gradedNdcgAtFive": 0.7265054424617173,
+          "textOnlyPrecisionAtFive": 0.5333333333333333,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.7777777777777777,
+          "invalidTopFive": 0.08333333333333333
+        },
+        "tfidf": {
+          "precisionAtK": 0.3666666666666667,
+          "recallAtK": 0.5277777777777778,
+          "ndcgAtK": 0.4858567099654499,
+          "reciprocalRank": 0.673611111111111,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.3666666666666667,
+          "gradedNdcgAtFive": 0.5715619697298221,
+          "textOnlyPrecisionAtFive": 0.7166666666666667,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.5277777777777778,
+          "invalidTopFive": 1.75
+        },
+        "stack": {
+          "precisionAtK": 0.3333333333333333,
+          "recallAtK": 0.4861111111111111,
+          "ndcgAtK": 0.4973180161268354,
+          "reciprocalRank": 0.7430555555555555,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.35648148148148145,
+          "gradedNdcgAtFive": 0.5458004132532038,
+          "textOnlyPrecisionAtFive": 0.5,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.4861111111111111,
+          "invalidTopFive": 0.9166666666666666
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4666666666666666,
+          "recallAtK": 0.6805555555555557,
+          "ndcgAtK": 0.6234172451706458,
+          "reciprocalRank": 0.7569444444444443,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.4666666666666666,
+          "gradedNdcgAtFive": 0.7508039158364107,
+          "textOnlyPrecisionAtFive": 0.4666666666666666,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.6805555555555557,
+          "invalidTopFive": 0.08333333333333333
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4166666666666667,
+          "recallAtK": 0.5972222222222222,
+          "ndcgAtK": 0.5701617913041683,
+          "reciprocalRank": 0.75,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.4702380952380952,
+          "gradedNdcgAtFive": 0.6368943326967496,
+          "textOnlyPrecisionAtFive": 0.4166666666666667,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.5972222222222222,
+          "invalidTopFive": 0.08333333333333333
+        }
+      }
+    },
+    {
+      "id": "B",
+      "maximumBackfillShare": 0.75,
+      "development": {
+        "supported/development": {
+          "product": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.4222222222222223,
+            "recallAtK": 0.35793650793650794,
+            "ndcgAtK": 0.4463236620317381,
+            "reciprocalRank": 0.5777777777777777,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.40740740740740733
+          },
+          "lexical": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3333333333333333,
+            "recallAtK": 0.3067019400352734,
+            "ndcgAtK": 0.36215262521137725,
+            "reciprocalRank": 0.5436507936507936,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.3333333333333333
+          },
+          "stack": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3111111111111111,
+            "recallAtK": 0.2873015873015872,
+            "ndcgAtK": 0.3510109532204011,
+            "reciprocalRank": 0.49158249158249157,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.2923685573685573
+          }
+        },
+        "supported/holdout": {
+          "product": null,
+          "lexical": null,
+          "stack": null
+        },
+        "supported/combined": {
+          "product": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.4222222222222223,
+            "recallAtK": 0.35793650793650794,
+            "ndcgAtK": 0.4463236620317381,
+            "reciprocalRank": 0.5777777777777777,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.40740740740740733
+          },
+          "lexical": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3333333333333333,
+            "recallAtK": 0.3067019400352734,
+            "ndcgAtK": 0.36215262521137725,
+            "reciprocalRank": 0.5436507936507936,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.3333333333333333
+          },
+          "stack": {
+            "vacancies": 9,
+            "pairs": 246,
+            "precisionAtK": 0.3111111111111111,
+            "recallAtK": 0.2873015873015872,
+            "ndcgAtK": 0.3510109532204011,
+            "reciprocalRank": 0.49158249158249157,
+            "randomPrecisionAtK": 0.3159016101211502,
+            "randomNdcgAtK": 0.33359600380338666,
+            "tieAdjustedPrecisionAtK": 0.2923685573685573
+          }
+        },
+        "all/development": {
+          "product": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.4200000000000001,
+            "recallAtK": 0.3657334332334332,
+            "ndcgAtK": 0.44690989546379767,
+            "reciprocalRank": 0.5838095238095238,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.4173333333333334
+          },
+          "lexical": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.32000000000000006,
+            "recallAtK": 0.30373556998556994,
+            "ndcgAtK": 0.34583373541140844,
+            "reciprocalRank": 0.5229761904761905,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.32000000000000006
+          },
+          "stack": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.3500000000000001,
+            "recallAtK": 0.3134348984348984,
+            "ndcgAtK": 0.39799225571766106,
+            "reciprocalRank": 0.5503787878787878,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.3446204508052334
+          }
+        },
+        "all/holdout": {
+          "product": null,
+          "lexical": null,
+          "stack": null
+        },
+        "all/combined": {
+          "product": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.4200000000000001,
+            "recallAtK": 0.3657334332334332,
+            "ndcgAtK": 0.44690989546379767,
+            "reciprocalRank": 0.5838095238095238,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.4173333333333334
+          },
+          "lexical": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.32000000000000006,
+            "recallAtK": 0.30373556998556994,
+            "ndcgAtK": 0.34583373541140844,
+            "reciprocalRank": 0.5229761904761905,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.32000000000000006
+          },
+          "stack": {
+            "vacancies": 20,
+            "pairs": 457,
+            "precisionAtK": 0.3500000000000001,
+            "recallAtK": 0.3134348984348984,
+            "ndcgAtK": 0.39799225571766106,
+            "reciprocalRank": 0.5503787878787878,
+            "randomPrecisionAtK": 0.3368239408528946,
+            "randomNdcgAtK": 0.3717863245529315,
+            "tieAdjustedPrecisionAtK": 0.3446204508052334
+          }
+        }
+      },
+      "knownStress": {
+        "full": {
+          "precisionAtK": 0.5333333333333333,
+          "recallAtK": 0.7777777777777777,
+          "ndcgAtK": 0.6488972226678018,
+          "reciprocalRank": 0.6527777777777778,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.5513888888888888,
+          "gradedNdcgAtFive": 0.728123411202755,
+          "textOnlyPrecisionAtFive": 0.5333333333333333,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.7777777777777777,
+          "invalidTopFive": 0.08333333333333333
+        },
+        "tfidf": {
+          "precisionAtK": 0.3666666666666667,
+          "recallAtK": 0.5277777777777778,
+          "ndcgAtK": 0.4858567099654499,
+          "reciprocalRank": 0.673611111111111,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.3666666666666667,
+          "gradedNdcgAtFive": 0.5715619697298221,
+          "textOnlyPrecisionAtFive": 0.7166666666666667,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.5277777777777778,
+          "invalidTopFive": 1.75
+        },
+        "stack": {
+          "precisionAtK": 0.3333333333333333,
+          "recallAtK": 0.4861111111111111,
+          "ndcgAtK": 0.4973180161268354,
+          "reciprocalRank": 0.7430555555555555,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.35648148148148145,
+          "gradedNdcgAtFive": 0.5458004132532038,
+          "textOnlyPrecisionAtFive": 0.5,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.4861111111111111,
+          "invalidTopFive": 0.9166666666666666
+        },
+        "hard_filters_tfidf": {
+          "precisionAtK": 0.4666666666666666,
+          "recallAtK": 0.6805555555555557,
+          "ndcgAtK": 0.6234172451706458,
+          "reciprocalRank": 0.7569444444444443,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.4666666666666666,
+          "gradedNdcgAtFive": 0.7508039158364107,
+          "textOnlyPrecisionAtFive": 0.4666666666666666,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.6805555555555557,
+          "invalidTopFive": 0.08333333333333333
+        },
+        "hard_filters_stack": {
+          "precisionAtK": 0.4166666666666667,
+          "recallAtK": 0.5972222222222222,
+          "ndcgAtK": 0.5701617913041683,
+          "reciprocalRank": 0.75,
+          "randomPrecisionAtK": 0.3499999999999999,
+          "randomNdcgAtK": 0.43775129450124606,
+          "tieAdjustedPrecisionAtK": 0.4702380952380952,
+          "gradedNdcgAtFive": 0.6368943326967496,
+          "textOnlyPrecisionAtFive": 0.4166666666666667,
+          "precisionAtFiveCeiling": 0.6999999999999998,
+          "fractionOfAvailableTopFiveRelevant": 0.5972222222222222,
+          "invalidTopFive": 0.08333333333333333
+        }
+      }
+    }
+  ],
+  "frozenKnownStressBaseline": {
+    "full": {
+      "precisionAtK": 0.44999999999999996,
+      "recallAtK": 0.6527777777777778,
+      "ndcgAtK": 0.5450993959299791,
+      "reciprocalRank": 0.611111111111111,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.46388888888888885,
+      "gradedNdcgAtFive": 0.653158746472868,
+      "textOnlyPrecisionAtFive": 0.44999999999999996,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.6527777777777778,
+      "invalidTopFive": 0.08333333333333333
+    },
+    "tfidf": {
+      "precisionAtK": 0.3666666666666667,
+      "recallAtK": 0.5277777777777778,
+      "ndcgAtK": 0.48757050612904945,
+      "reciprocalRank": 0.673611111111111,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.3666666666666667,
+      "gradedNdcgAtFive": 0.5673019999291652,
+      "textOnlyPrecisionAtFive": 0.7166666666666667,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.5277777777777778,
+      "invalidTopFive": 1.75
+    },
+    "stack": {
+      "precisionAtK": 0.3333333333333333,
+      "recallAtK": 0.4861111111111111,
+      "ndcgAtK": 0.4973180161268354,
+      "reciprocalRank": 0.7430555555555555,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.35648148148148145,
+      "gradedNdcgAtFive": 0.5458004132532038,
+      "textOnlyPrecisionAtFive": 0.5,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.4861111111111111,
+      "invalidTopFive": 0.9166666666666666
+    },
+    "hard_filters_tfidf": {
+      "precisionAtK": 0.4666666666666666,
+      "recallAtK": 0.6805555555555557,
+      "ndcgAtK": 0.6285374575001864,
+      "reciprocalRank": 0.7569444444444443,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.4666666666666666,
+      "gradedNdcgAtFive": 0.7515689852153562,
+      "textOnlyPrecisionAtFive": 0.4666666666666666,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.6805555555555557,
+      "invalidTopFive": 0.08333333333333333
+    },
+    "hard_filters_stack": {
+      "precisionAtK": 0.4166666666666667,
+      "recallAtK": 0.5972222222222222,
+      "ndcgAtK": 0.5701617913041683,
+      "reciprocalRank": 0.75,
+      "randomPrecisionAtK": 0.3499999999999999,
+      "randomNdcgAtK": 0.43775129450124606,
+      "tieAdjustedPrecisionAtK": 0.4702380952380952,
+      "gradedNdcgAtFive": 0.6368943326967496,
+      "textOnlyPrecisionAtFive": 0.4166666666666667,
+      "precisionAtFiveCeiling": 0.6999999999999998,
+      "fractionOfAvailableTopFiveRelevant": 0.5972222222222222,
+      "invalidTopFive": 0.08333333333333333
+    }
+  },
+  "baselineCaution": "Generic affirmative-verb extraction also affects candidateResumeSkills, which feeds stress baseline text. Keep the frozen original pure TF-IDF metrics above alongside contemporaneous metrics; do not report their minor nDCG variation as a baseline algorithm improvement.",
+  "freeze": {
+    "files": {
+      "lib/resume-fit.mjs": "4ea26b2e676f6062157eb9978364afc6f61d87ee24589651d14daff0000398c1",
+      "lib/matching.mjs": "80dfdd3cb7711d0b239197a2a797a2194d8acbb8311bad3886705dc6265f923e",
+      "tests/resume-lexical-blend.test.mjs": "ff3f1fde0192cd6ca180d5e1aca6eff952797119700a0dc9c1a0a6683367f3f9",
+      "tests/resume-evidence-balance.test.mjs": "74f7a2eab9c7c03e1a22e5169a5b1e0eff7c0b4945b368ed09ff6b92f0655ef3"
+    },
+    "focusedTests": {
+      "total": 63,
+      "passed": 63,
+      "failed": 0
+    },
+    "freshChallengeOpened": false,
+    "rootPolicyIntegrationPending": true
+  },
+  "limits": [
+    "TalentMatch contains no FSP, product assessment, confirmed-category or availability ground truth: it is partial text-ranking validation only.",
+    "Known authored stress has subjective labels, pre-evaluation review disagreements and is now development data, not a new independent holdout.",
+    "Historical known-holdout H2 P@5=35% belongs to the previous frozen H2 snapshot, not this new blend.",
+    "Self-reported affirmative descriptions are not assessment verification. Mandatory filters and confirmed-grade/category requirements remain authoritative.",
+    "No new embeddings, LLM, learned weights, external API or synthetic-to-real quality claim."
+  ]
+}

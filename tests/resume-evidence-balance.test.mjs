@@ -18,11 +18,12 @@ test('task evidence cannot compensate for missing requested technologies',()=>{
  assert.equal(evidence.skills.length,0);assert.equal(evidence.tasks.length,1);assert.equal(evidence.share,0);
 });
 
-test('balanced partial evidence uses harmonic coverage without changing hard filters',()=>{
+test('balanced partial evidence retains harmonic coverage beneath bounded lexical backfill',()=>{
  const candidate={...base,work:'Разработал API на Python.'};
  const fit=matching(candidate,need);
- assert.equal(fit.resumeEvidence.share,2/3);
- assert.equal(fit.parts.find(p=>p.key==='resume').points,13);
+ assert.equal(fit.resumeEvidence.canonicalShare,2/3);
+ assert.ok(fit.resumeEvidence.share>=2/3&&fit.resumeEvidence.share<=5/6);
+ assert.ok(fit.parts.find(p=>p.key==='resume').points>=13&&fit.parts.find(p=>p.key==='resume').points<=17);
  assert.equal(fit.eligibility.status,'pass');
  assert.equal(fit.score,fit.parts.reduce((sum,p)=>sum+p.points,0));
 });
